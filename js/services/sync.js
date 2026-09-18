@@ -4,17 +4,19 @@ import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.
 import { AppState } from '../state.js';
 
 export const initCloudSync = () => {
+    console.log("🔄 Avvio sincronizzazione cloud in tempo reale...");
+
     // 1. Sincronizzazione Ospiti
     onSnapshot(collection(db, "ospiti"), (snap) => {
         const ospiti = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         AppState.update('ospiti', ospiti);
+        console.log("👥 Ospiti sincronizzati:", ospiti.length);
         
-        // Aggiorna l'interfaccia degli ospiti se la funzione globale è disponibile
         if (typeof window.loadGuests === 'function') {
             window.loadGuests();
         }
     }, (error) => {
-        console.error("Errore sync ospiti:", error);
+        console.error("❌ Errore sync ospiti:", error);
     });
 
     // 2. Sincronizzazione Cartelle Cliniche
@@ -27,7 +29,7 @@ export const initCloudSync = () => {
             window.loadAlerts();
         }
     }, (error) => {
-        console.error("Errore sync cartelle cliniche:", error);
+        console.error("❌ Errore sync cartelle cliniche:", error);
     });
 
     // 3. Sincronizzazione Magazzino

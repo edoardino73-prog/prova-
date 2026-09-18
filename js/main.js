@@ -2,9 +2,9 @@
 import { initFirebase } from './services/firebase-init.js';
 import { initAuth } from './auth.js';
 import { initNavigation } from './ui/navigation.js';
-import { initCloudSync } from './services/sync.js';
+import { initCloudSync } from './services/sync.js'; // 👈 INDISPENSABILE
 
-// Importiamo i moduli funzionali clinici, regionali e di utilità
+// Importiamo tutti i moduli funzionali dell'app
 import './api/clinica.js';
 import './api/flussi.js';
 import './ui/utils.js';
@@ -22,8 +22,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 3. Avvio della navigazione UI e della sidebar
         initNavigation();
         
-        // 4. Avvio dei flussi di dati in tempo reale dal cloud (Ospiti, Clinica, Magazzino)
-        initCloudSync();
+        // 4. Avvio dei flussi di dati in tempo reale dal cloud
+        initCloudSync(); // 👈 ATTIVAZIONE DELLA SINCRONIZZAZIONE
         
         // Controllo sessione locale attiva
         const savedOp = sessionStorage.getItem("activeOperator");

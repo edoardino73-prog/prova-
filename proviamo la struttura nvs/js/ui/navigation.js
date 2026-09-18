@@ -1,0 +1,1 @@
+export const initNavigation = () => { console.log("Navigation stub caricato"); };

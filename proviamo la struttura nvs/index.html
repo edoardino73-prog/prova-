@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NVS Masterpiece - UI Istituzionale (Regione Umbria) & Clinica</title>
+    
+    <!-- Librerie Esterne -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+
+    <!-- CSS Modulare -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Overlay Globali -->
+    <div id="toast-container"></div>
+    <div id="printArea"></div>
+
+    <!-- SCHERMATA PRIVACY E CONSENSO RSA (Ospiti esterni via Smartphone) -->
+    <div id="privacyScreen">
+        <div class="privacy-container" id="privacyMainForm">
+            <div style="text-align:center; margin-bottom:20px;">
+                <h1 style="color:var(--primary-color); margin:0 0 5px 0; font-size:1.5em;">NUOVA VILLA SILVANA</h1>
+                <p style="margin:0; font-weight:bold;">Informativa e Consensi (Privacy e RSA)</p>
+                <p style="font-size:0.9em; color:#475569; margin-top:5px;">Paziente/Ospite: <span id="ospiteNameDisplay" style="color:var(--primary-color); font-size:1.1em; font-weight:bold;">Caricamento...</span></p>
+            </div>
+            
+            <!-- SEZIONE 1: PRIVACY -->
+            <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:15px; border-radius:6px; margin-bottom:20px;">
+                <h3 style="margin:0 0 10px 0; color:var(--primary-color); font-size:1.1em; border-bottom:1px solid #cbd5e1; padding-bottom:5px;">1. Modulistica Ingresso</h3>
+                <div style="font-size:0.85em; line-height:1.4; color:var(--text-main); margin-bottom:15px;">
+                    La informiamo che i dati personali e sensibili raccolti verranno trattati dalla struttura esclusivamente per finalità legate all'assistenza socio-sanitaria, gestione amministrativa e adempimenti di legge (Reg. UE 2016/679 GDPR).
+                </div>
+                
+                <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:12px; font-size:0.9em;">
+                    <input type="checkbox" id="chkPrivacy" onchange="window.checkPrivacyForm()" style="transform:scale(1.3); margin-top:3px; accent-color:var(--primary-color);">
+                    <label for="chkPrivacy" style="color:var(--text-main);"><strong>Privacy:</strong> Acconsento al trattamento dei dati personali e sanitari (Obbligatorio).</label>
+                </div>
+                <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:12px; font-size:0.9em;">
+                    <input type="checkbox" id="chkReg" onchange="window.checkPrivacyForm()" style="transform:scale(1.3); margin-top:3px; accent-color:var(--primary-color);">
+                    <label for="chkReg" style="color:var(--text-main);"><strong>Regolamento:</strong> Dichiaro di aver ricevuto e accettato il Regolamento (Obbligatorio).</label>
+                </div>
+                <div style="display:flex; align-items:flex-start; gap:10px; font-size:0.9em;">
+                    <input type="checkbox" id="chkFoto" style="transform:scale(1.3); margin-top:3px; accent-color:var(--primary-color);">
+                    <label for="chkFoto" style="color:var(--text-main);"><strong>Immagini:</strong> Acconsento all'utilizzo di foto/immagini per fini interni (Facoltativo).</label>
+                </div>
+            </div>
+
+            <!-- SEZIONE 2: CONSENSO INFORMATO RSA -->
+            <div style="background:#f0f9ff; border:1px solid #bae6fd; padding:15px; border-radius:6px; margin-bottom:20px;">
+                <h3 style="margin:0 0 10px 0; color:var(--terapia-color); font-size:1.1em; border-bottom:1px solid #bae6fd; padding-bottom:5px;">2. Consenso Informato Trattamenti</h3>
+                <p style="font-size:0.85em; color:var(--text-main); margin-bottom:12px;">Dichiaro di aver compreso il colloquio informativo con l'équipe medica e acconsento ai seguenti trattamenti (selezionare le voci):</p>
+                
+                <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:15px; font-size:0.9em;">
+                    <label style="display:flex; align-items:flex-start; gap:8px;"><input type="checkbox" id="extAmbitoPai" style="transform:scale(1.3); margin-top:2px;"> Presa in carico Globale e PAI</label>
+                    <label style="display:flex; align-items:flex-start; gap:8px;"><input type="checkbox" id="extAmbitoSanitario" style="transform:scale(1.3); margin-top:2px;"> Terapie mediche e protocolli di routine</label>
+                    <label style="display:flex; align-items:flex-start; gap:8px;"><input type="checkbox" id="extAmbitoVaccinale" style="transform:scale(1.3); margin-top:2px;"> Protocolli di prevenzione (vaccinazioni)</label>
+                    <label style="display:flex; align-items:flex-start; gap:8px;"><input type="checkbox" id="extAmbitoPrivacy" style="transform:scale(1.3); margin-top:2px;"> Contatti con i familiari e aggiornamenti clinici</label>
+                </div>
+
+                <div style="margin-bottom:15px; padding-top:10px; border-top:1px dashed #bae6fd;">
+                    <label style="display:block; font-weight:bold; margin-bottom:8px; font-size:0.9em;">Capacità decisionale dell'ospite:</label>
+                    <div style="display:flex; gap:15px; font-size:0.9em;">
+                        <label style="cursor:pointer;"><input type="radio" name="extCapacita" value="capace" onclick="window.toggleExtRappresentante(false)" checked> Pienamente Capace</label>
+                        <label style="cursor:pointer;"><input type="radio" name="extCapacita" value="incapace" onclick="window.toggleExtRappresentante(true)"> Rappresentato / Supportato</label>
+                    </div>
+                </div>
+
+                <div id="extSezioneRappresentante" style="display:none; margin-bottom:10px; padding-left:10px; border-left:3px solid var(--terapia-color);">
+                    <label style="display:block; font-weight:bold; margin-bottom:5px; font-size:0.9em;">In qualità di:</label>
+                    <select id="extTipoRappresentanza" style="width:100%; padding:10px; border-radius:4px; border:1px solid #cbd5e1; font-size:0.9em;">
+                        <option value="">Seleziona titolo legale...</option>
+                        <option value="ads">Amministratore di Sostegno (AdS)</option>
+                        <option value="tutore">Tutore Legale</option>
+                        <option value="dat">Fiduciario (DAT)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- SEZIONE FIRMA -->
+            <div style="margin-bottom:20px;">
+                <label style="display:block; font-weight:bold; margin-bottom:5px; font-size:0.9em; color:var(--text-main);">Nome e Cognome del Firmatario *</label>
+                <input type="text" id="nomeFirmatario" placeholder="Es. Giuseppe Rossi" oninput="window.checkPrivacyForm()" style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:6px; box-sizing:border-box; font-size:1.1em; font-family:inherit;">
+            </div>
+            
+            <button class="btn-submit-privacy" id="btnFirma" disabled onclick="window.submitConsenso()">Firma Digitalmente e Accetta Tutto</button>
+        </div>
+
+        <div class="privacy-container" id="privacySuccessMessage" style="display:none; text-align:center;">
+            <h1 style="font-size:3em; margin:0 0 10px 0;">✅</h1>
+            <h2 style="color:#059669; margin:0 0 10px 0;">Modulistica Firmata!</h2>
+            <p style="color:var(--text-main);">Grazie <strong id="nomeSuccesso"></strong>. La documentazione clinica e privacy dell'ospite è stata regolarmente aggiornata nel sistema della struttura.</p>
+        </div>
+    </div>
+
+    <!-- SCHERMATA LOGIN -->
+    <div id="loginScreen">
+        <div class="login-header-title">
+            <h1>NUOVA VILLA SILVANA</h1>
+            <h2>Residenza Protetta per Anziani</h2>
+        </div>
+        <div class="login-box">
+            <img src="1000300139_2.jpg" alt="Logo" class="login-logo" onerror="this.style.display='none'">
+            <h2 class="dynamic-greeting" id="loginGreeting" style="color:var(--primary-color);">Benvenuto</h2>
+            <p class="login-subtitle">Sistema Informativo Clinico</p>
+            <label style="display:block; text-align:center; font-size:0.95em; margin-bottom:15px; font-weight:bold; color:var(--text-main);">Seleziona il tuo Profilo</label>
+            <div id="loginProfilesContainer" class="profiles-grid">
+                <p style="color:var(--text-light); width:100%;">Caricamento profili in corso...</p>
+            </div>
+            <div id="loginPinArea" style="display:none; animation: fadeIn 0.3s ease;">
+                <label id="selectedProfileLabel" style="display:block; text-align:center; font-size:0.9em; margin-bottom:10px; font-weight:bold; color:var(--primary-color);"></label>
+                <div class="login-input-wrapper"><input type="password" id="loginPinInput" class="login-input" placeholder="****"></div>
+                <button class="login-btn-master" onclick="window.performLogin()">Accedi al Sistema</button>
+                <button id="backToProfilesBtn" class="btn-doc" style="margin: 15px auto 0 auto; display:block;" onclick="window.resetLoginSelection()">← Cambia Profilo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVBAR E MENU -->
+    <div id="top-nav-container">
+        <div class="navbar">
+            <div class="navbar-brand"><img src="1000300139_2.jpg" class="navbar-logo" style="max-height:30px;" onerror="this.style.display='none'"><span>NVS Masterpiece [Clinica]</span></div>
+            <div class="navbar-actions">
+                <a href="iso_9001_accreditamento.html" target="_blank" class="nav-btn" style="text-decoration:none; color:#fde047; font-weight:bold;">🏆 Area Direzione (ISO)</a>
+                <a href="haccp_sicurezza_dash.html" target="_blank" class="nav-btn" style="text-decoration:none; color:#a7f3d0; font-weight:bold;">🛡️ HACCP e Sicurezza</a>
+                <span class="current-op-badge" id="currentOpBadge">👤 Op</span>
+                <button class="nav-btn" onclick="window.printMasterFascicolo()">🖨️ Stampa Fascicolo PDF</button>
+                <button class="nav-btn" onclick="window.logout()">🚪 Esci</button>
+            </div>
+        </div>
+        <div class="app-menu">
+            <button class="menu-tab active" onclick="window.switchTab('dashboard', this)">🏠 Dashboard</button>
+            <button class="menu-tab" onclick="window.switchTab('ospiti', this)">🛏️ Anagrafica Letti</button>
+            <button class="menu-tab" onclick="window.switchTab('clinica', this)">⚕️ Cartella Clinica & BINA</button>
+            <button class="menu-tab" onclick="window.switchTab('contenzioni', this)" style="color:var(--error-color);">🔒 Registro Contenzioni</button>
+            <button class="menu-tab" style="color:var(--terapia-color);" onclick="window.switchTab('terapia', this)">💊 Terapia & Stupefacenti</button>
+            <button class="menu-tab" onclick="window.switchTab('rischio', this)">⚠️ Rischio Clinico</button>
+            <button class="menu-tab" onclick="window.switchTab('appuntamenti', this)">📅 CUP</button>
+            <button class="menu-tab" onclick="window.switchTab('consegne', this)">📖 Consegne</button>
+            <button class="menu-tab restrict-oss" onclick="window.switchTab('lettere', this)">📄 Lettere & Dimissioni</button>
+            <button class="menu-tab" onclick="window.switchTab('magazzino', this)">📦 Magazzino</button>
+            <button class="menu-tab restrict-oss" onclick="window.switchTab('flussi', this)" style="color:var(--dir-color);">📤 Flussi e Portali</button>
+            <button class="menu-tab" onclick="window.switchTab('storico', this)">🗄️ Storico</button>
+        </div>
+    </div>
+
+    <!-- AREA DI LAVORO -->
+    <div id="appScreen">
+        <div class="sidebar" id="patientSidebar">
+            <div style="padding: 15px; border-bottom: 1px solid var(--border-color); background: white; position: sticky; top: 0; z-index: 2;">
+                <button class="btn-success" style="width:100%; margin-bottom: 10px;" onclick="window.goToNuovoOspite()">➕ Nuovo Ospite</button>
+                <input type="text" id="sidebarSearch" placeholder="🔍 Cerca Paziente..." onkeyup="window.renderSidebarPatients()" style="width:100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box;">
+            </div>
+            <div id="sidebarPatientList" style="padding: 10px; overflow-y: auto; flex: 1;"></div>
+        </div>
+
+        <div class="main-content">
+            
+            <!-- 1. DASHBOARD -->
+            <div id="ws-dashboard" class="workspace active">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h2 id="dash-guests-count" style="margin-bottom:0;">0</h2>
+                        <span id="dash-guests-detail" style="font-size:0.85em; color:var(--text-light); font-weight:normal;">0 Presenti | 0 Assenti</span><br>
+                        <span style="margin-top:5px; display:inline-block; font-size:0.8em; text-transform:uppercase;">Posti Letto Occupati</span>
+                    </div>
+                    <div class="metric-card" style="border-left-color: var(--app-color);"><h2 id="dash-app-count" style="color: var(--app-color);">0</h2><span style="font-size:0.8em; text-transform:uppercase;">Visite Programmate (CUP)</span></div>
+                    <div class="metric-card" style="border-left-color: var(--error-color);"><h2 id="dash-cont-count" style="color: var(--error-color);">0</h2><span style="font-size:0.8em; text-transform:uppercase;">Contenzioni Attive</span></div>
+                </div>
+                
+                <div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom: 20px;">
+                    <div class="card" style="flex:2; min-width:300px; margin-bottom:0; border-top:4px solid var(--warning-color);"><div class="card-header"><h3 style="color:var(--warning-color);">Scadenziario Legale e Alert Clinici</h3></div><div id="dashboardAlertsList"></div></div>
+                    <div class="card" style="flex:1; min-width:300px; margin-bottom:0;"><div class="card-header"><h3>Agenda CUP</h3></div><div id="dashMiniCalendar"></div></div>
+                </div>
+
+                <div style="display:flex; gap:20px; flex-wrap:wrap;">
+                    <div class="card" style="flex: 1; min-width: 300px;">
+                        <div class="card-header"><h3>Statistiche Ospiti</h3></div>
+                        <div class="chart-container" style="height: 180px;"><canvas id="guestChart"></canvas></div>
+                    </div>
+                    <div class="card" style="flex: 1; min-width: 300px; border-top: 4px solid var(--error-color);">
+                        <div class="card-header"><h3 style="color:var(--error-color);">📦 Alert Scorte Magazzini</h3></div>
+                        <div id="dashInvAlertsList" style="max-height: 180px; overflow-y: auto; padding-right: 5px;"></div>
+                    </div>
+                </div>
+
+                <div id="adminPanel" style="display: none;">
+                    <div class="card" style="border-color: var(--dir-color);"><div class="card-header"><h3 style="color:var(--dir-color);">Gestione Staff</h3></div>
+                        <div style="display:flex; gap:12px; margin-bottom:15px; flex-wrap:wrap; background: #f8fafc; padding:15px; border: 1px solid var(--border-color);">
+                            <div style="flex:2; min-width:180px;"><label>Nome e Cognome</label><input type="text" id="newOpInput"></div>
+                            <div style="flex:1; min-width:140px;"><label>Qualifica</label><select id="newOpQualifica"><option value="Amministrazione">Amministrazione</option><option value="Direttore Sanitario">Direttore Sanitario</option><option value="Infermiere" selected>Infermiere</option><option value="Medico">Medico</option><option value="Fisioterapista">Fisioterapista</option><option value="Educatore">Educatore / Animatore</option><option value="OSS">OSS</option><option value="Altro">Altro</option></select></div>
+                            <div style="flex:1; min-width:120px;"><label>PIN</label><input type="password" id="newOpPin"></div>
+                            <div style="flex:1; min-width:140px;"><label>Accesso</label><select id="newOpRole"><option value="user">Standard</option><option value="admin">Admin</option></select></div>
+                            <div style="flex:1; min-width:140px;"><label>Foto (Opz.)</label><input type="file" id="newOpPhoto" accept="image/*" onchange="window.encodeOpPhoto(event)" style="padding:4px; font-size:0.8em;"></div>
+                            <div style="display:flex; align-items:flex-end;"><button class="btn-primary" onclick="window.addOperator()">Aggiungi</button></div>
+                        </div>
+                        <ul class="staff-list" id="operatorList" style="list-style:none; padding:0; display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:10px;"></ul>
+                    </div>
+
+                    <div class="card" style="border-top: 4px solid #475569; margin-top: 20px;">
+                        <div class="card-header"><h3 style="color:#475569;">Impostazioni Struttura (Intestazione Stampe)</h3></div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; background: #f8fafc; padding:15px; border: 1px solid var(--border-color); border-radius:4px;">
+                            <div class="form-group" style="flex:2; min-width:200px;"><label>Denominazione Struttura</label><input type="text" id="strutDenominazione" placeholder="Es. Nuova Villa Silvana"></div>
+                            <div class="form-group" style="flex:1; min-width:150px;"><label>Tipo Struttura</label><input type="text" id="strutTipo" placeholder="Es. Residenza Protetta"></div>
+                            <div class="form-group" style="flex:2; min-width:250px;"><label>Indirizzo Completo</label><input type="text" id="strutIndirizzo" placeholder="Via, CAP, Città, Prov"></div>
+                            <div class="form-group" style="flex:2; min-width:200px;"><label>Ragione Sociale</label><input type="text" id="strutRagioneSociale" placeholder="Es. NVS S.r.l."></div>
+                            <div class="form-group" style="flex:1; min-width:150px;"><label>Partita IVA / CF</label><input type="text" id="strutPiva"></div>
+                            <div class="form-group" style="flex:1; min-width:150px;"><label>Telefono</label><input type="text" id="strutTelefono"></div>
+                            <div class="form-group" style="flex:1.5; min-width:200px;"><label>Email / PEC</label><input type="text" id="strutEmail"></div>
+                            <div style="display:flex; align-items:flex-end; width:100%; justify-content:flex-end; margin-top:10px;">
+                                <button class="btn-primary" style="background:#475569; padding: 10px 20px;" onclick="window.saveDatiStruttura()">💾 Salva Dati Struttura</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. ANAGRAFICA OSPITI -->
+            <div id="ws-ospiti" class="workspace">
+                <div class="card restrict-oss">
+                    <div class="card-header">
+                        <h3 id="anagraficaFormTitle">Nuovo Ingresso / Anagrafica</h3>
+                        <button class="btn-doc" onclick="window.resetAnagraficaForm()">🔄 Svuota Campi / Nuovo Ospite</button>
+                    </div>
+
+                    <div class="form-group" style="background:#e0f2fe; padding:10px; border:1px solid #bae6fd; border-radius:4px; margin-bottom:15px;">
+                        <label style="color:#0284c7;"><strong>✏️ Modifica Anagrafica / Recupera Ospite</strong> (seleziona per precompilare)</label>
+                        <select id="editAnagraficaSelect" onchange="window.loadAnagraficaForEdit()" style="border-color:#0284c7;">
+                            <option value="">-- ➕ Crea Nuovo Ospite (Svuota Campi) --</option>
+                        </select>
+                    </div>
+                    
+                    <div style="background: #fef9c3; border: 1px solid #fde047; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+                        <label style="color: #854d0e; font-weight: bold; margin-bottom: 8px; display:block;">Autocompilazione da Tessera Sanitaria (Nuovi Ingressi)</label>
+                        <div style="display:flex; gap:10px;">
+                            <input type="text" id="tsBarcodeScanner" placeholder="Spara Barcode TEAM..." onkeypress="window.handleTSBarcode(event)" style="border-color:#fde047; background:#fff; flex:1;">
+                            <button type="button" class="btn-success" onclick="window.leggiSmartCardTS()" style="white-space: nowrap; padding: 10px 15px;">💳 Leggi Smart Card</button>
+                        </div>
+                    </div>
+
+                    <div class="section-box">
+                        <h4>1. Dati Generali e Nascita (Per Portale Alloggiati)</h4>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                            <div class="form-group" style="flex:1.5;">
+                                <label>Cognome * <span style="font-size:0.8em;color:#64748b;font-weight:normal;">(Obbligatorio Alloggiati)</span></label>
+                                <input type="text" id="newGuestCognome" style="border: 2px solid var(--error-color);">
+                            </div>
+                            <div class="form-group" style="flex:1.5;">
+                                <label>Nome * <span style="font-size:0.8em;color:#64748b;font-weight:normal;">(Obbligatorio Alloggiati)</span></label>
+                                <input type="text" id="newGuestNome" style="border: 2px solid var(--error-color);">
+                            </div>
+                            <div class="form-group" style="flex:0.5;"><label>Sesso</label><select id="newGuestSesso" style="border: 2px solid var(--error-color);"><option value="M">M</option><option value="F">F</option></select></div>
+                            <div class="form-group" style="flex:1;"><label>Data Nascita *</label><input type="date" id="newGuestDob" style="border: 2px solid var(--error-color);"></div>
+                            <div class="form-group" style="flex:1.5;"><label>Codice Fiscale *</label><input type="text" id="newGuestCF" style="border: 2px solid var(--error-color);"></div>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <div class="form-group" style="flex:2;">
+                                <label>Comune o Stato Estero di Nascita *</label>
+                                <input type="text" id="newGuestPob" list="comuniList" onchange="window.fillComune('Pob')" placeholder="Inizia a digitare..." style="border: 2px solid var(--error-color);">
+                            </div>
+                            <div class="form-group" style="flex:0.5;"><label>Prov.</label><input type="text" id="newGuestPobProv" maxlength="2" readonly style="border: 2px solid var(--error-color);"></div>
+                            <div class="form-group" style="flex:1.5;"><label>Codice Alloggiati Nascita</label><input type="text" id="newGuestPobCod" placeholder="Calcolo Auto..." readonly></div>
+                            <div class="form-group" style="flex:1.5;"><label>Cod. Cittadinanza *</label><input type="text" id="newGuestCittadinanza" value="100000100" placeholder="Italia = 100000100" style="border: 2px solid var(--error-color);"></div>
+                        </div>
+                    </div>
+
+                    <div class="section-box">
+                        <h4>2. Luogo di Residenza e Dati Ingresso</h4>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                            <div class="form-group" style="flex:2;"><label>Indirizzo (Via/Piazza)</label><input type="text" id="newGuestResInd"></div>
+                            <div class="form-group" style="flex:2;">
+                                <label>Comune di Residenza *</label>
+                                <input type="text" id="newGuestResCom" list="comuniList" onchange="window.fillComune('Res')" placeholder="Inizia a digitare...">
+                            </div>
+                            <div class="form-group" style="flex:0.5;"><label>Prov.</label><input type="text" id="newGuestResProv" maxlength="2" readonly></div>
+                            <div class="form-group" style="flex:1.5;"><label>Codice Alloggiati Resid.</label><input type="text" id="newGuestResCod" placeholder="Calcolo Auto..." readonly></div>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <div class="form-group" style="flex:1;"><label>Data Ingresso in Struttura *</label><input type="date" id="newGuestIngresso" style="border: 2px solid var(--error-color);"></div>
+                            <div class="form-group" style="flex:1;"><label>Stanza Assegnata</label><input type="text" id="newGuestRoom"></div>
+                            <div class="form-group" style="flex:1.5;"><label>Foto Profilo</label><input type="file" id="newGuestPhoto" accept="image/*" onchange="window.processFileUpload(event, 'newPhoto')" style="background:#fff;"></div>
+                        </div>
+                    </div>
+
+                    <div class="section-box">
+                        <h4>3. Estremi Documento Identità (Obbligatori per Alloggiati Web)</h4>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                            <div class="form-group" style="flex:1;">
+                                <label>Tipo Doc *</label>
+                                <select id="newGuestDocTipo" style="border: 2px solid var(--error-color);">
+                                    <option value="IDENT">Carta d'Identità</option>
+                                    <option value="PASSP">Passaporto</option>
+                                    <option value="PATEN">Patente</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="flex:1.5;"><label>Numero Documento *</label><input type="text" id="newGuestDocNum" style="text-transform:uppercase; border: 2px solid var(--error-color);"></div>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                            <div class="form-group" style="flex:2;">
+                                <label>Comune Rilascio *</label>
+                                <input type="text" id="newGuestDocRilascioNome" list="comuniList" onchange="window.fillComune('Doc')" placeholder="Inizia a digitare..." style="border: 2px solid var(--error-color);">
+                            </div>
+                            <div class="form-group" style="flex:1.5;"><label>Codice Alloggiati Rilascio *</label><input type="text" id="newGuestDocRilascioCod" placeholder="Calcolo Auto..." readonly style="border: 2px solid var(--error-color);"></div>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <div class="form-group" style="flex:1;"><label>Data Rilascio</label><input type="date" id="newGuestDocDataRil"></div>
+                            <div class="form-group" style="flex:1;"><label>Data Scadenza</label><input type="date" id="newGuestDocDataScad"></div>
+                        </div>
+                    </div>
+
+                    <div class="section-box">
+                        <h4>4. Figure di Riferimento, Tutela Legale e U.V.M.</h4>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                            <div class="form-group" style="flex:2;"><label>Nome Familiare</label><input type="text" id="newGuestRef"></div>
+                            <div class="form-group" style="flex:1;"><label>Parentela</label><select id="newGuestRefParentela"><option value="Figlio/a">Figlio/a</option><option value="Coniuge">Coniuge</option><option value="Altro">Altro</option></select></div>
+                            <div class="form-group" style="flex:1.5;"><label>Telefono Familiare</label><input type="text" id="newGuestRefTel"></div>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                            <div class="form-group" style="flex:2;"><label>Medico di Base (MMG)</label><input type="text" id="newGuestMMG"></div>
+                            <div class="form-group" style="flex:1;"><label>Telefono MMG</label><input type="text" id="newGuestMMGTel"></div>
+                            <div class="form-group" style="flex:1.5;"><label>Email MMG</label><input type="text" id="newGuestMMGEmail"></div>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; border-bottom:1px dashed #cbd5e1; padding-bottom:10px;">
+                            <div class="form-group" style="flex:2;"><label>Nome Tutore / AdS</label><input type="text" id="newGuestTutore"></div>
+                            <div class="form-group" style="flex:1.5;"><label>Tel. e Email AdS</label><input type="text" id="newGuestTutoreTel" placeholder="Telefono o Email"></div>
+                            <div class="form-group" style="flex:1;"><label>Scadenza Legale</label><input type="date" id="newGuestTutoreScadenza"></div>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <div class="form-group" style="flex:1;"><label>Data Verbale U.V.M.</label><input type="date" id="newGuestUVMData"></div>
+                            <div class="form-group" style="flex:1;"><label>Punteggio</label><input type="text" id="newGuestUVMPunteggio"></div>
+                            <div class="form-group" style="flex:1.5;"><label>Verbale U.V.M. (PDF)</label><input type="file" id="newGuestDocUVM" accept="image/*,application/pdf" onchange="window.processFileUpload(event, 'newUvm')" style="background:#fff;"></div>
+                        </div>
+                    </div>
+
+                    <!-- MODULO INTEGRATO: CONSENSO INFORMATO E CAPACITÀ DECISIONALE (RSA) -->
+                    <div class="section-box" style="border-left: 4px solid var(--terapia-color);">
+                        <h4>4 bis. Consenso Informato e Valutazione Capacità (RSA)</h4>
+                        <div class="form-group">
+                            <label>L'ospite è capace di esprimere un consenso libero e informato?</label>
+                            <div class="radio-group" style="display:flex; gap:20px; margin-top:5px;">
+                                <label style="font-weight:normal; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="radio" name="capacitaDecisionale" value="capace" onclick="window.toggleRappresentante(false)" checked> Sì (Autonomo)</label>
+                                <label style="font-weight:normal; display:flex; align-items:center; gap:5px; cursor:pointer;"><input type="radio" name="capacitaDecisionale" value="incapace" onclick="window.toggleRappresentante(true)"> No (Supportato / Rappresentato)</label>
+                            </div>
+                        </div>
+
+                        <div id="sezioneRappresentante" class="conditional-field" style="display:none; margin-top:10px; padding-left:15px; border-left:3px solid var(--primary-color);">
+                            <div class="form-group">
+                                <label>Titolo del Rappresentante Legale:</label>
+                                <select id="newGuestTipoRappresentanza" onchange="window.toggleDatiRappresentante()">
+                                    <option value="">Seleziona titolo...</option>
+                                    <option value="ads">Amministratore di Sostegno (AdS)</option>
+                                    <option value="tutore">Tutore Legale</option>
+                                    <option value="dat">Disposizioni Anticipate di Trattamento (DAT)</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="gruppoNomeRappresentante" style="display:none;">
+                                <label>Nome e Cognome del Rappresentante / Fiduciario:</label>
+                                <input type="text" id="newGuestNomeRappresentante" placeholder="Es. Luigi Rossi">
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top:15px;">
+                            <label>Tipologia di Trattamento / Presa in carico:</label>
+                            <div style="display:flex; flex-direction:column; gap:8px; margin-top:5px;">
+                                <label style="display:flex; align-items:center; gap:8px; font-weight:normal;"><input type="checkbox" id="ambitoPai" style="width:auto; transform:scale(1.2);"> Presa in carico Globale e Piano Assistenziale Individualizzato (PAI)</label>
+                                <label style="display:flex; align-items:center; gap:8px; font-weight:normal;"><input type="checkbox" id="ambitoSanitario" style="width:auto; transform:scale(1.2);"> Terapie mediche e protocolli assistenziali di routine</label>
+                                <label style="display:flex; align-items:center; gap:8px; font-weight:normal;"><input type="checkbox" id="ambitoVaccinale" style="width:auto; transform:scale(1.2);"> Protocolli di prevenzione e profilassi (es. vaccinazioni)</label>
+                                <label style="display:flex; align-items:center; gap:8px; font-weight:normal;"><input type="checkbox" id="ambitoPrivacy" style="width:auto; transform:scale(1.2);"> Trattamento dati sensibili / Cartella clinica e contatti familiari</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top:15px;">
+                            <label>Note sul colloquio informativo (Sintesi rischi, benefici e alternative):</label>
+                            <textarea id="newGuestNoteColloquio" placeholder="Sintesi del colloquio con l'équipe medica..." style="width:100%; padding:8px; border:1px solid #94a3b8; border-radius:4px;"></textarea>
+                        </div>
+
+                        <div style="margin-top:15px; background:#f0fdf4; border:1px solid #bbf7d0; padding:15px; border-radius:4px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                            <strong style="color:var(--success-color);">Firma Consenso Informato via QR Code</strong>
+                            <small style="color:var(--text-light); margin-bottom:10px; display:block;">Genera il QR code specifico per la firma digitale del consenso da parte dell'ospite o del rappresentante.</small>
+                            
+                            <div id="consensoQRCodeContainer" style="height:120px; width:120px; background:#fff; border:1px solid #cbd5e1; border-radius:4px; display:flex; align-items:center; justify-content:center; margin-bottom:10px;">
+                                <span style="color:#94a3b8; font-size:0.75em;">In attesa...</span>
+                            </div>
+                            
+                            <button class="btn-success" onclick="window.generateConsensoQR()" style="width:100%;">📱 Genera QR Code Consenso</button>
+                            <div id="consensoStatusBadge" style="margin-top:10px; font-size:0.85em; display:none;"></div>
+                        </div>
+                    </div>
+
+                    <div class="section-box" style="border-left: 4px solid var(--primary-color);">
+                        <h4>5. Scansioni e Consensi Privacy (QR Code)</h4>
+                        <div style="display:flex; gap:15px; flex-wrap:wrap; align-items:center; margin-bottom: 20px;">
+                            <div class="form-group" style="flex:1; min-width:200px;"><label>Doc. Identità (Foto/PDF)</label><input type="file" id="newGuestDocId" accept="image/*,application/pdf" onchange="window.processFileUpload(event, 'newId')" style="background:#fff;"></div>
+                            <div class="form-group" style="flex:1; min-width:200px;"><label>Cod. Fiscale / TEAM (Foto/PDF)</label><input type="file" id="newGuestDocCf" accept="image/*,application/pdf" onchange="window.processFileUpload(event, 'newCf')" style="background:#fff;"></div>
+                        </div>
+                        
+                        <div style="display:flex; gap:20px; flex-wrap:wrap; background:#f8fafc; padding:15px; border-radius:4px; border:1px solid var(--border-color);">
+                            <div style="flex:2; display:flex; flex-direction:column; gap:12px; justify-content:center;">
+                                <div id="privacyStatusBadge" style="margin-bottom:10px; font-size:0.85em; display:none;"></div>
+                                
+                                <label style="display:flex; align-items:center; gap:8px;">
+                                    <input type="checkbox" id="newGuestConsensoPrivacy" style="width:auto; transform:scale(1.2);"> 
+                                    <span><strong>Privacy:</strong> Autorizzazione trattamento dati sanitari.</span>
+                                </label>
+                                <label style="display:flex; align-items:center; gap:8px;">
+                                    <input type="checkbox" id="newGuestConsensoFoto" style="width:auto; transform:scale(1.2);"> 
+                                    <span><strong>Immagini:</strong> Uso foto per fini interni.</span>
+                                </label>
+                                <label style="display:flex; align-items:center; gap:8px;">
+                                    <input type="checkbox" id="newGuestConsensoReg" style="width:auto; transform:scale(1.2);"> 
+                                    <span><strong>Regolamento:</strong> Copia firmata consegnata.</span>
+                                </label>
+                            </div>
+                            
+                            <div style="flex:1.5; background:#f0fdf4; border:1px solid #bbf7d0; padding:15px; border-radius:4px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                                <strong style="color:var(--success-color);">Firma Privacy via QR Code</strong>
+                                <small style="color:var(--text-light); margin-bottom:10px; display:block;">Fai inquadrare al familiare per accettazione digitale.</small>
+                                
+                                <div id="privacyQRCodeContainer" style="height:120px; width:120px; background:#fff; border:1px solid #cbd5e1; border-radius:4px; display:flex; align-items:center; justify-content:center; margin-bottom:10px;">
+                                    <span style="color:#94a3b8; font-size:0.75em;">In attesa...</span>
+                                </div>
+                                
+                                <button class="btn-success" onclick="window.generatePrivacyQR()" style="width:100%;">📱 Genera QR Code</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button id="anagraficaSaveBtn" class="btn-primary" style="width:100%; padding:12px; font-size:1.1em; background:var(--primary-color);" onclick="window.saveAnagrafica()">💾 Registra Nuovo Ospite</button>
+                </div>
+                
+                <div class="card restrict-oss" style="border-left: 4px solid var(--warning-color);">
+                    <div class="card-header"><h3 style="color:var(--warning-color);">Registro Movimenti</h3><button class="btn-export" onclick="window.exportFARUmbria()">📊 Esporta Flusso FAR (USL Umbria)</button></div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; background: #f8fafc; padding: 10px; border: 1px solid var(--border-color);">
+                        <div class="form-group" style="flex:2;"><label>Ospite</label><select id="movGuestSelect"><option value="" disabled selected>Scegli...</option></select></div><div class="form-group" style="flex:1;"><label>Movimento</label><select id="movTipo"><option value="RICOVERO">Ricovero</option><option value="FAMIGLIA">Famiglia</option><option value="RIENTRO">Rientro</option></select></div><div class="form-group" style="flex:1;"><label>Data</label><input type="date" id="movData"></div><div class="form-group" style="flex:2;"><label>Note</label><input type="text" id="movNote"></div><div style="display:flex; align-items:flex-end;"><button class="btn-primary" onclick="window.addMovimento()">Registra</button></div>
+                    </div>
+                </div>
+                <div class="card"><div class="card-header"><h3>Elenco Ospiti in Struttura</h3></div><div class="guest-grid" id="guestGrid"></div></div>
+            </div>
+
+            <!-- 3. CARTELLA CLINICA E BINA (UX Ottimizzata) -->
+            <div id="ws-clinica" class="workspace">
+                
+                <div class="card" style="margin-bottom: 10px;">
+                    <div class="form-group" style="margin:0;">
+                        <label>Seleziona Fascicolo Paziente</label>
+                        <select id="clinicalGuestSelect" class="input-required" onchange="window.handlePatientSelect('clinicalGuestSelect')" style="padding: 10px; font-size: 1.1em;">
+                            <option value="" disabled selected>Scegli un ospite dalla lista...</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="clinicalContent" style="display:none; position: relative;">
+                    <!-- Header Sticky -->
+                    <div class="sticky-clinical-header" id="clinicalHeader"></div>
+                    
+                    <!-- Anagrafica Rapida Collapsable (Minimizza il carico visivo) -->
+                    <details class="card restrict-oss" style="border-left: 4px solid var(--primary-color); margin-bottom: 20px;">
+                        <summary style="font-size: 1em; font-weight: bold; color: var(--primary-color); cursor: pointer; outline: none;">📋 Consulta / Modifica Anagrafica Rapida e Documenti</summary>
+                        <div style="margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                <div class="form-group" style="flex:2;"><label>Nome</label><input type="text" id="editGuestName" readonly style="background:#f1f5f9; font-weight:bold;"></div>
+                                <div class="form-group" style="flex:1;"><label>CF</label><input type="text" id="editGuestCF" style="text-transform: uppercase;"></div>
+                                <div class="form-group" style="flex:1;"><label>Stanza</label><input type="text" id="editGuestRoom"></div>
+                            </div>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap; background:#f8fafc; padding:10px; border:1px solid #cbd5e1; margin-bottom:15px;"><div class="form-group" style="flex:2;"><label>Ref</label><input type="text" id="editGuestRef"></div><div class="form-group" style="flex:1;"><label>Tel Ref</label><input type="text" id="editGuestRefTel"></div><div class="form-group" style="flex:2;"><label>MMG</label><input type="text" id="editGuestMMG"></div><div class="form-group" style="flex:1;"><label>Scadenza AdS/Tutore</label><input type="date" id="editGuestTutoreScadenza"></div></div>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap; background:#f0f9ff; padding:10px; border:1px solid #bae6fd; margin-bottom:15px;"><div class="form-group" style="flex:1;"><label>Data U.V.M.</label><input type="date" id="editGuestUVMData"></div><div class="form-group" style="flex:1;"><label>Punteggio U.V.M.</label><input type="text" id="editGuestUVMPunteggio"></div><div class="form-group" style="flex:1; min-width:200px;"><label>Aggiorna Verbale U.V.M.</label><input type="file" id="editGuestDocUVM" accept="image/*,application/pdf" onchange="window.processFileUpload(event, 'editUvm')" style="background:#fff;"><div id="viewGuestDocUvm" style="margin-top:5px;"></div></div></div>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;"><div class="form-group" style="flex:1; min-width:200px;"><label>Cambia Foto Profilo</label><input type="file" id="editGuestPhoto" accept="image/*" onchange="window.processFileUpload(event, 'editPhoto')" style="background:#fff;"></div><div class="form-group" style="flex:1; min-width:200px;"><label>Aggiorna Doc. Identità</label><input type="file" id="editGuestDocId" accept="image/*,application/pdf" onchange="window.processFileUpload(event, 'editId')" style="background:#fff;"><div id="viewGuestDocId" style="margin-top:5px;"></div></div><div class="form-group" style="flex:1; min-width:200px;"><label>Aggiorna CF/TEAM</label><input type="file" id="editGuestDocCf" accept="image/*,application/pdf" onchange="window.processFileUpload(event, 'editCf')" style="background:#fff;"><div id="viewGuestDocCf" style="margin-top:5px;"></div></div></div>
+                            <button class="btn-success" style="margin-top:10px;" onclick="window.updateGuestData()">💾 Aggiorna Dati</button>
+                        </div>
+                    </details>
+
+                    <!-- Area Parametri Vitali ad Alta Frequenza (Spostata in alto per ergonomia) -->
+                    <div class="card" style="border-top: 4px solid var(--secondary-color);">
+                        <div class="card-header"><h3 style="color:var(--secondary-color);">📊 Inserimento Rapido Parametri Vitali</h3></div>
+                        <div class="restrict-oss vitals-input-group">
+                            <div class="form-group" style="flex:1; min-width:90px;">
+                                <label>PA (mmHg)</label>
+                                <input type="text" id="vitPA" placeholder="es. 120/80" tabindex="1">
+                            </div>
+                            <div class="form-group" style="flex:1; min-width:80px;">
+                                <label>FC (bpm)</label>
+                                <input type="number" id="vitFC" min="30" max="220" placeholder="00" tabindex="2">
+                            </div>
+                            <div class="form-group" style="flex:1; min-width:80px;">
+                                <label>SpO2 (%)</label>
+                                <input type="number" id="vitSPO2" min="50" max="100" placeholder="98" tabindex="3">
+                            </div>
+                            <div class="form-group" style="flex:1; min-width:80px;">
+                                <label>TC (°C)</label>
+                                <input type="number" id="vitTC" step="0.1" min="34.0" max="42.0" placeholder="36.5" tabindex="4">
+                            </div>
+                            <div style="display:flex; align-items:flex-end;">
+                                <button class="btn-primary" tabindex="5" style="padding: 10px 20px; font-size: 1em;" onclick="window.addVitals()">Registra</button>
+                            </div>
+                        </div>
+                        <table class="data-table" id="vitalsTable" style="margin-top:15px;">
+                            <thead><tr><th>Data/Ora</th><th>Op</th><th>PA</th><th>FC</th><th>SpO2</th><th>TC</th><th class="restrict-oss">Del</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Check-in e Mappe -->
+                    <div class="card">
+                        <div class="card-header"><h3>Check-in e Mappatura Lesioni</h3></div>
+                        <div class="form-group"><label>Condizioni Generali all'Arrivo</label><textarea id="chkGen" class="restrict-oss-input" rows="2"></textarea></div>
+                        <div class="form-group"><label>Piaghe/Lesioni</label><textarea id="chkPiaghe" class="restrict-oss-input" rows="2"></textarea></div>
+                        
+                        <div class="form-group restrict-oss">
+                            <label>Mappa Anatomica (Clicca per segnare lesioni decubito)</label>
+                            <div id="bodyMapWrapper" style="position:relative; width: 100%; max-width: 350px; margin: 10px 0; border: 1px solid var(--border-color); background: #fff;" onclick="window.handleBodyMapClick(event)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 250" id="bodyMapSvg" style="width:100%; height:auto; display:block; cursor:crosshair; pointer-events:none;"><g transform="translate(40, 30)"><text x="35" y="-10" text-anchor="middle" font-size="12" font-weight="bold" fill="#64748b">FRONTE</text><circle cx="35" cy="15" r="18" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/><rect x="10" y="38" width="50" height="75" rx="4" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/><rect x="-8" y="42" width="12" height="65" rx="2" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1" transform="rotate(10, -2, 42)"/><rect x="66" y="42" width="12" height="65" rx="2" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1" transform="rotate(-10, 72, 42)"/><rect x="14" y="118" width="18" height="80" rx="2" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/><rect x="38" y="118" width="18" height="80" rx="2" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/></g><g transform="translate(190, 30)"><text x="35" y="-10" text-anchor="middle" font-size="12" font-weight="bold" fill="#64748b">RETRO</text><circle cx="35" cy="15" r="18" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/><rect x="10" y="38" width="50" height="75" rx="4" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/><rect x="-8" y="42" width="12" height="65" rx="2" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1" transform="rotate(10, -2, 42)"/><rect x="66" y="42" width="12" height="65" rx="2" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1" transform="rotate(-10, 72, 42)"/><rect x="14" y="118" width="18" height="80" rx="2" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/><rect x="38" y="118" width="18" height="80" rx="2" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/></g></svg><div id="bodyMarkersLayer" style="position:absolute; top:0; left:0; width:100%; height:100%;"></div></div><button class="btn-doc" onclick="window.clearBodyMarkers()">Cancella Punti</button>
+                        </div>
+                        <div class="restrict-oss" style="display:flex; gap:10px; margin-top:10px;">
+                            <button class="btn-success" onclick="window.saveClinicalData()">💾 Salva Check-in</button>
+                        </div>
+                    </div>
+
+                    <div class="card" style="border-top: 4px solid var(--primary-color);"><div class="card-header"><h3>🏃‍♂️ Scheda Fisioterapica (FKT)</h3></div><div class="form-group"><label>Valutazione Motoria Iniziale / Attuale</label><textarea id="fktValutazione" class="restrict-oss-input" rows="3"></textarea></div><div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:15px;"><div class="form-group" style="flex:1;"><label>Ausili in Uso</label><input type="text" id="fktAusili" class="restrict-oss-input"></div></div><div class="form-group"><label>Piano di Trattamento / Obiettivi</label><textarea id="fktObiettivi" class="restrict-oss-input" rows="2"></textarea></div><div class="restrict-oss" style="display:flex; gap:10px; margin-top:10px;"><button class="btn-success" onclick="window.saveClinicalData()">💾 Salva Scheda FKT</button></div></div>
+                    
+                    <!-- MODULO B.I.N.A. REGIONE UMBRIA -->
+                    <div class="card" style="border-top: 4px solid var(--primary-color);">
+                        <div class="card-header">
+                            <h3 style="color:var(--primary-color);">🏛️ Scheda Valutazione B.I.N.A. (Regione Umbria)</h3>
+                            <button class="btn-primary" onclick="window.calcolaBINA()">📊 Calcola Indice B.I.N.A.</button>
+                        </div>
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:15px; background:#f8fafc; padding:15px; border:1px solid var(--border-color); margin-bottom:15px;">
+                            <div class="form-group">
+                                <label>1. Non Autosufficienza (0-10)</label>
+                                <input type="number" id="binaAuto" min="0" max="10" step="0.5" class="restrict-oss-input" placeholder="0 = Autonomo, 10 = Grave">
+                            </div>
+                            <div class="form-group">
+                                <label>2. Stato Sanitario / Cura (0-10)</label>
+                                <input type="number" id="binaSanita" min="0" max="10" step="0.5" class="restrict-oss-input" placeholder="Comorbidità/Trattamenti">
+                            </div>
+                            <div class="form-group">
+                                <label>3. Stato Psichico / Comportamento (0-10)</label>
+                                <input type="number" id="binaPsiche" min="0" max="10" step="0.5" class="restrict-oss-input" placeholder="Demenza/Disturbi">
+                            </div>
+                            <div class="form-group">
+                                <label>4. Condizione Socio-Relazionale (0-10)</label>
+                                <input type="number" id="binaSociale" min="0" max="10" step="0.5" class="restrict-oss-input" placeholder="Rete familiare/supporto">
+                            </div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:#e0f2fe; padding:12px; border-radius:4px;">
+                            <div>
+                                <strong>Punteggio B.I.N.A. Totale:</strong> <span id="binaScoreBadge" style="font-size:1.3em; font-weight:bold; color:var(--primary-color);">- / 40</span>
+                                <div id="binaClasseBadge" style="font-size:0.85em; color:#0369a1; margin-top:2px;">Classe di Intensità: Da calcolare</div>
+                            </div>
+                            <button class="btn-success restrict-oss" onclick="window.saveClinicalData()">💾 Salva B.I.N.A.</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header"><h3>P.A.I. Multidisciplinare</h3><button class="btn-primary restrict-oss" onclick="window.archiviaNuovoPAI()">➕ Nuovo PAI (Archivia)</button></div>
+                        <div id="paiStatusBanner"></div>
+                        <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:15px;"><div class="form-group" style="flex:1;"><label>Data Stesura</label><input type="date" id="paiDataStesura" class="restrict-oss-input" onchange="window.calcProssimaRevisione()"></div><div class="form-group" style="flex:1;"><label>Scadenza</label><input type="date" id="paiDataRevisione" class="restrict-oss-input" onchange="window.aggiornaBannerPAI()"></div></div>
+                        <div class="form-group"><label>Medica</label><textarea id="paiMedico" class="restrict-oss-input" rows="2"></textarea></div>
+                        <div class="form-group"><label>Infermieristica</label><textarea id="paiInfermieristico" class="restrict-oss-input" rows="2"></textarea></div>
+                        <div class="form-group"><label>Assistenziale (OSS)</label><textarea id="paiAssistenziale" class="restrict-oss-input" rows="2"></textarea></div>
+                        <div class="form-group restrict-oss"><label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="paiCondiviso" class="restrict-oss-input"><span>🤝 P.A.I. condiviso con Ospite/Familiare.</span></label></div>
+                        
+                        <div style="background:#f8fafc; border:1px solid var(--border-color); padding:15px; border-radius:4px; margin-bottom:15px;">
+                            <h4 style="margin:0 0 10px 0; color:var(--primary-color);">Firme P.A.I. Multidisciplinare</h4>
+                            <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                                <div style="flex:1; min-width:180px; background:#f0fdf4; border:1px solid #bbf7d0; padding:10px; border-radius:4px; text-align:center;">
+                                    <strong style="color:#166534;">Medico / Dir. Sanitario</strong><br>
+                                    <span id="paiFirmaMedStatus" style="font-size:0.85em; color:var(--text-light); display:block; margin:5px 0;">Non validato</span>
+                                    <input type="hidden" id="paiFirmaMedDate">
+                                    <button class="btn-primary" style="margin-top:5px; width:100%; font-size:0.85em; background:#15803d;" onclick="window.firmaPAI('Medico')">Firma Medico</button>
+                                </div>
+                                <div style="flex:1; min-width:180px; background:#f0f9ff; border:1px solid #bae6fd; padding:10px; border-radius:4px; text-align:center;">
+                                    <strong style="color:#0369a1;">Infermiere</strong><br>
+                                    <span id="paiFirmaInfStatus" style="font-size:0.85em; color:var(--text-light); display:block; margin:5px 0;">Non validato</span>
+                                    <input type="hidden" id="paiFirmaInfDate">
+                                    <button class="btn-primary" style="margin-top:5px; width:100%; font-size:0.85em; background:#0284c7;" onclick="window.firmaPAI('Infermiere')">Firma Infermiere</button>
+                                </div>
+                                <div style="flex:1; min-width:180px; background:#fffbeb; border:1px solid #fde68a; padding:10px; border-radius:4px; text-align:center;">
+                                    <strong style="color:#b45309;">O.S.S.</strong><br>
+                                    <span id="paiFirmaOssStatus" style="font-size:0.85em; color:var(--text-light); display:block; margin:5px 0;">Non validato</span>
+                                    <input type="hidden" id="paiFirmaOssDate">
+                                    <button class="btn-primary" style="margin-top:5px; width:100%; font-size:0.85em; background:#d97706;" onclick="window.firmaPAI('OSS')">Firma OSS</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="restrict-oss" style="display:flex; gap:10px; margin-top:10px;"><button class="btn-success" onclick="window.saveClinicalData()">💾 Salva Testi PAI</button></div>
+                        <div id="paiStoricoList" style="margin-top:20px; border-top:2px solid var(--border-color); padding-top:15px;"></div>
+                    </div>
+                    
+                    <div class="card"><div class="card-header"><h3>V.M.D. Scale</h3></div><div style="display:flex; gap:15px; flex-wrap:wrap; background: #f8fafc; padding: 15px; border: 1px solid var(--border-color);"><div class="form-group"><label>ADL</label><input type="number" id="vmdADL" class="restrict-oss-input"></div><div class="form-group"><label>IADL</label><input type="number" id="vmdIADL" class="restrict-oss-input"></div><div class="form-group"><label>MMSE</label><input type="number" id="vmdMMSE" class="restrict-oss-input" step="0.1"></div><div class="form-group"><label>Braden</label><input type="number" id="vmdBraden" class="restrict-oss-input"></div><div class="form-group"><label>Morse</label><input type="number" id="vmdMorse" class="restrict-oss-input"></div></div><div class="restrict-oss" style="display:flex; gap:10px; margin-top:10px;"><button class="btn-success" onclick="window.saveClinicalData()">💾 Salva Scale</button></div></div>
+                    <div class="card"><div class="card-header"><h3>📎 Documenti PDF e Immagini</h3></div><div class="form-group restrict-oss"><input type="file" id="newDocUpload" accept="image/*,application/pdf" onchange="window.handlePatientDocUpload(event)" style="padding:10px; border:2px dashed var(--primary-color); background:#f0f9ff;"></div><div id="patientDocsList" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:15px;"></div></div>
+                </div>
+            </div>
+
+            <!-- 4. REGISTRO CONTENZIONI FISICHE (REGIONE UMBRIA) -->
+            <div id="ws-contenzioni" class="workspace">
+                <div class="card restrict-oss" style="border-left: 5px solid var(--error-color);">
+                    <div class="card-header"><h3 style="color:var(--error-color);">🔒 Prescrizione e Registro Contenzioni Fisiche</h3></div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; background:#fef2f2; border:1px solid #fca5a5; padding:15px; margin-bottom:15px;">
+                        <div class="form-group" style="flex:1.5;"><label>Ospite</label><select id="contOspite"><option value="" disabled selected>Scegli...</option></select></div>
+                        <div class="form-group" style="flex:1;"><label>Tipo Presidio</label><select id="contTipo"><option value="Spondine letto">Spondine a letto</option><option value="Cintura pelvica">Cintura pelvica in carrozzina</option><option value="Tavolino carrozzina">Tavolino per carrozzina</option><option value="Altro">Altro presidio</option></select></div>
+                        <div class="form-group" style="flex:1;"><label>Data Inizio</label><input type="date" id="contDataInizio"></div>
+                        <div class="form-group" style="flex:1;"><label>Ora Inizio</label><input type="time" id="contOraInizio"></div>
+                        <div class="form-group" style="flex:2;"><label>Motivazione Medica / Rischio</label><input type="text" id="contMotivo" placeholder="Es. Rischio caduta grave da decubito"></div>
+                        <div class="form-group" style="flex:1;"><label>Consenso Informato</label><select id="contConsenso"><option value="Acquisito Familiare/AdS">Acquisito Familiare/AdS</option><option value="Stato di Necessità">Stato di Necessità (Art. 54 CP)</option></select></div>
+                        <div style="display:flex; align-items:flex-end;"><button class="btn-danger" onclick="window.addContenzione()">🔒 Prescrivi Contenzione</button></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3>Registro Contenzioni in Essere e Storico</h3></div>
+                    <table class="data-table" id="contenzioniTable">
+                        <thead><tr><th>Ospite</th><th>Tipo Presidio</th><th>Inizio</th><th>Motivo Clinico</th><th>Firme (Dir. San. / Inf.)</th><th>Stato / Revoca</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5. TERAPIA -->
+            <div id="ws-terapia" class="workspace">
+                <div class="card"><div class="form-group"><label>Seleziona Paziente per Prospetto Terapia</label><select id="terapiaGuestSelect" onchange="window.handlePatientSelect('terapiaGuestSelect')"><option value="" disabled selected>Scegli...</option></select></div></div>
+                <div id="terapiaContent" style="display:none;">
+                    <div class="clinical-header" id="terapiaHeader"></div>
+                    <div class="card" style="padding: 10px;">
+                        <div class="card-header" style="padding: 10px;"><h3 style="color:var(--terapia-color);">Prospetto Terapia</h3><button class="btn-primary" onclick="window.printModule('terapia')">🖨️ Stampa</button></div>
+                        <div class="only-medico" style="display:flex; gap:10px; margin:15px 10px; flex-wrap:wrap; background:#f8fafc; padding:15px; border:1px solid var(--border-color);">
+                            <div style="flex:2; min-width:180px;">
+                                <label style="font-size:0.8em;">Farmaco (Ricerca rapida)</label>
+                                <input type="text" id="terapiaFarmaco" list="listaFarmaciAifa" placeholder="Scrivi nome farmaco o p.attivo...">
+                                <datalist id="listaFarmaciAifa"></datalist>
+                            </div>
+                            <div style="flex:1; min-width:120px;"><label style="font-size:0.8em;">Posologia</label><input type="text" id="terapiaPosologia"></div>
+                            <div style="flex:1.5; min-width:140px;"><label style="font-size:0.8em;">Orario</label><select id="terapiaOrario" style="width:100%;"><option value="08:00">08:00 (Mattina)</option><option value="12:00">12:00 (Pranzo)</option><option value="18:00">18:00 (Sera)</option><option value="20:00">20:00 (Cena)</option><option value="08:00 - 20:00">08:00 - 20:00</option><option value="08:00 - 12:00 - 18:00">08:00 - 12:00 - 18:00</option><option value="Al bisogno">Al bisogno</option><option value="Firma">Solo Firma</option></select></div>
+                            <div style="flex:2; min-width:180px;"><label style="font-size:0.8em;">Note Aggiuntive</label><input type="text" id="terapiaNote"></div>
+                            <div style="display:flex; align-items:flex-end;"><button class="btn-primary" style="background:var(--terapia-color); padding: 8px 12px; white-space:nowrap;" onclick="window.addTerapiaItem()">➕ Prescrivi</button></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin: 10px; padding:8px 15px; border:1px solid var(--border-color); background: #f1f5f9;"><button class="btn-doc" onclick="window.changeTerapiaMonth(-1)">◀ Mese Prec.</button><h4 id="terapiaMonthLabel" style="margin:0; font-size:1.2em;">...</h4><button class="btn-doc" onclick="window.changeTerapiaMonth(1)">Mese Succ. ▶</button></div>
+                        <div style="overflow-x:auto; padding: 0 10px;">
+                            <table class="terapia-table" id="terapiaGridTable"><thead><tr id="terapiaGridHead"></tr></thead><tbody></tbody></table>
+                        </div>
+                        
+                        <!-- SEZIONE FIRMA E VALIDAZIONE TERAPIA MENSILE -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:#f0fdf4; border:1px solid #bbf7d0; padding:15px; margin: 15px 10px 10px 10px; border-radius:4px;">
+                            <div>
+                                <strong style="color:var(--success-color);">Firma e Validazione Piano Terapeutico</strong><br>
+                                <span id="terapiaFirmaGlobaleStatus" style="font-size:0.85em; color:var(--text-light);">Non validato</span>
+                            </div>
+                            <button class="btn-success only-medico" onclick="window.firmaTerapiaPiano()">⚕️ Firma Mese Visualizzato</button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:20px;" class="restrict-oss">
+                    <div style="flex:1; min-width:350px;">
+                        <div class="card" style="border-top: 4px solid #ef4444;">
+                            <div class="card-header"><h3 style="color:#ef4444;">Armadio Stupefacenti</h3><div style="display:flex; align-items:center; gap:10px;"><input type="number" id="narcThreshold" value="5" min="1" style="width:60px; padding:4px;" onchange="window.loadNarcoticsTable()"><button class="btn-primary" onclick="window.printStupefacentiInv()">🖨️ Stampa</button></div></div>
+                            <table class="data-table" id="narcoticInvTable"><thead><tr><th>Farmaco</th><th>Stato</th><th>Qta</th><th>Barcode</th></tr></thead><tbody></tbody></table>
+                        </div>
+                    </div>
+                    <div style="flex:2; min-width:400px;">
+                        <div class="card" style="border-top: 4px solid #ef4444;">
+                            <div class="card-header"><h3 style="color:#ef4444;">Movimento 309/90</h3><button class="btn-primary" onclick="window.printStupefacentiRegistry()">🖨️ Stampa Registro</button></div>
+                            <div class="restrict-oss" style="display:flex; gap:15px; margin-bottom:15px; background:#fef2f2; padding:15px; border:1px solid #fecaca; border-radius:4px;">
+                                <div class="form-group"><label>Nome / Barcode</label><input type="text" id="narcBarcode" placeholder="Spara barcode o scrivi..." onkeypress="window.handleNarcBarcode(event)"><input type="hidden" id="narcNome"></div>
+                                <div class="form-group"><label>Op</label><select id="narcTipoOp"><option value="CARICO">CARICO</option><option value="SCARICO">SCARICO</option><option value="SCARTO">SCARTO</option></select></div>
+                                <div class="form-group"><label>Qta</label><input type="number" id="narcQta" min="1"></div>
+                                <div class="form-group"><label>Rif. Ricetta/Paziente</label><input type="text" id="narcRif"></div>
+                                <div style="display:flex; align-items:flex-end;"><button class="btn-danger" onclick="window.addNarcoticMovement()">Registra</button></div>
+                            </div>
+                            <table class="data-table" id="narcoticTable"><thead><tr><th>Data</th><th>Farmaco</th><th>Op</th><th>Qta</th><th>Rif</th></tr></thead><tbody></tbody></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. RISCHIO CLINICO -->
+            <div id="ws-rischio" class="workspace"><div class="card restrict-oss" style="border-left: 5px solid var(--error-color);"><div class="card-header"><h3 style="color:var(--error-color);">Incident Reporting</h3></div><div style="display:flex; gap:10px; flex-wrap:wrap; background:#fef2f2; border:1px solid #fca5a5; padding:15px; margin-bottom:15px;"><div class="form-group"><label>Ospite</label><select id="newRischioOspite"><option value="" disabled selected>Scegli...</option></select></div><div class="form-group"><label>Data Evento</label><input type="date" id="newRischioData"></div><div class="form-group"><label>Tipo</label><select id="newRischioTipo"><option value="Caduta Accidentale">Caduta Accidentale</option><option value="Errore Terapia">Errore Terapia</option><option value="Lesione">Lesione/Trauma</option><option value="Fuga">Fuga</option><option value="Aggressione">Aggressione</option><option value="Altro">Altro</option></select></div><div class="form-group" style="flex:2;"><label>Dinamica</label><input type="text" id="newRischioDinamica"></div><div style="display:flex; align-items:flex-end;"><button class="btn-danger" onclick="window.addEventoRischio()">Segnala</button></div></div></div><div class="card"><div class="card-header"><h3>Archivio Eventi</h3></div><table class="data-table" id="rischioTable"><thead><tr><th>Data</th><th>Ospite</th><th>Tipo</th><th>Dinamica</th><th>Op</th></tr></thead><tbody></tbody></table></div></div>
+            
+            <!-- 7. CUP APPUNTAMENTI -->
+            <div id="ws-appuntamenti" class="workspace">
+                <div class="card restrict-oss">
+                    <div class="card-header"><h3>Nuovo CUP</h3></div>
+                    <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:15px;">
+                        <div class="form-group"><label>Ospite</label><select id="appGuestSelect"><option value="" disabled selected>Scegli...</option></select></div>
+                        <div class="form-group"><label>Data</label><input type="date" id="appDate"></div>
+                        <div class="form-group"><label>Ora</label><input type="time" id="appTime"></div>
+                        <div class="form-group"><label>Esame</label><input type="text" id="appType"></div>
+                        <div class="form-group"><label>Trasporto</label><select id="appTransport"><option value="In Sede">In Sede</option><option value="Proprio">Proprio</option><option value="Ambulanza">Ambulanza</option></select></div>
+                        <div style="display:flex; align-items:flex-end;"><button class="btn-primary restrict-oss" onclick="window.addAppointment()">Salva</button></div>
+                    </div>
+                </div>
+                <div class="card"><div class="card-header"><h3>Agenda</h3></div><table class="data-table" id="appointmentsTable"><thead><tr><th>Data/Ora</th><th>Ospite</th><th>Esame</th><th>Trasp.</th><th>Op</th><th class="restrict-oss">Az</th></tr></thead><tbody></tbody></table></div>
+            </div>
+            
+            <!-- 8. CONSEGNE -->
+            <div id="ws-consegne" class="workspace"><div style="display:flex; gap:20px; flex-wrap:wrap;"><div style="flex:1; min-width:300px;"><div class="card inf-edit-area"><div class="card-header"><h3>Nuova Consegna Inf.</h3></div><textarea id="newConsegnaInfText" rows="3" style="width:100%;"></textarea><button class="btn-primary" style="margin-top:12px; width:100%;" onclick="window.addConsegna('inf')">Inserisci</button></div><div class="card"><div class="card-header"><h3>Bacheca Inf</h3></div><div id="consegneInfList"></div></div></div><div style="flex:1; min-width:300px;"><div class="card oss-edit-area"><div class="card-header"><h3>Nuova Consegna O.S.S.</h3></div><textarea id="newConsegnaOssText" rows="3" style="width:100%;"></textarea><button class="btn-success" style="margin-top:12px; width:100%;" onclick="window.addConsegna('oss')">Inserisci</button></div><div class="card"><div class="card-header"><h3>Bacheca OSS</h3></div><div id="consegneOssList"></div></div></div></div></div>
+            
+            <!-- 9. LETTERE -->
+            <div id="ws-lettere" class="workspace">
+                <div class="card"><div class="form-group"><label>Seleziona Fascicolo Paziente per Modulistica</label><select id="lettereGuestSelect" onchange="window.handlePatientSelect('lettereGuestSelect')"><option value="" disabled selected>Scegli...</option></select></div></div>
+                <div id="lettereContent" style="display:none;">
+                    <div class="clinical-header" id="lettereHeader"></div>
+                    
+                    <div class="card">
+                        <div class="card-header"><h3>Attestazione di Decesso</h3><button class="btn-primary" onclick="window.printModule('decesso')">🖨️ Stampa Documento</button></div>
+                        <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:15px;"><div class="form-group" style="flex:1;"><label>Data Decesso</label><input type="date" id="decData" class="restrict-oss-input only-medico-input"></div><div class="form-group" style="flex:1;"><label>Ora Decesso</label><input type="time" id="decOra" class="restrict-oss-input only-medico-input"></div></div>
+                        <div class="restrict-oss only-medico"><button class="btn-success" onclick="window.saveClinicalData()">💾 Salva ed Archivia Paziente</button></div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header"><h3>Lettera di Dimissione (Rientro a Casa o Altra Struttura)</h3><button class="btn-primary" onclick="window.printModule('dimissioni')">🖨️ Stampa Lettera</button></div>
+                        <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:15px;">
+                            <div class="form-group" style="flex:1;">
+                                <label>Tipo di Uscita</label>
+                                <select id="dimTipo" class="restrict-oss-input only-medico-input">
+                                    <option value="Rientro">🏠 Rientro a Casa</option>
+                                    <option value="Trasferimento">🚑 Trasferimento (Altra Struttura)</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="flex:1;"><label>Data Trasferimento/Dimissione</label><input type="date" id="dimData" class="restrict-oss-input only-medico-input"></div>
+                            <div class="form-group" style="flex:1;"><label>Ora</label><input type="time" id="dimOra" class="restrict-oss-input only-medico-input"></div>
+                        </div>
+                        <div class="form-group"><label>Motivo e Destinazione</label><textarea id="dimMotivo" class="restrict-oss-input only-medico-input" rows="2" placeholder="Es. Rientro a domicilio, trasferimento presso RSA..."></textarea></div>
+                        <div class="form-group"><label>Decorso Clinico</label><textarea id="dimDecorso" class="restrict-oss-input only-medico-input" rows="4" placeholder="Inserisci un riassunto del decorso..."></textarea></div>
+                        <p style="font-size:0.85em; color:var(--text-light);"><em>La Terapia in atto verrà automaticamente allegata alla stampa della lettera.</em></p>
+                        <div class="restrict-oss only-medico"><button class="btn-success" onclick="window.saveClinicalData()">💾 Salva ed Archivia Paziente</button></div>
+                    </div>
+
+                    <div class="card" style="border-top: 4px solid var(--error-color);">
+                        <div class="card-header"><h3 style="color:var(--error-color);">Lettera di Trasferimento in Pronto Soccorso</h3><button class="btn-primary" onclick="window.printModule('prontosoccorso')">🖨️ Stampa Lettera per 118 / P.S.</button></div>
+                        <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:15px;"><div class="form-group" style="flex:1;"><label>Data Invio</label><input type="date" id="psData" class="restrict-oss-input only-medico-input"></div><div class="form-group" style="flex:1;"><label>Ora Invio</label><input type="time" id="psOra" class="restrict-oss-input only-medico-input"></div></div>
+                        <div class="form-group"><label>Motivo Invio / Sintomi Acuti</label><textarea id="psMotivo" class="restrict-oss-input only-medico-input" rows="2"></textarea></div>
+                        <div class="form-group"><label>Riassunto Cartella Clinica</label><textarea id="psRiassunto" class="restrict-oss-input only-medico-input" rows="4"></textarea></div>
+                        <p style="font-size:0.85em; color:var(--text-light);"><em>La Terapia in atto e le copie dei Documenti d'Identità verranno automaticamente allegati alla stampa.</em></p>
+                        <div class="restrict-oss only-medico"><button class="btn-success" onclick="window.saveClinicalData()">💾 Salva Dati</button></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 10. MAGAZZINO -->
+            <div id="ws-magazzino" class="workspace">
+                <div class="card" style="border-top: 4px solid var(--primary-color);">
+                    <div class="card-header"><h3>📦 Scorte e Magazzino Medico</h3><input type="number" id="invThreshold" value="5" min="1" style="width:60px;" onchange="window.loadInventory()"></div>
+                    <div style="display:flex; gap:12px; margin-bottom:20px; background: #f8fafc; padding: 15px; border: 1px solid var(--border-color); border-radius:4px;"><div class="form-group"><label>Nome Articolo / Barcode</label><input type="text" id="newInvItem"></div><div style="display:flex; align-items:flex-end;"><button class="btn-primary" onclick="window.addInvItem()">Aggiungi</button></div></div>
+                    <div class="inventory-grid" id="invGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:15px;"></div>
+                </div>
+            </div>
+
+            <!-- 11. FLUSSI E PORTALI -->
+            <div id="ws-flussi" class="workspace">
+                <div class="card restrict-oss" style="border-left: 4px solid var(--dir-color);">
+                    <div class="card-header"><h3 style="color:var(--dir-color);">📤 Flussi Regionali e Portali</h3></div>
+                    <div style="display:flex; flex-direction:column; gap:15px; margin-top:15px;">
+                        
+                        <!-- ALLOGGIATI WEB -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:#e0f2fe; padding:15px; border:1px solid #bae6fd; border-radius:4px; flex-wrap:wrap; gap:10px;">
+                            <div>
+                                <strong style="color:var(--text-main); font-size:1.1em;">👮‍♂️ Esportazione "Alloggiati Web" (Polizia)</strong>
+                                <div style="font-size:0.85em; color:var(--text-light); margin-top:5px;">Genera file .txt (179 byte/record). "Rinnovo Tutti" imposta la <b>Data Dal</b> come data arrivo e 30gg di permanenza per tutti i presenti.</div>
+                                <div style="display:flex; gap:10px; margin-top:10px; align-items:flex-end; flex-wrap:wrap;">
+                                    <div class="form-group" style="margin:0;"><label style="font-size:10px;">Dal (Data Inizio / Rinnovo):</label><input type="date" id="alloggiatiStart" style="padding:4px; font-size:12px;"></div>
+                                    <div class="form-group" style="margin:0;"><label style="font-size:10px;">Al (Per i nuovi ingressi):</label><input type="date" id="alloggiatiEnd" style="padding:4px; font-size:12px;"></div>
+                                    <button class="btn-doc" style="padding:4px 10px; font-size:11px; height:26px;" onclick="window.setAlloggiatiDates('oggi')">📅 Oggi</button>
+                                    <button class="btn-doc" style="padding:4px 10px; font-size:11px; height:26px;" onclick="window.setAlloggiatiDates('mese')">🗓️ Mese Corrente (1-30)</button>
+                                </div>
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:8px;">
+                                <button class="btn-primary" style="background:#0284c7; white-space:nowrap; font-size:0.9em; padding:10px;" onclick="window.exportAlloggiati('nuovi')">⬇️ File TXT: Solo Nuovi Ingressi</button>
+                                <button class="btn-success" style="background:#15803d; white-space:nowrap; font-size:0.9em; padding:10px;" onclick="window.exportAlloggiati('rinnovo')">🔄 File TXT: Rinnovo TUTTI I PRESENTI (30gg)</button>
+                            </div>
+                        </div>
+                        
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:15px; border:1px solid var(--border-color); border-radius:4px; flex-wrap:wrap; gap:10px;"><div><strong style="color:var(--text-main); font-size:1.1em;">Flusso F.A.R. (USL Umbria)</strong></div><button class="btn-primary" style="background:#0f766e; white-space:nowrap;" onclick="window.exportFARUmbria()">📊 Genera CSV FAR</button></div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:15px; border:1px solid var(--border-color); border-radius:4px; flex-wrap:wrap; gap:10px;"><div><strong style="color:var(--text-main); font-size:1.1em;">Flusso S.I.A.R. / S.I.C.O.F.</strong></div><button class="btn-primary" style="background:#0ea5e9; white-space:nowrap;" onclick="window.exportSIAR()">🏃‍♂️ Genera CSV SIAR</button></div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:15px; border:1px solid var(--border-color); border-radius:4px; flex-wrap:wrap; gap:10px;"><div><strong style="color:var(--text-main); font-size:1.1em;">Integrazione FSE (FHIR)</strong></div><button class="btn-primary" style="background:var(--dir-color); white-space:nowrap;" onclick="window.exportFSE()">🌐 Genera Tracciato FSE</button></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 12. STORICO -->
+            <div id="ws-storico" class="workspace"><div class="card"><div class="card-header"><h3>Archivio Storico (Dimessi/Deceduti)</h3></div><div class="guest-grid" id="storicoGrid"></div></div></div>
+
+        </main>
+    </div>
+
+    <!-- Entry Point Logico -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

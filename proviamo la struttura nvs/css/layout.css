@@ -1,0 +1,35 @@
+/* css/layout.css */
+
+/* Animazioni Base */
+@keyframes slideUpFade { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Login Screen & Privacy Screen (Full Overlay) */
+#loginScreen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; width: 100%; position: fixed; top: 0; left: 0; z-index: 9999; background-color: var(--primary-color); }
+.login-header-title { text-align: center; color: white; margin-bottom: 30px; z-index: 10; animation: slideUpFade 0.8s forwards; }
+.login-header-title h1 { margin: 0; font-size: 2.6em; font-weight: 800; letter-spacing: 2px; }
+.login-header-title h2 { margin: 5px 0 0 0; font-size: 1.3em; color: #ccfbf1; }
+.login-box { background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; max-width: 450px; width: 90%; border-top: 5px solid var(--secondary-color); animation: slideUpFade 0.8s forwards;}
+.profiles-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-bottom: 10px; max-height: 280px; overflow-y: auto; padding: 5px; }
+
+#privacyScreen { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; width: 100%; position: fixed; top: 0; left: 0; z-index: 10000; background-color: var(--bg-color); padding: 20px; box-sizing: border-box; overflow-y: auto; }
+.privacy-container { background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 500px; width: 100%; border-top: 6px solid var(--primary-color); margin: auto; }
+
+/* Navbar e App Menu (Sticky Top) */
+#top-nav-container { position: sticky; top: 0; z-index: 1000; width: 100%; display: flex; flex-direction: column; flex-shrink: 0; }
+.navbar { background: var(--primary-color); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--secondary-color); }
+.navbar-brand { display: flex; align-items: center; gap: 15px; font-weight: bold; font-size: 1.1em; }
+.navbar-actions { display: flex; gap: 10px; align-items: center; }
+.app-menu { display: flex; background: #cbd5e1; padding: 10px 20px 0 20px; gap: 2px; overflow-x: auto; border-bottom: 1px solid #94a3b8; }
+
+/* Main Workspace Layout */
+#appScreen { display: none; flex-direction: row; flex-grow: 1; height: 0; overflow: hidden; }
+.sidebar { width: 260px; background: var(--box-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0; }
+.main-content { padding: 20px; flex-grow: 1; overflow-y: auto; box-sizing: border-box; }
+.workspace { display: none; }
+.workspace.active { display: block; animation: fadeIn 0.2s ease; }
+
+/* Grids per Dashboard e Elenco Pazienti */
+.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
+.guest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; margin-top: 15px; }
+.inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }

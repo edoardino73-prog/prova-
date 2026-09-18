@@ -1,0 +1,89 @@
+/* css/components.css */
+
+/* --- REGOLE DI AUTORIZZAZIONE VISIVA (RBAC) --- */
+body[data-qualifica="OSS"] .restrict-oss { display: none !important; }
+body[data-qualifica="OSS"] textarea.restrict-oss-input, body[data-qualifica="OSS"] input.restrict-oss-input, body[data-qualifica="OSS"] select.restrict-oss-input { pointer-events: none; opacity: 0.6; background-color: #f1f5f9; }
+body:not([data-med-access="true"]) .only-medico { display: none !important; }
+body:not([data-med-access="true"]) .only-medico-input { pointer-events: none; opacity: 0.6; background-color: #f1f5f9;}
+body:not([data-sign-access="true"]) .req-sign-role { display: none !important; }
+.inf-edit-area, .inf-delete-btn, .oss-edit-area, .oss-delete-btn { display: none !important; }
+body[data-qualifica="Infermiere"] .inf-edit-area, body[data-qualifica="Infermiere"] .inf-delete-btn { display: block !important; }
+body[data-qualifica="OSS"] .oss-edit-area, body[data-qualifica="OSS"] .oss-delete-btn { display: block !important; }
+
+/* --- TABS & SIDEBAR ITEMS --- */
+.nav-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 6px 12px; border-radius: var(--radius); cursor: pointer; transition: 0.2s; text-decoration:none; display:flex; align-items:center; }
+.nav-btn:hover { background: rgba(255,255,255,0.2); }
+.menu-tab { padding: 8px 14px; background: #e2e8f0; border: 1px solid #94a3b8; border-bottom: none; border-radius: 6px 6px 0 0; color: var(--text-light); font-weight: 600; font-size: 0.85em; cursor: pointer; white-space: nowrap; margin-bottom: -1px; }
+.menu-tab:hover { background: #f8fafc; color: var(--text-main); }
+.menu-tab.active { background: var(--box-bg); color: var(--primary-color); border-top: 3px solid var(--primary-color); font-weight: bold; }
+.sidebar-item { padding: 8px 12px; border-radius: 6px; cursor: pointer; margin-bottom: 4px; display: flex; align-items: center; gap: 10px; transition: 0.2s; border: 1px solid transparent; }
+.sidebar-item:hover { background: #f1f5f9; border-color: #cbd5e1; }
+.sidebar-item.active { background: #e0f2fe; border-color: var(--primary-color); border-left: 4px solid var(--primary-color); }
+
+/* --- CARDS & CONTAINERS --- */
+.card { background: var(--box-bg); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid var(--primary-color); padding-bottom: 8px; flex-wrap: wrap; gap:10px;}
+.card-header h3 { margin: 0; color: var(--primary-color); font-size: 1.1em; text-transform: uppercase; }
+.section-box { background: #f8fafc; border: 1px solid var(--border-color); padding: 15px; margin-bottom: 15px; border-radius:4px;}
+.section-box h4 { margin: 0 0 10px 0; color: var(--primary-color); font-size: 1em; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; }
+.metric-card { background: var(--box-bg); padding: 15px; border-radius: var(--radius); border: 1px solid var(--border-color); text-align: center; border-left: 5px solid var(--primary-color); }
+.metric-card h2 { margin: 0; font-size: 2em; color: var(--primary-color); }
+.chart-container { background: #fff; padding: 15px; border-radius: 6px; border: 1px solid #cbd5e1; display:flex; justify-content:center; align-items:center;}
+.guest-card { background: #ffffff; border: 1px solid var(--border-color); padding: 12px; border-radius: var(--radius); display: flex; flex-direction: column; gap: 8px; border-left: 4px solid var(--secondary-color);}
+.guest-card-top { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; }
+
+/* --- AVATARS --- */
+.profile-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-bottom: 8px; background: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.4em; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.sidebar-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.guest-avatar { width: 50px; height: 50px; border-radius: 4px; object-fit: cover; background: #e2e8f0; border: 1px solid var(--border-color); overflow: hidden; }
+
+/* --- BUTTONS --- */
+.btn-primary, .btn-success, .btn-danger, .btn-dir, .btn-export, .btn-doc { color: white; border: none; padding: 8px 16px; border-radius: var(--radius); font-weight: 600; cursor: pointer; font-size: 0.9em; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.15); transition: 0.2s;}
+.btn-primary { background: var(--secondary-color); } .btn-primary:hover { background: var(--primary-color); }
+.btn-success { background: var(--success-color); } 
+.btn-danger { background: var(--error-color); } 
+.btn-dir { background: var(--dir-color); }
+.btn-export { background: #047857; border: 1px solid #064e3b; }
+.btn-doc { background: #475569; } .btn-doc:hover { background: #334155; }
+.profile-btn { color: var(--text-main); background: #f8fafc; border: 1px solid var(--border-color); box-shadow: none; display: flex; flex-direction: column; align-items: center; width: 85px; }
+.btn-submit-privacy { background-color: var(--primary-color); color: white; border: none; width: 100%; padding: 15px; border-radius: 6px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background 0.2s; margin-top: 10px; }
+.btn-submit-privacy:disabled { background-color: #94a3b8; cursor: not-allowed; }
+
+/* --- FORMS & INPUTS --- */
+.form-group { margin-bottom: 12px; }
+.form-group label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 0.85em; color: var(--text-main); }
+input[type="text"], input[type="password"], input[type="number"], input[type="date"], input[type="time"], textarea, select { width: 100%; padding: 8px; border: 1px solid #94a3b8; border-radius: 4px; box-sizing: border-box; background-color: var(--input-bg); color: var(--text-main); font-family: inherit; font-size: 0.95em; }
+input:focus, select:focus, textarea:focus { border-color: var(--primary-color); outline: none; background-color: #f0fdfa; }
+input[readonly] { background-color: #f1f5f9; cursor: not-allowed; }
+.login-input { width: 100%; padding: 15px; font-size: 1.2em; border: 1px solid var(--border-color); border-radius: var(--radius); text-align: center; letter-spacing: 5px; box-sizing: border-box;}
+
+/* --- TABELLE E TERAPIA --- */
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.9em; background: #ffffff; }
+.data-table th, .data-table td { border: 1px solid var(--border-color); padding: 8px; text-align: left; vertical-align: middle; }
+.data-table th { background-color: var(--primary-color); color: white; font-weight: normal; text-transform: uppercase; font-size: 0.85em; }
+.data-table tr:nth-child(even) { background-color: #f8fafc; } .data-table tr:hover { background-color: #f1f5f9; }
+.terapia-table { width: 100%; border-collapse: collapse; font-size: 0.8em; text-align:center; min-width: 1000px; background: #ffffff;}
+.terapia-table th, .terapia-table td { border: 1px solid #cbd5e1; padding: 2px; }
+.terapia-table th { background: var(--terapia-color); color: white; padding: 6px 2px; font-weight: normal; }
+.terapia-table td.farmaco-col { text-align:left; padding: 4px 8px; min-width: 200px; background: #f8fafc; position: sticky; left: 0; z-index: 2; border-right: 2px solid var(--terapia-color);}
+.micro-shifts { display: flex; flex-direction: column; gap: 2px; justify-content: center; align-items:center; height:100%; width: 100%; padding: 2px 0;}
+.shift-btn.single-btn { width: 90%; min-width: 30px; max-width: 45px; height: 16px; border-radius: 2px; font-size: 8.5px; font-weight:bold; line-height: 16px; text-align: center; color: #334155; cursor: pointer; border: 1px solid #94a3b8; background: #e2e8f0; overflow: hidden; }
+.shift-btn:not(.disabled):hover { background: #cbd5e1; } 
+.signature-text { color: var(--success-color); font-weight: bold; font-size: 8px; cursor:pointer; background: #d1fae5; border:1px solid #34d399; border-radius:2px; padding: 0; line-height: 16px; width: 90%; text-align: center; overflow:hidden; white-space:nowrap; margin-bottom:2px;}
+
+/* --- BADGES E ALERTS --- */
+.current-op-badge { background: #ffffff; color: var(--primary-color); padding: 4px 10px; border-radius: 4px; font-size: 0.85em; font-weight: bold; }
+.alert-item { background: #fef2f2; border: 1px solid #fca5a5; border-left: 4px solid #ef4444; padding: 10px; margin-bottom: 8px; border-radius: 4px; color: #991b1b; display: flex; justify-content: space-between; align-items: center;}
+.alert-item.warning { background: #fffbeb; border-color: #fcd34d; border-left-color: #f59e0b; color: #b45309; }
+#toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 2000; }
+.toast { background: var(--text-main); color: #fff; padding: 12px 24px; border-radius: 4px; font-weight: bold; margin-top: 10px; opacity: 0; transition: opacity 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+.toast.show { opacity: 1; }
+
+/* --- UX CLINICA OTTIMIZZATA --- */
+.body-marker { position: absolute; width: 14px; height: 14px; background-color: var(--error-color); border: 2px solid white; border-radius: 50%; transform: translate(-50%, -50%); cursor: pointer; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.3);}
+.sticky-clinical-header { position: sticky; top: -20px; z-index: 50; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(5px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border-color); border-left: 8px solid var(--primary-color); padding: 10px 15px; margin-bottom: 20px; border-radius: 4px; display: flex; align-items: center; gap: 15px; transition: var(--transition); }
+.sticky-clinical-header img { width: 50px; height: 50px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border-color); }
+.sticky-clinical-header h2 { margin: 0; color: var(--primary-color); font-size: 1.2em; }
+.vitals-input-group { display: flex; gap: 12px; flex-wrap: wrap; background: #f8fafc; padding: 15px; border: 1px solid var(--border-color); border-radius: 6px; }
+.vitals-input-group input:out-of-range, .vitals-input-group input:invalid { border-color: var(--error-color); background-color: #fef2f2; color: #991b1b; }
+.input-required { border-left: 3px solid var(--warning-color) !important; }

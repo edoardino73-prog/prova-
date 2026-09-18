@@ -1,0 +1,56 @@
+/* css/base.css */
+:root {
+    --bg-color: #f1f5f9;         
+    --box-bg: #ffffff;
+    --primary-color: #0d9488; 
+    --secondary-color: #0f766e;  
+    --text-main: #0f172a;
+    --text-light: #475569;
+    --input-bg: #ffffff;
+    --border-color: #cbd5e1;     
+    --error-color: #e11d48; 
+    --warning-color: #d97706; 
+    --success-color: #059669; 
+    --dir-color: #4f46e5;
+    --terapia-color: #0284c7; 
+    --app-color: #db2777;
+    --iso-color: #d97706;
+    --base-font-size: 14px;      
+    --radius: 6px;               
+    --transition: all 0.2s ease;
+}
+
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background-color: var(--bg-color); 
+    margin: 0; 
+    padding: 0; 
+    color: var(--text-main); 
+    font-size: var(--base-font-size); 
+    display: flex; 
+    flex-direction: column; 
+    height: 100vh; 
+    overflow: hidden; 
+}
+
+/* --- REGOLE DI STAMPA PDF/CARTA --- */
+#printArea { display: none; }
+@media print {
+    body * { visibility: hidden; } 
+    #printArea, #printArea * { visibility: visible; }
+    #printArea { display: block !important; position: absolute; left: 0; top: 0; width: 100%; background: white !important; color: black !important; font-size: 10pt !important; padding: 20px; box-sizing: border-box; }
+    .print-header { text-align: center; margin-bottom: 20px; }
+    .print-header h1 { margin: 0; font-size: 18pt; text-transform: uppercase; letter-spacing: 1px; color: #000; }
+    .print-header-details { font-size: 9pt; margin-top: 6px; color: #333; line-height: 1.4; }
+    .print-header h2 { margin: 0; font-size: 13pt; border-top: 2px solid black; padding-top: 10px; margin-top: 15px; text-transform: uppercase; font-weight: bold; }
+    .print-title { font-size: 12pt; font-weight: bold; text-align: center; margin-bottom: 15px; text-transform: uppercase; background: #eee; padding: 8px; -webkit-print-color-adjust: exact; }
+    .print-table { width: 100%; border-collapse: collapse; margin-top: 10px; } 
+    .print-table th, .print-table td { border: 1px solid black; padding: 4px; text-align: center; font-size: 8pt; } 
+    .print-table th { background-color: #eee !important; -webkit-print-color-adjust: exact; }
+    .print-terapia-table { width: 100%; border-collapse: collapse; text-align:center; font-size: 7.5pt !important; margin-top:10px; } 
+    .print-terapia-table th, .print-terapia-table td { border: 1px solid #777; padding: 2px; } 
+    .print-terapia-table th { background: #ddd !important; -webkit-print-color-adjust: exact; font-size: 6.5pt; } 
+    .print-signatures { margin-top: 30px; display: flex; justify-content: space-between; page-break-inside: avoid; } 
+    .print-signatures > div { width: 45%; text-align: center; } 
+    .print-signatures p.line { border-top: 1px solid black; padding-top: 5px; margin-top: 30px; font-weight: bold; }
+}

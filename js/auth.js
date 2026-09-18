@@ -1,0 +1,1 @@
+export const initAuth = () => { console.log("Auth stub caricato"); };

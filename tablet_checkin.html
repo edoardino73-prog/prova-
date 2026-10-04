@@ -3,88 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Check-in & Mappatura Lesioni - NVS WardPad</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Check-in & Monitoraggio Lesioni - NVS WardPad</title>
 
     <style>
         :root {
-            --primary-color: #0f766e;
-            --secondary-color: #0284c7;
-            --border-color: #cbd5e1;
-            --error-color: #ef4444;
-            --success-color: #10b981;
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
             --text-main: #0f172a;
-            --bg-body: #f8fafc;
-            --radius: 8px;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --brand-primary: #0f766e;
+            --brand-secondary: #0284c7; 
+            --success: #059669;
+            --alert-red: #e11d48;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-body); margin: 0; padding: 0; color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        .app-header { background: #ffffff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .app-header { background: #ffffff; color: var(--text-main); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); z-index: 10; flex-shrink: 0; }
         .header-left { display: flex; align-items: center; gap: 12px; }
-        .back-btn { background: none; border: none; font-size: 1.1rem; color: var(--primary-color); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-        .patient-title { font-size: 1.15rem; font-weight: 800; text-transform: uppercase; color: var(--text-main); border-left: 2px solid var(--border-color); padding-left: 12px; }
+        .back-btn { background: none; border: none; font-size: 1.15rem; color: var(--brand-primary); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 0; }
+        .patient-title { font-size: 1.1rem; font-weight: 800; text-transform: uppercase; color: var(--text-main); border-left: 2px solid var(--border); padding-left: 12px; }
 
-        .main-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; justify-content: center; }
-        .content-wrapper { width: 100%; max-width: 1000px; display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: start; }
-        @media (max-width: 860px) { .content-wrapper { grid-template-columns: 1fr; } }
+        .main-container { flex: 1; overflow-y: auto; padding: 18px 20px; -webkit-overflow-scrolling: touch; display: flex; justify-content: center; }
+        .content-wrapper { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 18px; padding-bottom: 50px; }
 
-        .card { background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
-        .card h3 { margin: 0 0 14px 0; font-size: 1.1rem; font-weight: 700; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+        .top-grid { display: grid; grid-template-columns: 370px 1fr; gap: 20px; align-items: start; }
+        @media (max-width: 880px) { .top-grid { grid-template-columns: 1fr; } }
+
+        .card-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; box-shadow: var(--shadow-sm); }
+        .card-title { margin: 0 0 14px 0; font-size: 1.02rem; font-weight: 800; color: var(--brand-primary); border-bottom: 1px solid var(--border); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; }
 
         /* BODY MAP FRAME ESATTO DEL DESKTOP */
         #bodyMapWrapper {
             position: relative;
             width: 100%;
-            max-width: 350px;
-            margin: 10px auto;
-            border: 1px solid var(--border-color);
+            max-width: 340px;
+            margin: 0 auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
             background: #ffffff;
             cursor: crosshair;
             user-select: none;
             overflow: hidden;
-            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
-        .body-map-img {
-            width: 100%;
-            height: auto;
-            display: block;
-            pointer-events: none;
-        }
+        .body-map-img { width: 100%; height: auto; display: block; pointer-events: none; }
 
-        /* CLASSE BODY-MARKER DEL GESTIONALE */
         .body-marker {
             position: absolute;
-            width: 14px;
-            height: 14px;
-            background-color: var(--error-color);
+            width: 16px;
+            height: 16px;
+            background-color: var(--alert-red);
             border: 2px solid white;
             border-radius: 50%;
             transform: translate(-50%, -50%);
             cursor: pointer;
             z-index: 20;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
         }
 
         .map-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-        .btn-clear { background: #fee2e2; color: var(--error-color); border: 1px solid #fecdd3; padding: 8px 14px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer; }
+        .btn-clear-points { background: #fee2e2; color: var(--alert-red); border: 1px solid #fecdd3; padding: 6px 12px; border-radius: var(--radius-md); font-weight: 700; font-size: 0.8rem; cursor: pointer; }
 
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 0.85rem; color: #64748b; text-transform: uppercase; }
-        .touch-input { background: #f8fafc; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 12px; font-size: 0.95rem; color: var(--text-main); outline: none; width: 100%; font-family: inherit; }
-        .touch-input:focus { border-color: var(--primary-color); background: #ffffff; }
+        /* FORM CLINICO & CAMPI */
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 4px; font-weight: 700; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
+        .touch-input { background: #f8fafc; border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 10px 12px; font-size: 0.95rem; color: var(--text-main); outline: none; width: 100%; font-weight: 600; font-family: inherit; }
+        .touch-input:focus { border-color: var(--brand-primary); background: #ffffff; }
 
-        .bottom-action-bar { position: sticky; bottom: 0; background: #ffffff; padding: 14px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: center; z-index: 20; }
-        .btn-save { background: var(--success-color); color: #fff; border: none; padding: 16px 28px; border-radius: 8px; font-size: 1.15rem; font-weight: 700; width: 100%; max-width: 1000px; cursor: pointer; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2); }
+        /* BOX FOTOCAMERA COMPATTA INTEGRATA */
+        .camera-box-inline { border: 2px dashed var(--brand-secondary); border-radius: var(--radius-md); background: #f0f9ff; min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; cursor: pointer; overflow: hidden; margin-top: 6px; }
+        .camera-box-inline img { width: 100%; height: 180px; object-fit: contain; }
+        .camera-prompt { text-align: center; color: var(--brand-secondary); padding: 12px; pointer-events: none; }
+        .camera-prompt svg { width: 36px; height: 36px; stroke: var(--brand-secondary); fill: none; stroke-width: 2; margin-bottom: 4px; }
+        .file-hidden-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5; }
+
+        /* STORICO RILEVAZIONI & FOTO */
+        .history-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; box-shadow: var(--shadow-sm); }
+        .timeline-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 10px; max-height: 380px; overflow-y: auto; padding: 4px; }
+        .timeline-card { border: 1px solid var(--border); border-left: 4px solid var(--brand-primary); border-radius: var(--radius-md); background: #f8fafc; padding: 12px; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; }
+        .timeline-card.has-photo { border-left-color: var(--brand-secondary); }
+        .tc-top { display: flex; justify-content: space-between; font-weight: 700; color: var(--text-muted); font-size: 0.78rem; }
+        .tc-body { line-height: 1.4; color: var(--text-main); font-weight: 500; }
+        .tc-photo { width: 100%; height: 120px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; }
+
+        .bottom-action-bar { position: sticky; bottom: 0; background: #ffffff; padding: 14px 20px; border-top: 1px solid var(--border); box-shadow: 0 -4px 10px rgba(0,0,0,0.04); display: flex; justify-content: center; z-index: 20; }
+        .btn-save-checkin { background: var(--success); color: #fff; border: none; padding: 16px 28px; border-radius: var(--radius-lg); font-size: 1.15rem; font-weight: 700; width: 100%; max-width: 1100px; cursor: pointer; box-shadow: 0 4px 6px rgba(5, 150, 105, 0.2); display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-save-checkin:active { transform: scale(0.98); }
+        .btn-save-checkin:disabled { opacity: 0.5; pointer-events: none; }
 
         #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 50000; }
-        .toast { background: #1e293b; color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 0.95rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; }
+        .toast { background: #1e293b; color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 0.95rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; box-shadow: var(--shadow-sm); text-align: center; }
         .toast.show { opacity: 1; }
+
+        .svg-icon { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     </style>
 
-    <!-- FIREBASE COMPAT SDK -->
+    <!-- FIREBASE COMPAT SDK: FIRESTORE + STORAGE -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 </head>
 <body>
     <div id="toast-container"></div>
@@ -92,47 +122,113 @@
     <header class="app-header">
         <div class="header-left">
             <button class="back-btn" onclick="window.location.href='tablet_hub.html'">
-                ← Reparto
+                <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg> Reparto
             </button>
             <div class="patient-title" id="headerPatientName">Caricamento...</div>
         </div>
-        <div style="font-size:0.85rem; font-weight:700; color:var(--primary-color);">Check-in e Mappatura Lesioni</div>
+        <div style="font-size:0.85rem; font-weight:700; color:var(--brand-primary); background:#f0fdfa; padding:6px 14px; border-radius:20px; border:1px solid #ccfbf1;">
+            Check-in & Monitoraggio Lesioni
+        </div>
     </header>
 
     <main class="main-container">
         <div class="content-wrapper">
 
-            <!-- 1. MAPPA ANATOMICA CON IMMAGINE DEL CORPO UMANO -->
-            <div class="card">
-                <h3>🧍 Mappa Anatomica (Clicca per segnare)</h3>
-                
-                <div id="bodyMapWrapper" onclick="window.handleBodyMapClick(event)">
-                    <img src="corpo_umano.png" alt="Mappa Corpo Umano" class="body-map-img" id="imgMappa">
-                    <div id="bodyMarkersLayer" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></div>
+            <!-- PARTE SUPERIORE: MAPPA + MODULO RIVALUTAZIONE E FOTO -->
+            <div class="top-grid">
+
+                <!-- 1. MAPPA CORPOREA DESKTOP -->
+                <div class="card-box">
+                    <h3 class="card-title">
+                        <span>🧍 Sagoma Anatomica</span>
+                        <small style="font-size:0.75rem; color:var(--text-muted); font-weight:bold;">Tocca per segnare</small>
+                    </h3>
+
+                    <div id="bodyMapWrapper" onclick="window.handleBodyMapClick(event)">
+                        <img src="corpo_umano.png" alt="Mappa Corpo Umano" class="body-map-img">
+                        <div id="bodyMarkersLayer" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></div>
+                    </div>
+
+                    <div class="map-actions">
+                        <span id="markersCountLabel" style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">0 punti segnati</span>
+                        <button type="button" class="btn-clear-points" onclick="window.clearBodyMarkers()">🗑 Cancella Punti</button>
+                    </div>
                 </div>
 
-                <div class="map-actions">
-                    <span id="markersCountLabel" style="font-size:0.85rem; font-weight:700; color:#64748b;">0 punti</span>
-                    <button type="button" class="btn-clear" onclick="window.clearBodyMarkers()">Cancella Punti</button>
+                <!-- 2. NUOVA RILEVAZIONE / MONITORAGGIO CUTANEO -->
+                <div class="card-box">
+                    <h3 class="card-title">
+                        <span>📋 Monitoraggio & Rilievo Lesione</span>
+                        <input type="date" id="chkData" style="font-size:0.82rem; padding:4px 8px; border:1px solid var(--border); border-radius:4px; font-weight:bold; color:var(--brand-primary); outline:none;">
+                    </h3>
+
+                    <div class="form-group">
+                        <label>Condizioni Generali all'Arrivo / di Reparto</label>
+                        <input type="text" id="chkGen" class="touch-input" placeholder="Es. Paziente vigile, nutrito, allettato...">
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                        <div class="form-group">
+                            <label>Sede Anatomica</label>
+                            <select id="monSede" class="touch-input">
+                                <option value="Zona Sacrale / Coccige">Zona Sacrale / Coccige</option>
+                                <option value="Tallone Destro">Tallone Destro</option>
+                                <option value="Tallone Sinistro">Tallone Sinistro</option>
+                                <option value="Trocantere Destro">Trocantere Destro</option>
+                                <option value="Trocantere Sinistro">Trocantere Sinistro</option>
+                                <option value="Gomito / Spalla">Gomito / Spalla</option>
+                                <option value="Malleolo">Malleolo</option>
+                                <option value="Altra Sede">Altra Sede (Cute)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Stadio / Grado</label>
+                            <select id="monStadio" class="touch-input">
+                                <option value="Cute Integra / Monitoraggio">Cute Integra / Monitoraggio</option>
+                                <option value="Iperemia (Non sbiancabile)">Iperemia (Non sbiancabile)</option>
+                                <option value="Stadio I">Stadio I</option>
+                                <option value="Stadio II (Erosione)">Stadio II (Erosione)</option>
+                                <option value="Stadio III (Sottocutaneo)">Stadio III (Sottocutaneo)</option>
+                                <option value="Stadio IV (Esteso)">Stadio IV (Esteso)</option>
+                                <option value="Escara / Necrosi">Escara / Necrosi</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Dettaglio Piaghe, Dimensioni & Medicazione</label>
+                        <textarea id="chkPiaghe" class="touch-input" rows="2" placeholder="Es. Lesione 2x2 cm a fondo deterso, applicato idrogel e idrocolloide..."></textarea>
+                    </div>
+
+                    <!-- FOTOCAMERA INTEGRATA -->
+                    <div class="form-group">
+                        <label>📸 Foto Lesione (Opzionale al Letto)</label>
+                        <div class="camera-box-inline" id="cameraZone">
+                            <input type="file" id="cameraFileInput" class="file-hidden-input" accept="image/*" capture="environment" onchange="window.handleImageCapture(event)">
+                            <img id="previewImg" style="display:none;" alt="Anteprima">
+                            <div class="camera-prompt" id="cameraPrompt">
+                                <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                                <div style="font-weight:700; font-size:0.9rem;">Tocca per Scattare Foto con la Fotocamera</div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
+
             </div>
 
-            <!-- 2. CAMPI IDENTICI DEL DESKTOP (chkGen, chkPiaghe) -->
-            <div class="card">
-                <h3>📋 Scheda Clinica Check-in</h3>
+            <!-- PARTE INFERIORE: STORICO CRONOLOGICO RIVALUTAZIONI & FOTOGRAFIE -->
+            <div class="history-section">
+                <h3 class="card-title" style="margin-bottom:8px;">
+                    <span>📈 Storico Monitoraggi & Evoluzione Lesioni</span>
+                    <span id="monCountBadge" style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">0 Rilievi</span>
+                </h3>
 
-                <div class="form-group">
-                    <label>Condizioni Generali all'Arrivo</label>
-                    <textarea id="chkGen" class="touch-input" rows="4" placeholder="Condizioni generali..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Piaghe/Lesioni</label>
-                    <textarea id="chkPiaghe" class="touch-input" rows="4" placeholder="Sede, stadio, medicazione..."></textarea>
-                </div>
-
-                <div style="font-size:0.85rem; color:#64748b; margin-top:10px;">
-                    Operatore attivo: <strong id="lblOp">-</strong>
+                <div class="timeline-grid" id="historyTimeline">
+                    <div style="grid-column: 1/-1; text-align:center; padding:30px; color:var(--text-muted); font-size:0.85rem;">
+                        Caricamento storico monitoraggi...
+                    </div>
                 </div>
             </div>
 
@@ -140,7 +236,9 @@
     </main>
 
     <div class="bottom-action-bar">
-        <button class="btn-save" onclick="window.saveClinicalData()">💾 Salva Check-in</button>
+        <button class="btn-save-checkin" id="btnSalva" onclick="window.saveClinicalAndPhotoData()">
+            💾 Registra Monitoraggio Lesione & Salva Check-in
+        </button>
     </div>
 
     <script>
@@ -157,21 +255,23 @@
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.firestore();
+        const storage = firebase.storage();
 
         window.activeOperator = sessionStorage.getItem("activeOperator") || localStorage.getItem("activeOperator") || "Operatore";
-        document.getElementById('lblOp').innerText = window.activeOperator;
 
         const urlParams = new URLSearchParams(window.location.search);
-        window.targetPatient = urlParams.get('ospite') || sessionStorage.getItem('globalSelectedPatient') || "";
+        window.targetPatient = (urlParams.get('ospite') || sessionStorage.getItem('globalSelectedPatient') || "").trim().toUpperCase();
 
         if(!window.targetPatient) {
             window.location.href = 'tablet_hub.html';
         } else {
             document.getElementById('headerPatientName').innerText = window.targetPatient;
+            const n = new Date();
+            document.getElementById('chkData').value = `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
         }
 
-        // Variabile identica al desktop
         window.currentBodyMarkers = [];
+        window.selectedBlob = null;
 
         window.showToast = (m) => {
             const c = document.getElementById('toast-container');
@@ -179,15 +279,14 @@
             t.className = 'toast'; t.innerText = m;
             c.appendChild(t);
             setTimeout(() => t.classList.add('show'), 10);
-            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2000);
+            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2200);
         };
 
-        // GESTIONE CLICK SULLA SAGOMA (IDENTICA AL DESKTOP)
+        // GESTIONE CLICK SULLA MAPPA ANATOMICA
         window.handleBodyMapClick = (e) => {
             const w = document.getElementById('bodyMapWrapper');
             if (!w) return;
             const r = w.getBoundingClientRect();
-            
             const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0].clientX);
             const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0].clientY);
 
@@ -200,9 +299,9 @@
             });
 
             window.renderBodyMarkers();
+            window.showToast("Punto lesione aggiunto!");
         };
 
-        // RENDER DEI MARKER (IDENTICO AL DESKTOP)
         window.renderBodyMarkers = () => {
             const l = document.getElementById('bodyMarkersLayer');
             if (!l) return;
@@ -214,66 +313,196 @@
                 d.style.left = m.x + '%';
                 d.style.top = m.y + '%';
                 d.style.pointerEvents = 'auto';
+                d.innerText = i + 1;
                 d.onclick = (ev) => {
                     ev.stopPropagation();
                     window.currentBodyMarkers.splice(i, 1);
                     window.renderBodyMarkers();
+                    window.showToast("Punto rimosso.");
                 };
                 l.appendChild(d);
             });
 
-            document.getElementById('markersCountLabel').innerText = `${window.currentBodyMarkers.length} punti`;
+            document.getElementById('markersCountLabel').innerText = `${window.currentBodyMarkers.length} punti segnati`;
         };
 
         window.clearBodyMarkers = () => {
             if (window.currentBodyMarkers.length === 0) return;
-            if (confirm('Svuotare la mappa?')) {
+            if (confirm('Svuotare tutti i punti segnati sulla mappa?')) {
                 window.currentBodyMarkers = [];
                 window.renderBodyMarkers();
+                window.showToast("Mappa ripulita.");
             }
         };
 
-        // CARICAMENTO DA: cartelle_cliniche / targetPatient
-        const caricaDati = () => {
+        // ACQUISIZIONE E COMPRESSIONE FOTOGRAFICA CLIENT-SIDE
+        window.handleImageCapture = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            window.showToast("Elaborazione scatto...");
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX = 1200;
+                    let w = img.width, h = img.height;
+                    if (w > h) { if (w > MAX) { h *= MAX / w; w = MAX; } }
+                    else { if (h > MAX) { w *= MAX / h; h = MAX; } }
+
+                    canvas.width = w; canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+
+                    canvas.toBlob((blob) => {
+                        window.selectedBlob = blob;
+                        const preview = document.getElementById('previewImg');
+                        preview.src = URL.createObjectURL(blob);
+                        preview.style.display = 'block';
+                        document.getElementById('cameraPrompt').style.display = 'none';
+                        window.showToast("Foto pronta per l'archiviazione!");
+                    }, 'image/jpeg', 0.82);
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        // CARICAMENTO REALTIME DA CARTELLA CLINICA
+        const caricaDatiCheckin = () => {
             db.collection("cartelle_cliniche").doc(window.targetPatient).onSnapshot(docSnap => {
                 if (docSnap.exists) {
                     const data = docSnap.data();
-                    if (data.chkGen) document.getElementById('chkGen').value = data.chkGen;
-                    if (data.chkPiaghe) document.getElementById('chkPiaghe').value = data.chkPiaghe;
+                    if (data.chkGen && !document.getElementById('chkGen').value) document.getElementById('chkGen').value = data.chkGen;
+                    if (data.chkPiaghe && !document.getElementById('chkPiaghe').value) document.getElementById('chkPiaghe').value = data.chkPiaghe;
 
-                    if (Array.isArray(data.chkMarkers)) {
-                        window.currentBodyMarkers = [...data.chkMarkers];
+                    const markersSalvati = data.chkMarkers || data.bodyMarkers || [];
+                    if (Array.isArray(markersSalvati) && window.currentBodyMarkers.length === 0) {
+                        window.currentBodyMarkers = [...markersSalvati];
                         window.renderBodyMarkers();
                     }
                 }
             });
         };
 
-        // SALVATAGGIO ALLINEATO A: d.chkMarkers, d.chkGen, d.chkPiaghe
-        window.saveClinicalData = async () => {
-            const gen = document.getElementById('chkGen').value.trim();
-            const piaghe = document.getElementById('chkPiaghe').value.trim();
+        // CARICAMENTO STORICO CRONOLOGICO MONITORAGGI
+        const caricaStoricoMonitoraggi = () => {
+            db.collection("monitoraggio_lesioni")
+              .where("ospite", "==", window.targetPatient)
+              .onSnapshot(snap => {
+                  const grid = document.getElementById('historyTimeline');
+                  grid.innerHTML = '';
+                  document.getElementById('monCountBadge').innerText = `${snap.size} Rilievi`;
+
+                  if (snap.empty) {
+                      grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:25px; color:var(--text-muted); font-size:0.85rem;">Nessun monitoraggio registrato in precedenza.</div>`;
+                      return;
+                  }
+
+                  let items = [];
+                  snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+                  items.sort((a,b) => (b.ts || 0) - (a.ts || 0));
+
+                  items.forEach(it => {
+                      grid.innerHTML += `
+                          <div class="timeline-card ${it.fotoUrl ? 'has-photo' : ''}">
+                              <div class="tc-top">
+                                  <span>📅 ${it.data}</span>
+                                  <span>👤 ${it.op || 'Operatore'}</span>
+                              </div>
+                              <div class="tc-body">
+                                  <strong>${it.sede}</strong> - <span>${it.stadio}</span><br>
+                                  ${it.note ? `<small>${it.note}</small>` : ''}
+                              </div>
+                              ${it.fotoUrl ? `<img src="${it.fotoUrl}" class="tc-photo" onclick="window.open('${it.fotoUrl}','_blank')" title="Tocca per ingrandire">` : ''}
+                          </div>
+                      `;
+                  });
+              });
+        };
+
+        // SALVATAGGIO COMPLETO (CHECKIN + MONITORAGGIO + FOTO SU STORAGE + DIARIO)
+        window.saveClinicalAndPhotoData = async () => {
+            const dataVal = document.getElementById('chkData').value;
+            const genVal = document.getElementById('chkGen').value.trim();
+            const piagheVal = document.getElementById('chkPiaghe').value.trim();
+            const sedeVal = document.getElementById('monSede').value;
+            const stadioVal = document.getElementById('monStadio').value;
+            const btn = document.getElementById('btnSalva');
 
             try {
-                window.showToast("Salvataggio in corso...");
+                btn.disabled = true;
+                btn.innerText = "⏳ Archiviazione in corso...";
+                window.showToast("Salvataggio dati e lesioni...");
 
-                // Aggiornamento su cartelle_cliniche
+                let uploadedPhotoUrl = null;
+                const timestamp = Date.now();
+                const now = new Date();
+                const timeStr = `${dataVal} ore ${now.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'})}`;
+
+                // 1. Upload foto su Firebase Storage (se scattata)
+                if (window.selectedBlob) {
+                    window.showToast("Caricamento foto su Cloud Storage...");
+                    const storagePath = `lesioni/${window.targetPatient}/${timestamp}_lesione.jpg`;
+                    const storageRef = storage.ref().child(storagePath);
+                    const uploadTask = await storageRef.put(window.selectedBlob, { contentType: 'image/jpeg' });
+                    uploadedPhotoUrl = await uploadTask.ref.getDownloadURL();
+                }
+
+                // 2. Aggiornamento Cartella Clinica Desktop (chkMarkers, chkGen, chkPiaghe)
                 await db.collection("cartelle_cliniche").doc(window.targetPatient).set({
-                    chkGen: gen,
-                    chkPiaghe: piaghe,
-                    chkMarkers: window.currentBodyMarkers ? [...window.currentBodyMarkers] : []
+                    chkGen: genVal,
+                    chkPiaghe: piagheVal,
+                    chkMarkers: window.currentBodyMarkers ? [...window.currentBodyMarkers] : [],
+                    checkinDataUltima: dataVal,
+                    ultimoOperatoreCheckin: window.activeOperator,
+                    tsUltimoCheckin: timestamp
                 }, { merge: true });
 
-                window.showToast("✅ Check-in e Mappa Salvati!");
-                setTimeout(() => { window.location.href = 'tablet_hub.html'; }, 900);
+                // 3. Registrazione nuovo evento nello storico di monitoraggio
+                await db.collection("monitoraggio_lesioni").add({
+                    ospite: window.targetPatient,
+                    data: timeStr,
+                    dataISO: dataVal,
+                    sede: sedeVal,
+                    stadio: stadioVal,
+                    note: piagheVal,
+                    fotoUrl: uploadedPhotoUrl,
+                    puntiMappa: window.currentBodyMarkers.length,
+                    op: window.activeOperator,
+                    ts: timestamp
+                });
+
+                // 4. Inserimento automatico nel Diario Clinico
+                await db.collection("diario_clinico").add({
+                    ospite: window.targetPatient,
+                    data: timeStr,
+                    tipo: 'Clinica',
+                    nota: `Monitoraggio Lesione ➔ Sede: ${sedeVal} | ${stadioVal} | Mappa: ${window.currentBodyMarkers.length} punti${piagheVal ? ' | ' + piagheVal : ''}`,
+                    fotoUrl: uploadedPhotoUrl,
+                    op: window.activeOperator,
+                    ts: timestamp
+                });
+
+                window.showToast("✅ Monitoraggio e Check-in registrati!");
+
+                // Reset scatto
+                window.selectedBlob = null;
+                document.getElementById('previewImg').style.display = 'none';
+                document.getElementById('cameraPrompt').style.display = 'block';
 
             } catch (err) {
-                console.error("Errore salvataggio:", err);
-                window.showToast("Errore durante il salvataggio.");
+                console.error("Errore salvataggio monitoraggio:", err);
+                window.showToast("❌ Errore durante il salvataggio: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "💾 Registra Monitoraggio Lesione & Salva Check-in";
             }
         };
 
-        caricaDati();
+        caricaDatiCheckin();
+        caricaStoricoMonitoraggi();
     </script>
 </body>
 </html>

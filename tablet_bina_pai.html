@@ -4,117 +4,292 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>B.I.N.A. & P.A.I. - NVS WardPad</title>
 
     <style>
         :root {
-            --bg-body: #f1f5f9;
+            --bg-body: #f8fafc;
             --bg-card: #ffffff;
-            --text-main: #1e293b;
+            --text-main: #0f172a;
             --text-muted: #64748b;
             --border: #e2e8f0;
             --brand-primary: #0f766e;
             --brand-secondary: #0284c7; 
-            --success: #16a34a;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --success: #059669;
+            --alert-red: #e11d48;
+            --alert-amber: #d97706;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-body); margin: 0; padding: 0; color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        .app-header { background: #ffffff; color: var(--text-main); padding: 16px 20px; display: flex; align-items: center; border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); z-index: 10; flex-shrink: 0; }
-        .back-btn { background: none; border: none; font-size: 1.2rem; color: var(--brand-primary); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 0 10px 0 0; }
-        .app-title { margin: 0 0 0 15px; font-size: 1.15rem; font-weight: 600; border-left: 2px solid var(--border); padding-left: 15px; display: flex; flex-direction: column; }
-        .app-title small { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        .app-header { background: #ffffff; color: var(--text-main); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); z-index: 10; flex-shrink: 0; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn { background: none; border: none; font-size: 1.15rem; color: var(--brand-primary); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 0; }
+        .patient-title { font-size: 1.1rem; font-weight: 800; text-transform: uppercase; color: var(--text-main); border-left: 2px solid var(--border); padding-left: 12px; }
 
-        .main-container { flex: 1; overflow-y: auto; padding: 24px; -webkit-overflow-scrolling: touch; display: flex; justify-content: center; }
-        .form-wrapper { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; }
+        /* TABS DI COMMUTAZIONE BINA / PAI */
+        .tab-nav-bar { display: flex; background: #ffffff; border-bottom: 1px solid var(--border); padding: 6px 20px 0 20px; gap: 10px; flex-shrink: 0; }
+        .tab-nav-btn { padding: 12px 22px; font-weight: 800; font-size: 0.95rem; border: none; background: transparent; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.15s; }
+        .tab-nav-btn.active { color: var(--brand-primary); border-bottom-color: var(--brand-primary); }
 
-        .card-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); }
-        .card-title { margin: 0 0 14px 0; font-size: 1.1rem; color: var(--brand-primary); border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        .main-container { flex: 1; overflow-y: auto; padding: 18px 20px; -webkit-overflow-scrolling: touch; display: flex; justify-content: center; }
+        .content-wrapper { width: 100%; max-width: 1050px; display: flex; flex-direction: column; gap: 18px; padding-bottom: 50px; }
 
-        .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.95rem; }
-        .info-label { color: var(--text-muted); font-weight: 500; }
-        .info-val { font-weight: 700; color: var(--text-main); text-align: right; }
+        .card-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 16px; }
+        .card-title { margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--brand-primary); border-bottom: 1px solid var(--border); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .bina-badge { background: #e0f2fe; color: #0369a1; padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 1rem; display: inline-block; }
+        /* SCORE DISPLAY B.I.N.A. */
+        .score-box { background: #f0fdfa; border: 2px solid #ccfbf1; border-radius: var(--radius-md); padding: 16px; text-align: center; color: var(--brand-primary); font-weight: 800; font-size: 1.25rem; }
+        .score-box.non-auto { background: #fef2f2; border-color: #fecdd3; color: var(--alert-red); }
+        .score-esito-txt { font-size: 1.8rem; font-weight: 900; margin-top: 4px; display: block; }
+        .score-sub { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-top: 4px; }
+
+        /* GRIGLIA 10 INDICATORI */
+        .bina-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        @media (max-width: 860px) { .bina-grid { grid-template-columns: 1fr; } }
+
+        .bina-item { display: flex; flex-direction: column; gap: 6px; }
+        .bina-label { font-size: 0.82rem; font-weight: 800; color: var(--text-main); text-transform: uppercase; }
+        .bina-select { background: #f8fafc; border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 11px 12px; font-size: 0.92rem; font-weight: 600; color: var(--text-main); outline: none; }
+        .bina-select:focus { border-color: var(--brand-primary); background: #ffffff; }
+
+        /* AREA FIRME VALIDAZIONE */
+        .firme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; }
+        @media (max-width: 768px) { .firme-grid { grid-template-columns: 1fr; } }
+        .firma-box { display: flex; flex-direction: column; gap: 6px; }
+        .firma-input { background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px 12px; font-size: 0.9rem; font-weight: 700; color: var(--text-main); }
+        .btn-valida { padding: 9px; border-radius: 6px; font-weight: 800; font-size: 0.82rem; border: none; cursor: pointer; color: #fff; background: var(--brand-secondary); }
+
+        /* FORM PAI */
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        .touch-input { background: #f8fafc; border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 11px 12px; font-size: 0.95rem; font-weight: 600; color: var(--text-main); outline: none; font-family: inherit; }
+        .touch-input:focus { border-color: var(--brand-primary); background: #ffffff; }
+
+        /* FOOTER ACTIONS */
+        .bottom-action-bar { position: sticky; bottom: 0; background: #ffffff; padding: 14px 20px; border-top: 1px solid var(--border); box-shadow: 0 -4px 10px rgba(0,0,0,0.04); display: flex; justify-content: center; z-index: 20; }
+        .btn-save-all { background: var(--success); color: #fff; border: none; padding: 16px 28px; border-radius: var(--radius-lg); font-size: 1.15rem; font-weight: 700; width: 100%; max-width: 1050px; cursor: pointer; box-shadow: 0 4px 6px rgba(5, 150, 105, 0.2); display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-save-all:active { transform: scale(0.98); }
 
         #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 50000; }
-        .toast { background: #1e293b; color: #fff; padding: 14px 24px; border-radius: 30px; font-size: 1rem; font-weight: 500; opacity: 0; transition: opacity 0.3s; box-shadow: var(--shadow-sm); text-align: center; }
+        .toast { background: #1e293b; color: #fff; padding: 14px 24px; border-radius: 30px; font-size: 0.95rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; box-shadow: var(--shadow-md); text-align: center; }
         .toast.show { opacity: 1; }
         
-        .svg-icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .svg-icon { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     </style>
+
+    <!-- FIREBASE COMPAT SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <div id="toast-container"></div>
 
     <header class="app-header">
-        <button class="back-btn" onclick="window.location.href='tablet_hub.html'">
-            <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg> Indietro
-        </button>
-        <div class="app-title">
-            <small>B.I.N.A. & P.A.I.</small>
-            <span id="headerPatientName">Caricamento...</span>
+        <div class="header-left">
+            <button class="back-btn" onclick="window.location.href='tablet_hub.html'">
+                <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg> Reparto
+            </button>
+            <div class="patient-title" id="headerPatientName">Caricamento...</div>
+        </div>
+        <div style="font-size:0.85rem; font-weight:700; color:var(--brand-primary); background:#f0fdfa; padding:6px 14px; border-radius:20px; border:1px solid #ccfbf1;">
+            Valutazione Multidimensionale
         </div>
     </header>
 
+    <!-- COMMUTAZIONE MODULO B.I.N.A. / P.A.I. -->
+    <nav class="tab-nav-bar">
+        <button class="tab-nav-btn active" id="tabBtnBina" onclick="window.switchTab('bina')">📋 Scala B.I.N.A. Ufficiale</button>
+        <button class="tab-nav-btn" id="tabBtnPai" onclick="window.switchTab('pai')">🎯 P.A.I. Individualizzato</button>
+    </nav>
+
     <main class="main-container">
-        <div class="form-wrapper">
-            
-            <!-- SCHEDA B.I.N.A. -->
-            <div class="card-box">
-                <h3 class="card-title">🏛️ Valutazione B.I.N.A. (Regione Umbria)</h3>
-                <div style="text-align:center; padding:10px 0 16px 0;">
-                    <div id="binaDisplayBadge" class="bina-badge">Caricamento punteggio...</div>
+        <div class="content-wrapper">
+
+            <!-- SEZIONE 1: SCALA B.I.N.A. REGIONALE -->
+            <div id="sectionBina" class="card-box">
+                <h3 class="card-title">
+                    <span>Valutazione B.I.N.A. (10 Indicatori)</span>
+                    <input type="date" id="bina_data" style="font-size:0.82rem; padding:4px 8px; border:1px solid var(--border); border-radius:4px; font-weight:bold; color:var(--brand-primary); outline:none;">
+                </h3>
+
+                <!-- Score Box in Tempo Reale -->
+                <div class="score-box" id="binaScoreBox">
+                    PUNTEGGIO TOTALE: <span id="binaScoreNum">100</span> pt
+                    <span class="score-esito-txt" id="binaEsitoTxt">AUTOSUFFICIENTE</span>
+                    <div class="score-sub">(Soglia Regionale Cut-off: 230 pt)</div>
                 </div>
-                <div class="info-row">
-                    <span class="info-label">Non Autosufficienza Funzionale:</span>
-                    <span class="info-val" id="valAuto">-</span>
+
+                <!-- 10 Indicatori Ufficiali -->
+                <div class="bina-grid">
+                    <!-- 1. Stato di Salute -->
+                    <div class="bina-item">
+                        <label class="bina-label">1. Stato di Salute</label>
+                        <select class="bina-select bina-calc" id="bina_q1" onchange="window.calcolaBina()">
+                            <option value="10">Buono stato di salute (10 pt)</option>
+                            <option value="40">Polipatologia senza acuzie (40 pt)</option>
+                            <option value="70">Patologia cronica instabile (70 pt)</option>
+                            <option value="100">Grave compromissione dello stato clinico (100 pt)</option>
+                        </select>
+                    </div>
+
+                    <!-- 2. Prestazioni Sanitarie -->
+                    <div class="bina-item">
+                        <label class="bina-label">2. Necessità Prestazioni Sanitarie</label>
+                        <select class="bina-select bina-calc" id="bina_q2" onchange="window.calcolaBina()">
+                            <option value="10">Buona salute (10 pt)</option>
+                            <option value="30">Prestazioni sanitarie non continuative (30 pt)</option>
+                            <option value="70">Prestazioni sanitarie / consulenze frequenti (70 pt)</option>
+                            <option value="100">Cure quotidiane, PEG, SNG, O2, lesioni complesse (100 pt)</option>
+                        </select>
+                    </div>
+
+                    <!-- 3. Controllo Sfinterico -->
+                    <div class="bina-item">
+                        <label class="bina-label">3. Controllo Sfinterico</label>
+                        <select class="bina-select bina-calc" id="bina_q3" onchange="window.calcolaBina()">
+                            <option value="10">Presente (10 pt)</option>
+                            <option value="30">Incontinenza episodica (30 pt)</option>
+                            <option value="70">Incontinenza permanente urinaria O fecale (70 pt)</option>
+                            <option value="100">Incontinenza totale urinaria E fecale (100 pt)</option>
+                        </select>
+                    </div>
+
+                    <!-- 4. Disturbi Cognitivi -->
+                    <div class="bina-item">
+                        <label class="bina-label">4. Disturbi Cognitivi / Comportamentali</label>
+                        <select class="bina-select bina-calc" id="bina_q4" onchange="window.calcolaBina()">
+                            <option value="10">Assenti (10 pt)</option>
+                            <option value="50">Disturbi dell'umore / cognitivi lievi (50 pt)</option>
+                            <option value="80">Disturbi cognitività senza agitazione grave (80 pt)</option>
+                            <option value="100">Comportamento disturbante, aggressivo o violento (100 pt)</option>
+                        </select>
+                    </div>
+
+                    <!-- 5. Linguaggio -->
+                    <div class="bina-item">
+                        <label class="bina-label">5. Funzioni del Linguaggio</label>
+                        <select class="bina-select bina-calc" id="bina_q5" onchange="window.calcolaBina()">
+                            <option value="10">Comprende/esprime normalmente, usa telefono (10 pt)</option>
+                            <option value="40">Linguaggio menomato ma esprime il pensiero (40 pt)</option>
+                            <option value="70">Comprende solo ordini semplici (70 pt)</option>
+                            <option value="100">Non comprende, non si esprime (100 pt)</option>
+                        </select>
+                    </div>
+
+                    <!-- 6. Deficit Sensoriali -->
+                    <div class="bina-item">
+                        <label class="bina-label">6. Deficit Sensoriali (Udito / Vista)</label>
+                        <select class="bina-select bina-calc" id="bina_q6" onchange="window.calcolaBina()">
+                            <option value="10">Normale (10 pt)</option>
+                            <option value="20">Deficit correggibile con protesi/occhiali (20 pt)</option>
+                            <option value="80">Grave deficit non correggibile (80 pt)</option>
+                            <option value="100">Cecità e/o sordità completa (100 pt)</option>
+                        </select>
+                    </div>
+
+                    <!-- 7. Mobilità -->
+                    <div class="bina-item">
+                        <label class="bina-label">7. Mobilità</label>
+                        <select class="bina-select bina-calc" id="bina_q7" onchange="window.calcolaBina()">
+                            <option value="10">Cammina autonomamente senza aiuto (10 pt)</option>
+                            <option value="30">Cammina con ausili o aiuto programmato (30 pt)</option>
+                            <option value="80">Si sposta solo con aiuto o sedia a ruote (80 pt)</option>
+                            <option value="100">Totalmente dipendente per le alzate / allettato (100 pt)</option>
+                        </select>
+                    </div>
+
+                    <!-- 8. Attività Vita Quotidiana -->
+                    <div class="bina-item">
+                        <label class="bina-label">8. Attività Vita Quotidiana (ADL)</label>
+                        <select class="bina-select bina-calc" id="bina_q8" onchange="window.calcolaBina()">
+                            <option value="10">Totalmente indipendente (10 pt)</option>
+                            <option value="20">Aiuto programmato o saltuario (20 pt)</option>
+                            <option value="70">Aiuto necessario ma parziale (70 pt)</option>
+                            <option value="100">Totalmente dipendente (100 pt)</option>
+                        </select>
+                    </div>
+
+                    <!-- 9. Fattori Abitativi -->
+                    <div class="bina-item">
+                        <label class="bina-label">9. Fattori Abitativi e Ambientali</label>
+                        <select class="bina-select bina-calc" id="bina_q9" onchange="window.calcolaBina()">
+                            <option value="10">Abitazione/camera idonea, servizi fruibili (10 pt)</option>
+                            <option value="20">Barriere architettoniche che limitano i servizi (20 pt)</option>
+                            <option value="70">Impedita fruibilità interna (70 pt)</option>
+                            <option value="100">Totale inadeguatezza, assenza servizi (100 pt)</option>
+                        </select>
+                    </div>
+
+                    <!-- 10. Rete Familiare -->
+                    <div class="bina-item">
+                        <label class="bina-label">10. Stato della Rete Familiare</label>
+                        <select class="bina-select bina-calc" id="bina_q10" onchange="window.calcolaBina()">
+                            <option value="10">Può contare sulla famiglia (10 pt)</option>
+                            <option value="30">Disponibilità parziale della rete informale (30 pt)</option>
+                            <option value="60">Famiglia disponibile solo se interpellata (60 pt)</option>
+                            <option value="100">Non può contare su nessuno (100 pt)</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="info-row">
-                    <span class="info-label">Stato Sanitario & Clinico:</span>
-                    <span class="info-val" id="valSanita">-</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Stato Psichico & Cognitivo:</span>
-                    <span class="info-val" id="valPsiche">-</span>
-                </div>
-                <div class="info-row" style="border:none;">
-                    <span class="info-label">Stato Socio-Relazionale:</span>
-                    <span class="info-val" id="valSociale">-</span>
+
+                <!-- Firme e Validazione Professionale -->
+                <div class="firme-grid">
+                    <div class="firma-box">
+                        <label style="font-size:0.8rem; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Firma Infermiere Professionale *</label>
+                        <input type="text" id="bina_firma_inf" class="firma-input" placeholder="In attesa di validazione..." readonly>
+                        <button type="button" class="btn-valida" onclick="window.validaFirmaRuolo('inf')">✍️ Valida come Infermiere</button>
+                    </div>
+                    <div class="firma-box">
+                        <label style="font-size:0.8rem; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Firma Medico / Direzione Sanitaria *</label>
+                        <input type="text" id="bina_firma_med" class="firma-input" placeholder="In attesa di validazione..." readonly>
+                        <button type="button" class="btn-valida" style="background:var(--brand-primary);" onclick="window.validaFirmaRuolo('med')">✍️ Valida come Medico</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- OBIETTIVI P.A.I. -->
-            <div class="card-box">
-                <h3 class="card-title">📝 Obiettivi P.A.I. Multidisciplinare</h3>
-                <div class="info-row">
-                    <span class="info-label">Data Stesura / Revisione:</span>
-                    <span class="info-val" id="valPaiData">-</span>
+            <!-- SEZIONE 2: PIANO ASSISTENZIALE INDIVIDUALIZZATO (P.A.I.) -->
+            <div id="sectionPai" class="card-box" style="display:none;">
+                <h3 class="card-title">
+                    <span>Piano Assistenziale Individualizzato (P.A.I.)</span>
+                    <input type="date" id="pai_data" style="font-size:0.82rem; padding:4px 8px; border:1px solid var(--border); border-radius:4px; font-weight:bold; color:var(--brand-primary); outline:none;">
+                </h3>
+
+                <div style="background:#e0f2fe; border:1px solid #bae6fd; border-radius:var(--radius-md); padding:12px; font-size:0.88rem; color:#0369a1; font-weight:700;">
+                    ℹ️ Il P.A.I. integra gli esiti della valutazione B.I.N.A. e definisce gli obiettivi assistenziali, sanitari e relazionali dell'equipe.
                 </div>
-                <div style="margin-top:12px;">
-                    <strong style="font-size:0.9rem; color:var(--brand-primary); display:block; margin-bottom:4px;">Obiettivo Medico:</strong>
-                    <p id="valPaiMed" style="margin:0 0 12px 0; font-size:0.95rem; color:var(--text-main);">-</p>
 
-                    <strong style="font-size:0.9rem; color:var(--brand-primary); display:block; margin-bottom:4px;">Obiettivo Infermieristico:</strong>
-                    <p id="valPaiInf" style="margin:0 0 12px 0; font-size:0.95rem; color:var(--text-main);">-</p>
+                <div class="form-group">
+                    <label>1. Obiettivi di Salute e Assistenziali</label>
+                    <textarea id="pai_obiettivi" class="touch-input" rows="3" placeholder="Mantenimento delle autonomie residue, prevenzione lesioni da decubito, controllo dolore..."></textarea>
+                </div>
 
-                    <strong style="font-size:0.9rem; color:var(--brand-primary); display:block; margin-bottom:4px;">Obiettivo Assistenziale (OSS):</strong>
-                    <p id="valPaiOss" style="margin:0; font-size:0.95rem; color:var(--text-main);">-</p>
+                <div class="form-group">
+                    <label>2. Interventi Sanitari e Infermieristici</label>
+                    <textarea id="pai_interventi" class="touch-input" rows="3" placeholder="Monitoraggio parametri vitali, somministrazione farmacologica S.U.T., medicazioni avanzate..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>3. Area Socio-Relazionale ed Educativa</label>
+                    <textarea id="pai_sociale" class="touch-input" rows="3" placeholder="Coinvolgimento nelle attività ricreative, supporto psicologico, contatti con i familiari..."></textarea>
                 </div>
             </div>
 
         </div>
     </main>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    <div class="bottom-action-bar">
+        <button class="btn-save-all" id="btnSalva" onclick="window.salvaValutazioneCompleta()">
+            💾 Registra Valutazione Multidimensionale & P.A.I.
+        </button>
+    </div>
 
+    <script>
         const firebaseConfig = { 
             apiKey: "AIzaSyAc0fIlfds4Gne5m3qpH25uacK4NeR6TzM", 
             authDomain: "gestione-visite-b445b.firebaseapp.com", 
@@ -123,46 +298,198 @@
             messagingSenderId: "720937824810", 
             appId: "1:720937824810:web:b04b60d1d66bb8f4040953" 
         };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        window.activeOperator = sessionStorage.getItem("activeOperator") || localStorage.getItem("activeOperator") || "Operatore";
+        window.activeQualifica = sessionStorage.getItem("activeQualifica") || localStorage.getItem("activeQualifica") || "Infermiere";
 
         const urlParams = new URLSearchParams(window.location.search);
-        window.targetPatient = urlParams.get('ospite');
+        window.targetPatient = (urlParams.get('ospite') || sessionStorage.getItem('globalSelectedPatient') || "").trim().toUpperCase();
 
         if(!window.targetPatient) {
             window.location.href = 'tablet_hub.html';
         } else {
             document.getElementById('headerPatientName').innerText = window.targetPatient;
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+            document.getElementById('bina_data').value = dateStr;
+            document.getElementById('pai_data').value = dateStr;
         }
 
-        // ASCOLTO DATI CLINICI DA FIRESTORE
-        onSnapshot(doc(db, "cartelle_cliniche", window.targetPatient), (docSnap) => {
-            const data = docSnap.exists() ? docSnap.data() : {};
+        window.showToast = (m) => {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = 'toast'; t.innerText = m;
+            c.appendChild(t);
+            setTimeout(() => t.classList.add('show'), 10);
+            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2400);
+        };
 
-            // Calcolo BINA
-            const auto = parseFloat(data.binaAuto) || 0;
-            const sanita = parseFloat(data.binaSanita) || 0;
-            const psiche = parseFloat(data.binaPsiche) || 0;
-            const sociale = parseFloat(data.binaSociale) || 0;
-            const tot = auto + sanita + psiche + sociale;
+        // COMMUTAZIONE TRA TAB BINA E PAI
+        window.currentTab = 'bina';
+        window.switchTab = (tab) => {
+            window.currentTab = tab;
+            document.getElementById('tabBtnBina').className = tab === 'bina' ? 'tab-nav-btn active' : 'tab-nav-btn';
+            document.getElementById('tabBtnPai').className = tab === 'pai' ? 'tab-nav-btn active' : 'tab-nav-btn';
 
-            document.getElementById('valAuto').innerText = `${auto} / 10`;
-            document.getElementById('valSanita').innerText = `${sanita} / 10`;
-            document.getElementById('valPsiche').innerText = `${psiche} / 10`;
-            document.getElementById('valSociale').innerText = `${sociale} / 10`;
+            document.getElementById('sectionBina').style.display = tab === 'bina' ? 'flex' : 'none';
+            document.getElementById('sectionPai').style.display = tab === 'pai' ? 'flex' : 'none';
+        };
 
-            let classeBina = `Totale: ${tot} / 40 (Classe R3)`;
-            if (tot >= 25) classeBina = `Totale: ${tot} / 40 (Classe R1 - Alta Intensità)`;
-            else if (tot >= 15) classeBina = `Totale: ${tot} / 40 (Classe R2 - Media Intensità)`;
-            
-            document.getElementById('binaDisplayBadge').innerText = classeBina;
+        // CALCOLO UFFICIALE SCALA B.I.N.A. (CUT-OFF 230 PT)
+        window.calcolaBina = () => {
+            let totale = 0;
+            document.querySelectorAll('.bina-calc').forEach(sel => {
+                totale += parseInt(sel.value, 10) || 0;
+            });
 
-            // Obiettivi PAI
-            document.getElementById('valPaiData').innerText = data.paiDataStesura ? `${data.paiDataStesura} (Scadenza: ${data.paiDataRevisione || '-'})` : 'Non definito';
-            document.getElementById('valPaiMed').innerText = data.paiMedico || 'Nessun obiettivo medico registrato.';
-            document.getElementById('valPaiInf').innerText = data.paiInfermieristico || 'Nessun obiettivo infermieristico registrato.';
-            document.getElementById('valPaiOss').innerText = data.paiAssistenziale || 'Nessun obiettivo assistenziale registrato.';
-        });
+            const scoreBox = document.getElementById('binaScoreBox');
+            const scoreNum = document.getElementById('binaScoreNum');
+            const esitoTxt = document.getElementById('binaEsitoTxt');
+
+            scoreNum.innerText = totale;
+
+            if (totale > 230) {
+                esitoTxt.innerText = "NON AUTOSUFFICIENTE";
+                scoreBox.className = "score-box non-auto";
+            } else {
+                esitoTxt.innerText = "AUTOSUFFICIENTE";
+                scoreBox.className = "score-box";
+            }
+
+            return { totale, esito: esitoTxt.innerText };
+        };
+
+        // VALIDAZIONE FIRME PROFESSIONALI
+        window.validaFirmaRuolo = (ruolo) => {
+            const timeStr = new Date().toLocaleDateString('it-IT');
+            if (ruolo === 'inf') {
+                document.getElementById('bina_firma_inf').value = `${window.activeOperator} (${timeStr})`;
+                window.showToast("✅ Validato come Infermiere");
+            } else if (ruolo === 'med') {
+                document.getElementById('bina_firma_med').value = `${window.activeOperator} (${timeStr})`;
+                window.showToast("✅ Validato come Medico / D.S.");
+            }
+        };
+
+        // CARICAMENTO VALUTAZIONI DALLA CARTELLA CLINICA
+        const caricaDatiEsistenti = () => {
+            db.collection("cartelle_cliniche").doc(window.targetPatient).onSnapshot(docSnap => {
+                if (docSnap.exists) {
+                    const d = docSnap.data();
+
+                    // Ricarica BINA se salvata
+                    if (d.binaPunteggio !== undefined) {
+                        if (d.binaRisposte) {
+                            for (let i = 1; i <= 10; i++) {
+                                if (d.binaRisposte[`q${i}`]) {
+                                    document.getElementById(`bina_q${i}`).value = d.binaRisposte[`q${i}`];
+                                }
+                            }
+                        }
+                        if (d.binaData) document.getElementById('bina_data').value = d.binaData;
+                        if (d.binaFirmaInf) document.getElementById('bina_firma_inf').value = d.binaFirmaInf;
+                        if (d.binaFirmaMed) document.getElementById('bina_firma_med').value = d.binaFirmaMed;
+                        window.calcolaBina();
+                    }
+
+                    // Ricarica PAI se salvato
+                    if (d.paiObiettivi) document.getElementById('pai_obiettivi').value = d.paiObiettivi;
+                    if (d.paiInterventi) document.getElementById('pai_interventi').value = d.paiInterventi;
+                    if (d.paiSociale) document.getElementById('pai_sociale').value = d.paiSociale;
+                    if (d.paiData) document.getElementById('pai_data').value = d.paiData;
+                }
+            });
+        };
+
+        // SALVATAGGIO COMPLETO SINCRONIZZATO CON IL DESKTOP
+        window.salvaValutazioneCompleta = async () => {
+            const { totale, esito } = window.calcolaBina();
+            const binaData = document.getElementById('bina_data').value;
+            const firmaInf = document.getElementById('bina_firma_inf').value.trim();
+            const firmaMed = document.getElementById('bina_firma_med').value.trim();
+
+            const paiData = document.getElementById('pai_data').value;
+            const paiObiettivi = document.getElementById('pai_obiettivi').value.trim();
+            const paiInterventi = document.getElementById('pai_interventi').value.trim();
+            const paiSociale = document.getElementById('pai_sociale').value.trim();
+
+            // Mappa risposte
+            let risposteBina = {};
+            for (let i = 1; i <= 10; i++) {
+                risposteBina[`q${i}`] = document.getElementById(`bina_q${i}`).value;
+            }
+
+            const timestamp = Date.now();
+            const now = new Date();
+            const timeStr = `${now.toLocaleDateString('it-IT')} ore ${now.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'})}`;
+
+            try {
+                window.showToast("⏳ Archiviazione B.I.N.A. e P.A.I....");
+
+                // 1. Aggiornamento Cartella Clinica Desktop
+                await db.collection("cartelle_cliniche").doc(window.targetPatient).set({
+                    binaPunteggio: totale,
+                    binaEsito: esito,
+                    binaData: binaData,
+                    binaRisposte: risposteBina,
+                    binaFirmaInf: firmaInf,
+                    binaFirmaMed: firmaMed,
+                    paiData: paiData,
+                    paiObiettivi: paiObiettivi,
+                    paiInterventi: paiInterventi,
+                    paiSociale: paiSociale,
+                    ultimoAggiornamentoBinaPai: timestamp
+                }, { merge: true });
+
+                // 2. Storico Collezioni Dedicate
+                await db.collection("bina_valutazioni").add({
+                    ospite: window.targetPatient,
+                    punteggio: totale,
+                    esito: esito,
+                    data: binaData,
+                    risposte: risposteBina,
+                    op: window.activeOperator,
+                    ts: timestamp
+                });
+
+                if (paiObiettivi || paiInterventi) {
+                    await db.collection("pai_valutazioni").add({
+                        ospite: window.targetPatient,
+                        data: paiData,
+                        obiettivi: paiObiettivi,
+                        interventi: paiInterventi,
+                        sociale: paiSociale,
+                        op: window.activeOperator,
+                        ts: timestamp
+                    });
+                }
+
+                // 3. Notifica nel Diario Clinico
+                await db.collection("diario_clinico").add({
+                    ospite: window.targetPatient,
+                    data: timeStr,
+                    tipo: 'Clinica',
+                    nota: `Valutazione B.I.N.A. & P.A.I. ➔ Esito: ${esito} (${totale} pt)${paiObiettivi ? ' | Obiettivi: ' + paiObiettivi : ''}`,
+                    op: window.activeOperator,
+                    ts: timestamp
+                });
+
+                window.showToast("✅ B.I.N.A. e P.A.I. registrati con successo!");
+                setTimeout(() => { window.location.href = 'tablet_hub.html'; }, 1200);
+
+            } catch(e) {
+                console.error("Errore salvataggio:", e);
+                window.showToast("❌ Errore durante il salvataggio: " + e.message);
+            }
+        };
+
+        window.calcolaBina();
+        caricaDatiEsistenti();
     </script>
 </body>
 </html>

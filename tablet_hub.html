@@ -18,6 +18,12 @@
             --brand-primary: #0f766e; 
             --brand-secondary: #0284c7;
             --accent-red: #e11d48;
+            --gender-male: #0284c7;
+            --gender-male-bg: #f0f9ff;
+            --gender-male-border: #bae6fd;
+            --gender-female: #db2777;
+            --gender-female-bg: #fdf2f8;
+            --gender-female-border: #fbcfe8;
             --radius-md: 10px;
             --radius-lg: 14px;
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
@@ -42,14 +48,26 @@
 
         .patient-list-scroll { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; -webkit-overflow-scrolling: touch; }
         
-        .patient-list-item { background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.15s; }
-        .patient-list-item:active, .patient-list-item.selected { background: #f0fdfa; border-color: var(--brand-primary); box-shadow: 0 0 0 2px var(--brand-primary); }
+        /* CARD OSPITE CON COLORI GENERE */
+        .patient-list-item { background: #ffffff; border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.15s; position: relative; border-left: 6px solid var(--border); }
+        .patient-list-item:active, .patient-list-item.selected { box-shadow: 0 0 0 2px var(--brand-primary); }
+
+        /* Colore Maschile */
+        .patient-list-item.male { border-left-color: var(--gender-male); background: var(--gender-male-bg); border-color: var(--gender-male-border); }
+        .patient-list-item.male .pli-avatar { background: #e0f2fe; color: var(--gender-male); border-color: #bae6fd; }
+        .patient-list-item.male .gender-tag { background: #e0f2fe; color: var(--gender-male); }
+
+        /* Colore Femminile */
+        .patient-list-item.female { border-left-color: var(--gender-female); background: var(--gender-female-bg); border-color: var(--gender-female-border); }
+        .patient-list-item.female .pli-avatar { background: #fce7f3; color: var(--gender-female); border-color: #fbcfe8; }
+        .patient-list-item.female .gender-tag { background: #fce7f3; color: var(--gender-female); }
         
-        .pli-avatar { width: 44px; height: 44px; border-radius: 50%; background: #e2e8f0; object-fit: cover; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-muted); font-size: 1.05rem; flex-shrink: 0; overflow: hidden; border: 1px solid var(--border); }
+        .pli-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.05rem; flex-shrink: 0; overflow: hidden; border: 1.5px solid var(--border); }
         .pli-info { flex: 1; min-width: 0; }
-        .pli-name { margin: 0 0 3px 0; font-size: 0.95rem; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; }
-        .pli-meta { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
-        .pli-badges { display: flex; gap: 5px; font-size: 0.9rem; }
+        .pli-name { margin: 0 0 3px 0; font-size: 0.95rem; font-weight: 800; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; }
+        .pli-meta { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+        .pli-badges { display: flex; gap: 5px; font-size: 0.9rem; align-items: center; }
+        .gender-tag { font-size: 0.7rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; }
 
         /* PANNELLO PRINCIPALE DESTRA */
         .main-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--main-bg); position: relative; }
@@ -58,7 +76,7 @@
         
         .selected-patient-banner { display: flex; align-items: center; gap: 12px; background: #f8fafc; border: 1px solid var(--border); padding: 6px 14px; border-radius: 30px; }
         .spb-icon { width: 34px; height: 34px; border-radius: 50%; background: #e0f2fe; color: var(--brand-secondary); display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold; }
-        .spb-text { font-size: 0.95rem; font-weight: 700; color: var(--text-main); text-transform: uppercase; }
+        .spb-text { font-size: 0.95rem; font-weight: 800; color: var(--text-main); text-transform: uppercase; }
         .spb-sub { font-size: 0.78rem; color: var(--text-muted); }
 
         .operator-pill { background: #f1f5f9; border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 700; }
@@ -78,10 +96,10 @@
         .alert-section-title { font-size: 1rem; font-weight: 700; color: var(--text-main); margin: 6px 0 0 0; display: flex; align-items: center; gap: 6px; }
         .alert-box { background: #fff1f2; border: 1px solid #fecdd3; border-radius: var(--radius-md); padding: 14px 18px; color: #991b1b; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; }
 
-        /* BOTTOM TAB BAR CON CONSENSI DOPO VITALI */
+        /* BOTTOM TAB BAR OTTIMIZZATA */
         .bottom-tab-bar { background: #ffffff; border-top: 1px solid var(--border); height: 75px; display: flex; justify-content: space-around; align-items: center; padding: 0 4px; flex-shrink: 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); }
         
-        .tab-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: transparent; border: none; color: var(--text-muted); font-size: 0.72rem; font-weight: 700; cursor: pointer; padding: 6px 6px; border-radius: var(--radius-md); transition: all 0.15s; flex: 1; max-width: 120px; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: transparent; border: none; color: var(--text-muted); font-size: 0.72rem; font-weight: 700; cursor: pointer; padding: 6px 4px; border-radius: var(--radius-md); transition: all 0.15s; flex: 1; max-width: 125px; }
         .tab-item.active { color: var(--brand-primary); }
         .tab-item:active { transform: scale(0.96); }
         .tab-item svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -94,7 +112,7 @@
         .toast.show { opacity: 1; }
     </style>
 
-    <!-- FIREBASE COMPAT SDK PER FILE:/// -->
+    <!-- FIREBASE COMPAT SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
@@ -166,7 +184,7 @@
             </div>
         </div>
 
-        <!-- ================= BOTTOM TAB BAR ORDINATA ================= -->
+        <!-- ================= BOTTOM TAB BAR (AGGIORNATA) ================= -->
         <nav class="bottom-tab-bar">
             <!-- 1. HOME -->
             <button class="tab-item active" onclick="window.navTab('home')">
@@ -174,7 +192,7 @@
                 Home
             </button>
 
-            <!-- 2. CHECK-IN -->
+            <!-- 2. CHECK-IN & LESIONI (INTEGRATO) -->
             <button class="tab-item disabled" id="tabCheckin" onclick="window.navModo('checkin')">
                 <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
                 Check-in
@@ -192,7 +210,7 @@
                 Consensi
             </button>
 
-            <!-- 5. TERAPIA -->
+            <!-- 5. TERAPIA (S.U.T.) -->
             <button class="tab-item disabled req-inf" id="tabTerapia" onclick="window.navModo('terapia')">
                 <svg viewBox="0 0 24 24"><path d="M10.5 20.5L3.5 13.5a5 5 0 0 1 7-7l1.5 1.5L13.5 8a5 5 0 0 1 7 7l-7 7z"></path></svg>
                 Terapia
@@ -204,19 +222,13 @@
                 Diari OSS
             </button>
 
-            <!-- 7. NOTE CLINICHE -->
+            <!-- 7. NOTE CLINICHE (MEDICO / INFERMIERE) -->
             <button class="tab-item disabled" id="tabNote" onclick="window.navModo('note')">
                 <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 Note Cliniche
             </button>
 
-            <!-- 8. FOTO LESIONI -->
-            <button class="tab-item disabled req-inf" id="tabLesioni" onclick="window.navModo('lesioni')">
-                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                Foto Lesioni
-            </button>
-
-            <!-- 9. BINA / PAI -->
+            <!-- 8. B.I.N.A. / P.A.I. -->
             <button class="tab-item disabled" id="tabBinaPai" onclick="window.navModo('binapai')">
                 <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                 BINA/PAI
@@ -283,6 +295,22 @@
             }
         };
 
+        // Funzione ausiliaria per riconoscere il sesso (M / F)
+        window.determinaGenere = (g) => {
+            if (g.gender === 'M' || g.sesso === 'M' || g.gender === 'Maschile' || g.sesso === 'Maschile') return 'M';
+            if (g.gender === 'F' || g.sesso === 'F' || g.gender === 'Femminile' || g.sesso === 'Femminile') return 'F';
+            
+            // Deduci dal Codice Fiscale (giorno > 40 = Donna)
+            if (g.cf && g.cf.length === 16) {
+                const giorno = parseInt(g.cf.substr(9, 2), 10);
+                if (!isNaN(giorno)) {
+                    return giorno > 40 ? 'F' : 'M';
+                }
+            }
+            return 'M'; // default fallback
+        };
+
+        // RENDER DELLA LISTA OSPITI CON COLORI GENERE
         window.renderSidebarOspiti = (lista = null) => {
             const container = document.getElementById('sidebarPatientList');
             container.innerHTML = '';
@@ -299,18 +327,28 @@
                 const isSelected = window.selectedPatient === g.name ? 'selected' : '';
                 const pD = window.dbClinica[g.name] || {};
 
+                // Determinazione classe genere: 'male' (azzurro) o 'female' (rosa)
+                const gender = window.determinaGenere(g);
+                const genderClass = gender === 'F' ? 'female' : 'male';
+                const genderLabel = gender === 'F' ? 'F' : 'M';
+
                 let badgeHtml = '';
                 if(pD.disfagia) badgeHtml += `<span title="Disfagico">🥣</span>`;
                 if(pD.infezione) badgeHtml += `<span title="Isolamento ICA">☣</span>`;
 
                 container.innerHTML += `
-                    <div class="patient-list-item ${isSelected}" onclick="window.selezionaPaziente('${g.name}')">
-                        <div class="pli-avatar">${g.photo ? `<img src="${g.photo}" style="width:100%;height:100%;object-fit:cover;">` : initials}</div>
+                    <div class="patient-list-item ${genderClass} ${isSelected}" onclick="window.selezionaPaziente('${g.name}')">
+                        <div class="pli-avatar">
+                            ${g.photo ? `<img src="${g.photo}" style="width:100%;height:100%;object-fit:cover;">` : initials}
+                        </div>
                         <div class="pli-info">
                             <h4 class="pli-name">${g.name}</h4>
                             <div class="pli-meta">
                                 <span>Stanza ${g.room || '-'} (Letto ${g.bed || '-'})</span>
-                                <div class="pli-badges">${badgeHtml}</div>
+                                <div class="pli-badges">
+                                    <span class="gender-tag">${genderLabel}</span>
+                                    ${badgeHtml}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -348,13 +386,19 @@
 
         window.aggiornaBannerSelezionato = (nome) => {
             const g = window.dbOspiti.find(x => x.name === nome) || {};
+            const gender = window.determinaGenere(g);
+            
             document.getElementById('headerSelectedName').innerText = nome;
-            document.getElementById('headerSelectedSub').innerText = `Stanza ${g.room || '-'} | CF: ${g.cf || '-'}`;
+            document.getElementById('headerSelectedSub').innerText = `Stanza ${g.room || '-'} | Sesso: ${gender} | CF: ${g.cf || '-'}`;
             document.getElementById('btnClearPatient').style.display = 'flex';
+            
+            const avatarIcon = document.getElementById('headerPatientAvatarIcon');
             if (g.photo) {
-                document.getElementById('headerPatientAvatarIcon').innerHTML = `<img src="${g.photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+                avatarIcon.innerHTML = `<img src="${g.photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
             } else {
-                document.getElementById('headerPatientAvatarIcon').innerText = '👤';
+                avatarIcon.innerText = gender === 'F' ? '👩' : '👨';
+                avatarIcon.style.background = gender === 'F' ? '#fce7f3' : '#e0f2fe';
+                avatarIcon.style.color = gender === 'F' ? 'var(--gender-female)' : 'var(--gender-male)';
             }
             window.sbloccaSezioni();
         };
@@ -369,13 +413,12 @@
             }
             
             const encoded = encodeURIComponent(window.selectedPatient);
+            if (modo === 'checkin') window.location.href = `tablet_checkin.html?ospite=${encoded}`;
             if (modo === 'vitali') window.location.href = `tablet_parametri.html?ospite=${encoded}`;
             if (modo === 'consensi') window.location.href = `tablet_consensi.html?ospite=${encoded}`;
             if (modo === 'terapia') window.location.href = `tablet_terapia.html?ospite=${encoded}`;
             if (modo === 'diari') window.location.href = `tablet_diario_oss.html?ospite=${encoded}`;
             if (modo === 'note') window.location.href = `tablet_diarioclinico.html?ospite=${encoded}`;
-            if (modo === 'lesioni') window.location.href = `tablet_fotoclinica.html?ospite=${encoded}`;
-            if (modo === 'checkin') window.location.href = `tablet_checkin.html?ospite=${encoded}`;
             if (modo === 'binapai') window.location.href = `tablet_bina_pai.html?ospite=${encoded}`;
         };
 
@@ -405,7 +448,7 @@
             }
         };
 
-        // ASCOLTO IN TEMPO REALE CON FIRESTORE COMPAT
+        // ASCOLTO REALTIME DA FIRESTORE
         db.collection("ospiti").onSnapshot(snap => {
             window.dbOspiti = snap.docs.map(d => ({id: d.id, ...d.data()}));
             window.renderSidebarOspiti();

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Diario & Consegne OSS - NVS WardPad</title>
+
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --brand-primary: #0f766e;
+            --brand-secondary: #0284c7; 
+            --success: #059669;
+            --alert-amber: #d97706;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-body); margin: 0; padding: 0; color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        .app-header { background: #ffffff; color: var(--text-main); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); z-index: 10; flex-shrink: 0; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn { background: none; border: none; font-size: 1.15rem; color: var(--brand-primary); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 0; }
+        .patient-title { font-size: 1.1rem; font-weight: 800; text-transform: uppercase; color: var(--text-main); border-left: 2px solid var(--border); padding-left: 12px; }
+
+        .main-container { flex: 1; overflow-y: auto; padding: 18px 20px; -webkit-overflow-scrolling: touch; display: flex; justify-content: center; }
+        .content-wrapper { width: 100%; max-width: 1050px; display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 20px; padding-bottom: 50px; }
+        @media (max-width: 900px) { .content-wrapper { grid-template-columns: 1fr; } }
+
+        .card-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 16px; }
+        .card-title { margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--brand-primary); border-bottom: 1px solid var(--border); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* SELETTORE TURNO */
+        .turno-selector { display: flex; gap: 8px; }
+        .btn-turno { flex: 1; padding: 10px 4px; background: #f1f5f9; border: 1.5px solid var(--border); border-radius: var(--radius-md); font-weight: 800; font-size: 0.88rem; color: var(--text-muted); cursor: pointer; text-align: center; transition: all 0.15s; }
+        .btn-turno.active { background: #f0fdfa; border-color: var(--brand-primary); color: var(--brand-primary); box-shadow: 0 0 0 1px var(--brand-primary); }
+
+        /* CHIPS ATTIVITÀ ASSISTENZIALI TOUCH */
+        .chips-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .activity-chip { background: #f8fafc; border: 1.5px solid var(--border); padding: 12px 14px; border-radius: var(--radius-md); font-weight: 700; font-size: 0.88rem; color: var(--text-main); cursor: pointer; user-select: none; display: flex; align-items: center; gap: 8px; transition: all 0.15s; }
+        .activity-chip:active { transform: scale(0.97); }
+        .activity-chip.active { background: #e0f2fe; border-color: var(--brand-secondary); color: #0369a1; box-shadow: 0 0 0 1px var(--brand-secondary); }
+
+        /* SELETTORI ALVO E DIURESI */
+        .alvo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .alvo-btn { padding: 9px 4px; background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-align: center; cursor: pointer; }
+        .alvo-btn.active { background: #fef3c7; border-color: var(--alert-amber); color: #92400e; font-weight: 800; }
+
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        .touch-input { background: #f8fafc; border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 12px; font-size: 0.95rem; font-weight: 600; color: var(--text-main); outline: none; font-family: inherit; }
+        .touch-input:focus { border-color: var(--brand-primary); background: #ffffff; }
+
+        /* TIMELINE ATTIVITÀ DI GIORNATA */
+        .log-timeline { display: flex; flex-direction: column; gap: 10px; max-height: 480px; overflow-y: auto; padding-right: 4px; }
+        .log-item { background: #f8fafc; border: 1px solid var(--border); border-left: 4px solid var(--brand-primary); border-radius: var(--radius-md); padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+        .log-top { display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); }
+        .log-desc { font-size: 0.9rem; font-weight: 600; color: var(--text-main); }
+        .log-sub { font-size: 0.8rem; color: var(--brand-secondary); font-weight: 700; }
+
+        /* FOOTER ACTIONS */
+        .bottom-action-bar { position: sticky; bottom: 0; background: #ffffff; padding: 14px 20px; border-top: 1px solid var(--border); box-shadow: 0 -4px 10px rgba(0,0,0,0.04); display: flex; justify-content: center; z-index: 20; }
+        .btn-save-log { background: var(--success); color: #fff; border: none; padding: 16px 28px; border-radius: var(--radius-lg); font-size: 1.15rem; font-weight: 700; width: 100%; max-width: 1050px; cursor: pointer; box-shadow: 0 4px 6px rgba(5, 150, 105, 0.2); display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-save-log:active { transform: scale(0.98); }
+
+        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 50000; }
+        .toast { background: #1e293b; color: #fff; padding: 14px 24px; border-radius: 30px; font-size: 0.95rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; box-shadow: var(--shadow-md); text-align: center; }
+        .toast.show { opacity: 1; }
+        
+        .svg-icon { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+
+    <!-- FIREBASE COMPAT SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <div id="toast-container"></div>
+
+    <header class="app-header">
+        <div class="header-left">
+            <button class="back-btn" onclick="window.location.href='tablet_hub.html'">
+                <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg> Reparto
+            </button>
+            <div class="patient-title" id="headerPatientName">Caricamento...</div>
+        </div>
+        <div style="font-size:0.85rem; font-weight:700; color:var(--brand-primary); background:#f0fdfa; padding:6px 14px; border-radius:20px; border:1px solid #ccfbf1;">
+            Assistenza OSS al Letto
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="content-wrapper">
+
+            <!-- 1. REGISTRAZIONE ATTIVITÀ & NOTE -->
+            <div class="card-box">
+                <h3 class="card-title">📝 Attività Assistenziali Eseguite</h3>
+
+                <!-- Selezione Turno -->
+                <div class="form-group">
+                    <label>Fascia Oraria / Turno</label>
+                    <div class="turno-selector">
+                        <div class="btn-turno active" onclick="window.selectTurno('Mattina', this)">🌅 Mattina</div>
+                        <div class="btn-turno" onclick="window.selectTurno('Pomeriggio', this)">☀️ Pomeriggio</div>
+                        <div class="btn-turno" onclick="window.selectTurno('Notte', this)">🌙 Notte</div>
+                    </div>
+                </div>
+
+                <!-- Chips Attività Frequenti -->
+                <div class="form-group">
+                    <label>Cure Igieniche & Posturali</label>
+                    <div class="chips-grid">
+                        <div class="activity-chip" onclick="window.toggleChip(this, 'Igiene Completa a Letto')">🧼 Igiene Completa</div>
+                        <div class="activity-chip" onclick="window.toggleChip(this, 'Cura Igiene Parziale')">🪥 Igiene Parziale</div>
+                        <div class="activity-chip" onclick="window.toggleChip(this, 'Cambio Ausilio Assorbente')">🧷 Cambio Ausilio</div>
+                        <div class="activity-chip" onclick="window.toggleChip(this, 'Cambio Postura Decubito')">🔄 Cambio Postura</div>
+                        <div class="activity-chip" onclick="window.toggleChip(this, 'Mobilizzazione / Poltrona')">♿ Messo in Poltrona</div>
+                        <div class="activity-chip" onclick="window.toggleChip(this, 'Alimentazione / Idratazione')">🥣 Assistenza Pasto</div>
+                    </div>
+                </div>
+
+                <!-- Monitoraggio Alvo -->
+                <div class="form-group">
+                    <label>Monitoraggio Alvo Odierno</label>
+                    <div class="alvo-grid">
+                        <div class="alvo-btn" onclick="window.selectAlvo('Regolare', this)">Regolare</div>
+                        <div class="alvo-btn" onclick="window.selectAlvo('Stipsi', this)">Stipsi</div>
+                        <div class="alvo-btn" onclick="window.selectAlvo('Diarroica', this)">Diarroica</div>
+                        <div class="alvo-btn" onclick="window.selectAlvo('Copiosa', this)">Copiosa</div>
+                    </div>
+                </div>
+
+                <!-- Note di Consegna -->
+                <div class="form-group">
+                    <label>Note Specifiche / Consegna di Turno</label>
+                    <textarea id="ossNote" class="touch-input" rows="3" placeholder="Es. L'ospite ha consumato tutto il pasto, collaborante nelle cure igieniche, idratato regolarmente..."></textarea>
+                </div>
+            </div>
+
+            <!-- 2. STORICO RECENTE DELLA GIORNATA -->
+            <div class="card-box">
+                <h3 class="card-title">
+                    <span>📋 Consegne & Diari Recenti</span>
+                    <span id="logCountBadge" style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">Oggi</span>
+                </h3>
+
+                <div class="log-timeline" id="logTimelineContainer">
+                    <div style="text-align:center; padding:35px; color:var(--text-muted); font-size:0.85rem;">
+                        Caricamento registrazioni del paziente...
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div class="bottom-action-bar">
+        <button class="btn-save-log" onclick="window.salvaAttivitaOSS()">
+            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+            Registra Consegna & Attività OSS
+        </button>
+    </div>
+
+    <script>
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAc0fIlfds4Gne5m3qpH25uacK4NeR6TzM", 
+            authDomain: "gestione-visite-b445b.firebaseapp.com", 
+            projectId: "gestione-visite-b445b", 
+            storageBucket: "gestione-visite-b445b.firebasestorage.app", 
+            messagingSenderId: "720937824810", 
+            appId: "1:720937824810:web:b04b60d1d66bb8f4040953" 
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        window.activeOperator = sessionStorage.getItem("activeOperator") || localStorage.getItem("activeOperator") || "Operatore";
+
+        const urlParams = new URLSearchParams(window.location.search);
+        window.targetPatient = (urlParams.get('ospite') || sessionStorage.getItem('globalSelectedPatient') || "").trim().toUpperCase();
+
+        if(!window.targetPatient) {
+            window.location.href = 'tablet_hub.html';
+        } else {
+            document.getElementById('headerPatientName').innerText = window.targetPatient;
+        }
+
+        window.selectedTurno = "Mattina";
+        window.selectedAlvo = "";
+        window.selectedActivities = new Set();
+
+        window.showToast = (m) => {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = 'toast'; t.innerText = m;
+            c.appendChild(t);
+            setTimeout(() => t.classList.add('show'), 10);
+            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2200);
+        };
+
+        window.selectTurno = (turno, el) => {
+            window.selectedTurno = turno;
+            document.querySelectorAll('.btn-turno').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+        };
+
+        window.toggleChip = (el, text) => {
+            if (window.selectedActivities.has(text)) {
+                window.selectedActivities.delete(text);
+                el.classList.remove('active');
+            } else {
+                window.selectedActivities.add(text);
+                el.classList.add('active');
+            }
+        };
+
+        window.selectAlvo = (tipo, el) => {
+            if (window.selectedAlvo === tipo) {
+                window.selectedAlvo = "";
+                el.classList.remove('active');
+            } else {
+                window.selectedAlvo = tipo;
+                document.querySelectorAll('.alvo-btn').forEach(b => b.classList.remove('active'));
+                el.classList.add('active');
+            }
+        };
+
+        // SALVATAGGIO ATTIVITÀ & CONSEGNA
+        window.salvaAttivitaOSS = async () => {
+            const noteText = document.getElementById('ossNote').value.trim();
+            const attivitaList = Array.from(window.selectedActivities);
+
+            if (attivitaList.length === 0 && !noteText && !window.selectedAlvo) {
+                return window.showToast("⚠️ Seleziona almeno un'attività o inserisci una nota.");
+            }
+
+            const now = new Date();
+            const timeStr = `${now.toLocaleDateString('it-IT')} ore ${now.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'})}`;
+            
+            let descrizioneLog = `[Turno ${window.selectedTurno}] `;
+            if (attivitaList.length > 0) descrizioneLog += `Attività: ${attivitaList.join(', ')}. `;
+            if (window.selectedAlvo) descrizioneLog += `Alvo: ${window.selectedAlvo}. `;
+            if (noteText) descrizioneLog += `Note: ${noteText}`;
+
+            try {
+                window.showToast("⏳ Registrazione consegna in corso...");
+
+                // 1. Registrazione nella collezione 'consegne'
+                await db.collection("consegne").add({
+                    ospite: window.targetPatient,
+                    turno: window.selectedTurno,
+                    attivita: attivitaList,
+                    alvo: window.selectedAlvo || 'Non segnalato',
+                    note: noteText,
+                    testoCompleto: descrizioneLog,
+                    op: window.activeOperator,
+                    data: timeStr,
+                    ts: Date.now()
+                });
+
+                // 2. Notifica parallela nel 'diario_clinico'
+                await db.collection("diario_clinico").add({
+                    ospite: window.targetPatient,
+                    tipo: 'Assistenziale',
+                    data: timeStr,
+                    nota: descrizioneLog,
+                    op: window.activeOperator,
+                    ts: Date.now()
+                });
+
+                window.showToast("✅ Consegna e attività registrate!");
+                
+                // Reset modulo
+                document.getElementById('ossNote').value = '';
+                window.selectedActivities.clear();
+                window.selectedAlvo = '';
+                document.querySelectorAll('.activity-chip, .alvo-btn').forEach(c => c.classList.remove('active'));
+
+            } catch(e) {
+                console.error("Errore salvataggio consegna OSS:", e);
+                window.showToast("❌ Errore durante il salvataggio.");
+            }
+        };
+
+        // ASCOLTO STORICO RECENTE
+        const ascoltaConsegneOggi = () => {
+            db.collection("diario_clinico")
+              .where("ospite", "==", window.targetPatient)
+              .onSnapshot(snap => {
+                  const container = document.getElementById('logTimelineContainer');
+                  container.innerHTML = '';
+
+                  let items = [];
+                  snap.forEach(d => {
+                      const data = d.data();
+                      if (data.tipo === 'Assistenziale' || (data.nota && data.nota.includes('Turno'))) {
+                          items.push({ id: d.id, ...data });
+                      }
+                  });
+
+                  if (items.length === 0) {
+                      container.innerHTML = `<div style="text-align:center; padding:35px; color:var(--text-muted); font-size:0.85rem;">Nessuna registrazione assistenziale recente per questo ospite.</div>`;
+                      return;
+                  }
+
+                  items.sort((a,b) => (b.ts || 0) - (a.ts || 0));
+
+                  items.slice(0, 15).forEach(item => {
+                      container.innerHTML += `
+                          <div class="log-item">
+                              <div class="log-top">
+                                  <span>${item.data}</span>
+                                  <span>👤 ${item.op || 'Operatore'}</span>
+                              </div>
+                              <div class="log-desc">${item.nota}</div>
+                          </div>
+                      `;
+                  });
+              });
+        };
+
+        ascoltaConsegneOggi();
+    </script>
+</body>
+</html>

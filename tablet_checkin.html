@@ -17,7 +17,7 @@
             --brand-primary: #0f766e;
             --brand-secondary: #0284c7; 
             --success: #059669;
-            --alert-red: #e11d48;
+            --error-color: #ef4444;
             --radius-md: 8px;
             --radius-lg: 12px;
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
@@ -40,17 +40,18 @@
         .card-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); }
         .card-title { margin: 0 0 14px 0; font-size: 1.05rem; font-weight: 800; color: var(--brand-primary); border-bottom: 1px solid var(--border); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* BODY MAP IDENTICA ALLA CARTELLA CLINICA */
-        .body-map-frame {
+        /* BODY MAP FRAME ESATTO DEL GESTIONALE */
+        #bodyMapWrapper {
             position: relative;
             width: 100%;
             max-width: 380px;
-            margin: 0 auto;
-            border: 2px solid var(--border);
+            margin: 10px auto;
+            border: 1px solid var(--border);
             border-radius: var(--radius-md);
             background: #ffffff;
-            overflow: hidden;
+            cursor: crosshair;
             user-select: none;
+            overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
         .body-map-img {
@@ -59,46 +60,31 @@
             display: block;
             pointer-events: none;
         }
-        .body-map-click-surface {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            cursor: crosshair;
-        }
 
-        /* MARKER LESIONE / PIAGA */
+        /* CLASSE BODY-MARKER ESATTA DEL DESKTOP */
         .body-marker {
             position: absolute;
-            width: 18px;
-            height: 18px;
-            background-color: var(--alert-red);
-            border: 2px solid #ffffff;
+            width: 16px;
+            height: 16px;
+            background-color: var(--error-color);
+            border: 2px solid white;
             border-radius: 50%;
             transform: translate(-50%, -50%);
             cursor: pointer;
             z-index: 20;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
             display: flex;
             align-items: center;
             justify-content: center;
             color: #fff;
             font-size: 10px;
             font-weight: 800;
-            animation: popIn 0.2s ease-out;
-        }
-        @keyframes popIn {
-            0% { transform: translate(-50%, -50%) scale(0); }
-            80% { transform: translate(-50%, -50%) scale(1.2); }
-            100% { transform: translate(-50%, -50%) scale(1); }
         }
 
         .map-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-        .btn-clear-points { background: #fee2e2; color: var(--alert-red); border: 1px solid #fecdd3; padding: 8px 14px; border-radius: var(--radius-md); font-weight: 700; font-size: 0.85rem; cursor: pointer; }
+        .btn-clear-points { background: #fee2e2; color: var(--error-color); border: 1px solid #fecdd3; padding: 8px 14px; border-radius: var(--radius-md); font-weight: 700; font-size: 0.85rem; cursor: pointer; }
         .btn-clear-points:active { background: #fca5a5; }
 
-        /* FORM CLINICO */
         .form-group { margin-bottom: 14px; }
         .form-group label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; }
         .touch-input { background: #f8fafc; border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 12px; font-size: 0.95rem; color: var(--text-main); outline: none; width: 100%; font-weight: 600; font-family: inherit; }
@@ -115,7 +101,7 @@
         .svg-icon { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     </style>
 
-    <!-- FIREBASE COMPAT SDK (FUNZIONA OVUNQUE) -->
+    <!-- FIREBASE COMPAT SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
@@ -142,14 +128,13 @@
                 <!-- 1. MAPPA CORPOREA IDENTICA AL DESKTOP -->
                 <div class="card-box">
                     <h3 class="card-title">
-                        <span>🧍 Mappa Anatomica Lesioni</span>
-                        <small style="font-size:0.75rem; color:var(--text-muted); font-weight:bold;">Tocca per segnare</small>
+                        <span>🧍 Mappa Anatomica (Clicca per segnare)</span>
                     </h3>
 
-                    <div class="body-map-frame" id="bodyMapWrapper">
-                        <img src="corpo_umano.png" alt="Mappa Corpo Umano Fronte Retro" class="body-map-img" id="bodyImgRef">
-                        <div class="body-map-click-surface" id="bodyMapClickSurface" onclick="window.handleBodyMapClick(event)"></div>
-                        <div id="bodyMarkersLayer"></div>
+                    <!-- ID esatti del desktop: bodyMapWrapper e bodyMarkersLayer -->
+                    <div id="bodyMapWrapper" onclick="window.handleBodyMapClick(event)">
+                        <img src="corpo_umano.png" alt="Mappa Corpo Umano Fronte Retro" class="body-map-img">
+                        <div id="bodyMarkersLayer" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></div>
                     </div>
 
                     <div class="map-actions">
@@ -158,40 +143,24 @@
                     </div>
                 </div>
 
-                <!-- 2. CAMPI CLINICI IDENTICI A CARTELLA_CLINICA.HTML -->
+                <!-- 2. CAMPI IDENTICI DEL DESKTOP (chkGen, chkPiaghe) -->
                 <div class="card-box">
                     <h3 class="card-title">
-                        <span>📋 Dati Clinici di Reparto</span>
-                        <span id="lastCheckinDateBadge" style="font-size:0.75rem; color:var(--text-muted);">Data: Oggi</span>
+                        <span>📋 Check-in e Mappatura Lesioni</span>
                     </h3>
 
                     <div class="form-group">
-                        <label>Data Valutazione / Check-in</label>
-                        <input type="date" id="chkData" class="touch-input">
+                        <label>Condizioni Generali all'Arrivo</label>
+                        <textarea id="chkGen" class="touch-input" rows="3" placeholder="Descrizione condizioni generali..."></textarea>
                     </div>
 
                     <div class="form-group">
-                        <label>Condizioni Generali all'Arrivo / di Reparto</label>
-                        <textarea id="chkGen" class="touch-input" rows="3" placeholder="Descrizione delle condizioni generali, nutrizione, mobilità, orientamento..."></textarea>
+                        <label>Piaghe/Lesioni</label>
+                        <textarea id="chkPiaghe" class="touch-input" rows="3" placeholder="Sede, grado piaga, medicazioni..."></textarea>
                     </div>
 
-                    <div class="form-group">
-                        <label>Dettaglio Piaghe / Lesioni / Cute</label>
-                        <textarea id="chkPiaghe" class="touch-input" rows="3" placeholder="Sede, stadio, stato della lesione da decubito, medicazioni in atto..."></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Esito Evolutivo / Note di Controllo</label>
-                        <select id="chkEsito" class="touch-input">
-                            <option value="Stabile / Cute Integra">Stabile / Cute Integra</option>
-                            <option value="Lesione in miglioramento / Detersione">Lesione in miglioramento / Detersione</option>
-                            <option value="Nuova lesione rilevata / Avviato protocollo">Nuova lesione rilevata / Avviato protocollo</option>
-                            <option value="Peggioramento / Necessaria rivalutazione medica">Peggioramento / Necessaria rivalutazione medica</option>
-                        </select>
-                    </div>
-
-                    <div style="background:#f8fafc; padding:10px 14px; border-radius:var(--radius-md); font-size:0.85rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; border:1px solid var(--border);">
-                        <span>Operatore Registrazione:</span>
+                    <div style="background:#f8fafc; padding:12px 14px; border-radius:var(--radius-md); font-size:0.85rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; border:1px solid var(--border);">
+                        <span>Operatore Incaricato:</span>
                         <strong id="labelOperatorBadge" style="color:var(--brand-primary);">-</strong>
                     </div>
                 </div>
@@ -202,7 +171,7 @@
     </main>
 
     <div class="bottom-action-bar">
-        <button class="btn-save-checkin" onclick="window.saveClinicalData()">💾 Salva Check-in e Mappatura Lesioni</button>
+        <button class="btn-save-checkin" onclick="window.saveClinicalData()">💾 Salva Check-in</button>
     </div>
 
     <script>
@@ -230,11 +199,10 @@
             window.location.href = 'tablet_hub.html';
         } else {
             document.getElementById('headerPatientName').innerText = window.targetPatient;
-            const n = new Date();
-            document.getElementById('chkData').value = `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
         }
 
-        window.currentMarkers = [];
+        // Variabile globale esattamente con lo stesso nome del gestionale desktop
+        window.currentBodyMarkers = [];
 
         window.showToast = (m) => {
             const c = document.getElementById('toast-container');
@@ -245,61 +213,62 @@
             setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2200);
         };
 
-        // GESTIONE CLICK E TOCCO SULLA MAPPA ANATOMICA
+        // GESTIONE CLICK SULLA MAPPA (LOGICA ESATTA DEL DESKTOP)
         window.handleBodyMapClick = (e) => {
-            const rect = e.currentTarget.getBoundingClientRect();
+            const w = document.getElementById('bodyMapWrapper');
+            if (!w) return;
+            const r = w.getBoundingClientRect();
             const clientX = e.clientX || (e.touches && e.touches[0].clientX);
             const clientY = e.clientY || (e.touches && e.touches[0].clientY);
 
-            const x = ((clientX - rect.left) / rect.width) * 100;
-            const y = ((clientY - rect.top) / rect.height) * 100;
+            const x = ((clientX - r.left) / r.width) * 100;
+            const y = ((clientY - r.top) / r.height) * 100;
 
-            const marker = {
-                id: 'm_' + Date.now(),
+            window.currentBodyMarkers.push({
                 x: Math.round(x * 10) / 10,
                 y: Math.round(y * 10) / 10
-            };
+            });
 
-            window.currentMarkers.push(marker);
-            window.renderMarkers();
+            window.renderBodyMarkers();
             window.showToast("Punto lesione aggiunto!");
         };
 
-        window.renderMarkers = () => {
-            const layer = document.getElementById('bodyMarkersLayer');
-            layer.innerHTML = '';
+        // RENDER DEI MARKER (LOGICA ESATTA DEL DESKTOP)
+        window.renderBodyMarkers = () => {
+            const l = document.getElementById('bodyMarkersLayer');
+            if (!l) return;
+            l.innerHTML = '';
 
-            window.currentMarkers.forEach((m, idx) => {
-                const dot = document.createElement('div');
-                dot.className = 'body-marker';
-                dot.style.left = m.x + '%';
-                dot.style.top = m.y + '%';
-                dot.innerText = idx + 1;
-                dot.title = `Punto #${idx + 1} (Tocca per rimuovere)`;
-
-                dot.onclick = (evt) => {
-                    evt.stopPropagation();
-                    window.currentMarkers = window.currentMarkers.filter(item => item.id !== m.id);
-                    window.renderMarkers();
+            window.currentBodyMarkers.forEach((m, i) => {
+                const d = document.createElement('div');
+                d.className = 'body-marker';
+                d.style.left = m.x + '%';
+                d.style.top = m.y + '%';
+                d.style.pointerEvents = 'auto';
+                d.innerText = i + 1;
+                d.onclick = (ev) => {
+                    ev.stopPropagation();
+                    window.currentBodyMarkers.splice(i, 1);
+                    window.renderBodyMarkers();
                     window.showToast("Punto rimosso.");
                 };
-
-                layer.appendChild(dot);
+                l.appendChild(d);
             });
 
-            document.getElementById('markersCountLabel').innerText = `${window.currentMarkers.length} punti segnati`;
+            document.getElementById('markersCountLabel').innerText = `${window.currentBodyMarkers.length} punti segnati`;
         };
 
+        // RESET MARKER (LOGICA ESATTA DEL DESKTOP)
         window.clearBodyMarkers = () => {
-            if (window.currentMarkers.length === 0) return;
-            if (confirm("Cancellare tutti i punti segnati sulla mappa corporea?")) {
-                window.currentMarkers = [];
-                window.renderMarkers();
+            if (window.currentBodyMarkers.length === 0) return;
+            if (confirm('Svuotare la mappa?')) {
+                window.currentBodyMarkers = [];
+                window.renderBodyMarkers();
                 window.showToast("Mappa ripulita.");
             }
         };
 
-        // CARICAMENTO DATI ESISTENTI DALLA CARTELLA CLINICA
+        // CARICAMENTO REALTIME DA FIRESTORE (LEGGE chkMarkers E I CAMPI DEL DESKTOP)
         const caricaDatiCheckin = () => {
             db.collection("cartelle_cliniche").doc(window.targetPatient).onSnapshot(docSnap => {
                 if (docSnap.exists) {
@@ -307,60 +276,50 @@
 
                     if (data.chkGen) document.getElementById('chkGen').value = data.chkGen;
                     if (data.chkPiaghe) document.getElementById('chkPiaghe').value = data.chkPiaghe;
-                    if (data.checkinEsito) document.getElementById('chkEsito').value = data.checkinEsito;
-                    if (data.checkinDataUltima) {
-                        document.getElementById('chkData').value = data.checkinDataUltima;
-                        document.getElementById('lastCheckinDateBadge').innerText = `Ultimo: ${data.checkinDataUltima}`;
-                    }
 
-                    // Caricamento dei punti anatomici salvati (array bodyMarkers compatibile col desktop)
-                    if (Array.isArray(data.bodyMarkers)) {
-                        window.currentMarkers = data.bodyMarkers;
-                        window.renderMarkers();
+                    // Supporta sia chkMarkers (desktop) che bodyMarkers (fallback)
+                    const markersSalvati = data.chkMarkers || data.bodyMarkers || [];
+                    if (Array.isArray(markersSalvati)) {
+                        window.currentBodyMarkers = [...markersSalvati];
+                        window.renderBodyMarkers();
                     }
                 }
             });
         };
 
-        // SALVATAGGIO ALLINEATO A CARTELLA_CLINICA.HTML E DIARIO
+        // SALVATAGGIO DEI DATI (SALVA SIA chkMarkers CHE bodyMarkers PER PIENA COMPATIBILITÀ)
         window.saveClinicalData = async () => {
-            const dataVal = document.getElementById('chkData').value;
             const genVal = document.getElementById('chkGen').value.trim();
             const piagheVal = document.getElementById('chkPiaghe').value.trim();
-            const esitoVal = document.getElementById('chkEsito').value;
-
             const timeStr = `${new Date().toLocaleDateString('it-IT')} ore ${new Date().toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'})}`;
-            const logNota = `Check-in Clinico & Lesioni ➔ Condizioni: ${genVal || 'Stabili'} | Piaghe/Cute: ${piagheVal || 'Integra'} | Mappa: ${window.currentMarkers.length} punti segnati | Esito: ${esitoVal}`;
 
             try {
                 window.showToast("⏳ Salvataggio in corso...");
 
-                // 1. Aggiornamento cartella clinica dell'ospite (stessi identici campi del gestionale desktop)
+                // Aggiorna cartelle_cliniche salvando contemporaneamente chkMarkers e bodyMarkers
                 await db.collection("cartelle_cliniche").doc(window.targetPatient).set({
                     chkGen: genVal,
                     chkPiaghe: piagheVal,
-                    bodyMarkers: window.currentMarkers,
-                    checkinEsito: esitoVal,
-                    checkinDataUltima: dataVal,
-                    ultimoOperatoreCheckin: window.activeOperator,
-                    tsUltimoCheckin: Date.now()
+                    chkMarkers: window.currentBodyMarkers ? [...window.currentBodyMarkers] : [],
+                    bodyMarkers: window.currentBodyMarkers ? [...window.currentBodyMarkers] : [],
+                    tsUltimoCheckin: Date.now(),
+                    ultimoOperatoreCheckin: window.activeOperator
                 }, { merge: true });
 
-                // 2. Tracciamento storico nel diario clinico
+                // Aggiunge la nota nel diario clinico
                 await db.collection("diario_clinico").add({
                     data: timeStr,
                     ospite: window.targetPatient,
                     tipo: 'Clinica',
-                    nota: logNota,
-                    puntiLesioni: window.currentMarkers.length,
+                    nota: `Check-in / Lesioni ➔ Condizioni: ${genVal || 'Stabili'} | Piaghe: ${piagheVal || 'Nessuna'} | Mappa: ${window.currentBodyMarkers.length} punti`,
                     op: window.activeOperator,
                     ts: Date.now()
                 });
 
-                window.showToast("✅ Check-in e lesioni salvati con successo!");
-                setTimeout(() => { window.location.href = 'tablet_hub.html'; }, 1200);
+                window.showToast("✅ Dati Salvati!");
+                setTimeout(() => { window.location.href = 'tablet_hub.html'; }, 1000);
 
-            } catch(e) {
+            } catch (e) {
                 console.error("Errore salvataggio check-in:", e);
                 window.showToast("❌ Errore durante il salvataggio.");
             }

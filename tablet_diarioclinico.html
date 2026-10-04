@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Diario Clinico - NVS WardPad</title>
+
+    <style>
+        :root {
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --brand-primary: #0f766e;
+            --brand-secondary: #0284c7; 
+            --success: #16a34a;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-body); margin: 0; padding: 0; color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        .app-header { background: #ffffff; color: var(--text-main); padding: 16px 20px; display: flex; align-items: center; border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); z-index: 10; flex-shrink: 0; }
+        .back-btn { background: none; border: none; font-size: 1.2rem; color: var(--brand-primary); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 0 10px 0 0; }
+        .app-title { margin: 0 0 0 15px; font-size: 1.15rem; font-weight: 600; border-left: 2px solid var(--border); padding-left: 15px; display: flex; flex-direction: column; }
+        .app-title small { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .main-container { flex: 1; overflow-y: auto; padding: 24px; -webkit-overflow-scrolling: touch; display: flex; justify-content: center; }
+        .form-wrapper { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; }
+
+        .card-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); }
+        .card-title { margin: 0 0 14px 0; font-size: 1.1rem; color: var(--brand-primary); border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+        .touch-input { background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; font-size: 1rem; color: var(--text-main); outline: none; width: 100%; margin-bottom: 12px; }
+        
+        .btn-add { background: var(--brand-secondary); color: #fff; border: none; padding: 12px 20px; border-radius: var(--radius-md); font-weight: 600; font-size: 1rem; cursor: pointer; display: block; width: 100%; }
+        .btn-add:active { transform: scale(0.98); }
+
+        /* LISTA STORICO NOTE */
+        .note-item { background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; margin-bottom: 10px; }
+        .note-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 0.85rem; color: var(--text-muted); }
+        .note-body { font-size: 0.95rem; line-height: 1.4; color: var(--text-main); }
+        .note-badge { background: #e0f2fe; color: var(--brand-secondary); padding: 2px 8px; border-radius: 12px; font-weight: 600; font-size: 0.75rem; }
+
+        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 50000; }
+        .toast { background: #1e293b; color: #fff; padding: 14px 24px; border-radius: 30px; font-size: 1rem; font-weight: 500; opacity: 0; transition: opacity 0.3s; box-shadow: var(--shadow-sm); text-align: center; }
+        .toast.show { opacity: 1; }
+        
+        .svg-icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+</head>
+<body>
+    <div id="toast-container"></div>
+
+    <header class="app-header">
+        <button class="back-btn" onclick="window.location.href='tablet_hub.html'">
+            <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg> Indietro
+        </button>
+        <div class="app-title">
+            <small>Diario Clinico & Note</small>
+            <span id="headerPatientName">Caricamento...</span>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="form-wrapper">
+            
+            <!-- NUOVA NOTA -->
+            <div class="card-box">
+                <h3 class="card-title">✍️ Inserisci Nuova Nota Clinica</h3>
+                <textarea id="nuovaNotaInput" class="touch-input" rows="3" placeholder="Scrivi una nota clinica o infermieristica al letto del paziente..."></textarea>
+                <button class="btn-add" onclick="window.salvaNotaClinica()">Registra Nota nel Diario</button>
+            </div>
+
+            <!-- STORICO NOTE -->
+            <div class="card-box">
+                <h3 class="card-title">📖 Storico Note Recenti</h3>
+                <div id="storicoNoteContainer">
+                    <div style="text-align:center; padding:20px; color:var(--text-muted);">Caricamento storico...</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAc0fIlfds4Gne5m3qpH25uacK4NeR6TzM", 
+            authDomain: "gestione-visite-b445b.firebaseapp.com", 
+            projectId: "gestione-visite-b445b", 
+            storageBucket: "gestione-visite-b445b.firebasestorage.app", 
+            messagingSenderId: "720937824810", 
+            appId: "1:720937824810:web:b04b60d1d66bb8f4040953" 
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.activeOperator = sessionStorage.getItem("activeOperator") || localStorage.getItem("activeOperator") || "Operatore";
+        window.activeQualifica = sessionStorage.getItem("activeQualifica") || localStorage.getItem("activeQualifica") || "Infermiere";
+
+        const urlParams = new URLSearchParams(window.location.search);
+        window.targetPatient = urlParams.get('ospite');
+
+        if(!window.targetPatient) {
+            window.location.href = 'tablet_hub.html';
+        } else {
+            document.getElementById('headerPatientName').innerText = window.targetPatient;
+        }
+
+        window.showToast = (m) => {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = 'toast'; t.innerText = m;
+            c.appendChild(t);
+            setTimeout(() => t.classList.add('show'), 10);
+            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2500);
+        };
+
+        window.getTimestamp = () => { 
+            const n = new Date(); 
+            return `${n.toLocaleDateString('it-IT')} ore ${n.toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'})}`; 
+        };
+
+        // ASCOLTO NOTE DAL DIARIO CLINICO
+        onSnapshot(collection(db, "diario_clinico"), (snapshot) => {
+            const container = document.getElementById('storicoNoteContainer');
+            container.innerHTML = '';
+
+            let notePaziente = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.ospite === window.targetPatient) {
+                    notePaziente.push(data);
+                }
+            });
+
+            // Ordina dal più recente al meno recente
+            notePaziente.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+
+            if (notePaziente.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted);">Nessuna nota registrata nel diario per questo ospite.</div>`;
+                return;
+            }
+
+            notePaziente.forEach(n => {
+                container.innerHTML += `
+                    <div class="note-item">
+                        <div class="note-header">
+                            <span><strong>${n.op || 'Operatore'}</strong> (${n.tipo || 'Clinica'})</span>
+                            <span>${n.data}</span>
+                        </div>
+                        <div class="note-body">${n.nota}</div>
+                    </div>
+                `;
+            });
+        });
+
+        window.salvaNotaClinica = async () => {
+            const testo = document.getElementById('nuovaNotaInput').value.trim();
+            if(!testo) return window.showToast("⚠️ Inserisci il testo della nota.");
+
+            try {
+                await addDoc(collection(db, "diario_clinico"), {
+                    data: window.getTimestamp(),
+                    ospite: window.targetPatient,
+                    nota: testo,
+                    tipo: window.activeQualifica === 'Medico' ? 'Medica' : 'Infermieristica',
+                    op: window.activeOperator,
+                    ts: Date.now()
+                });
+
+                document.getElementById('nuovaNotaInput').value = '';
+                window.showToast("✅ Nota salvata nel diario clinico!");
+            } catch(e) {
+                console.error(e);
+                window.showToast("❌ Errore durante il salvataggio.");
+            }
+        };
+    </script>
+</body>
+</html>

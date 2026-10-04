@@ -3,56 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Check-in & Mappatura Lesioni - NVS WardPad</title>
 
     <style>
         :root {
-            --bg-body: #f1f5f9;
-            --bg-card: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border: #cbd5e1;
-            --brand-primary: #0f766e;
-            --brand-secondary: #0284c7; 
-            --success: #059669;
+            --primary-color: #0f766e;
+            --secondary-color: #0284c7;
+            --border-color: #cbd5e1;
             --error-color: #ef4444;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --success-color: #10b981;
+            --text-main: #0f172a;
+            --bg-body: #f8fafc;
+            --radius: 8px;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-body); margin: 0; padding: 0; color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        .app-header { background: #ffffff; color: var(--text-main); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); z-index: 10; flex-shrink: 0; }
+        .app-header { background: #ffffff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .header-left { display: flex; align-items: center; gap: 12px; }
-        .back-btn { background: none; border: none; font-size: 1.15rem; color: var(--brand-primary); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 0; }
-        .patient-title { font-size: 1.1rem; font-weight: 800; text-transform: uppercase; color: var(--text-main); border-left: 2px solid var(--border); padding-left: 12px; }
+        .back-btn { background: none; border: none; font-size: 1.1rem; color: var(--primary-color); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .patient-title { font-size: 1.15rem; font-weight: 800; text-transform: uppercase; color: var(--text-main); border-left: 2px solid var(--border-color); padding-left: 12px; }
 
-        .main-container { flex: 1; overflow-y: auto; padding: 18px 20px; -webkit-overflow-scrolling: touch; display: flex; justify-content: center; }
-        .content-wrapper { width: 100%; max-width: 1050px; display: flex; flex-direction: column; gap: 18px; padding-bottom: 40px; }
+        .main-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; justify-content: center; }
+        .content-wrapper { width: 100%; max-width: 1000px; display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: start; }
+        @media (max-width: 860px) { .content-wrapper { grid-template-columns: 1fr; } }
 
-        .checkin-grid { display: grid; grid-template-columns: 420px 1fr; gap: 20px; align-items: start; }
-        @media (max-width: 860px) { .checkin-grid { grid-template-columns: 1fr; } }
+        .card { background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        .card h3 { margin: 0 0 14px 0; font-size: 1.1rem; font-weight: 700; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
 
-        .card-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); }
-        .card-title { margin: 0 0 14px 0; font-size: 1.05rem; font-weight: 800; color: var(--brand-primary); border-bottom: 1px solid var(--border); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-
-        /* BODY MAP FRAME ESATTO DEL GESTIONALE */
+        /* BODY MAP FRAME ESATTO DEL DESKTOP */
         #bodyMapWrapper {
             position: relative;
             width: 100%;
-            max-width: 380px;
+            max-width: 350px;
             margin: 10px auto;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
             background: #ffffff;
             cursor: crosshair;
             user-select: none;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border-radius: 6px;
         }
         .body-map-img {
             width: 100%;
@@ -61,11 +52,11 @@
             pointer-events: none;
         }
 
-        /* CLASSE BODY-MARKER ESATTA DEL DESKTOP */
+        /* CLASSE BODY-MARKER DEL GESTIONALE */
         .body-marker {
             position: absolute;
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             background-color: var(--error-color);
             border: 2px solid white;
             border-radius: 50%;
@@ -73,32 +64,22 @@
             cursor: pointer;
             z-index: 20;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 10px;
-            font-weight: 800;
         }
 
         .map-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-        .btn-clear-points { background: #fee2e2; color: var(--error-color); border: 1px solid #fecdd3; padding: 8px 14px; border-radius: var(--radius-md); font-weight: 700; font-size: 0.85rem; cursor: pointer; }
-        .btn-clear-points:active { background: #fca5a5; }
+        .btn-clear { background: #fee2e2; color: var(--error-color); border: 1px solid #fecdd3; padding: 8px 14px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer; }
 
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; }
-        .touch-input { background: #f8fafc; border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 12px; font-size: 0.95rem; color: var(--text-main); outline: none; width: 100%; font-weight: 600; font-family: inherit; }
-        .touch-input:focus { border-color: var(--brand-primary); background: #ffffff; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 0.85rem; color: #64748b; text-transform: uppercase; }
+        .touch-input { background: #f8fafc; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 12px; font-size: 0.95rem; color: var(--text-main); outline: none; width: 100%; font-family: inherit; }
+        .touch-input:focus { border-color: var(--primary-color); background: #ffffff; }
 
-        .bottom-action-bar { position: sticky; bottom: 0; background: #ffffff; padding: 14px 20px; border-top: 1px solid var(--border); box-shadow: 0 -4px 10px rgba(0,0,0,0.04); display: flex; justify-content: center; z-index: 20; }
-        .btn-save-checkin { background: var(--success); color: #fff; border: none; padding: 16px 28px; border-radius: var(--radius-lg); font-size: 1.15rem; font-weight: 700; width: 100%; max-width: 1050px; cursor: pointer; box-shadow: 0 4px 6px rgba(5, 150, 105, 0.2); }
-        .btn-save-checkin:active { transform: scale(0.98); }
+        .bottom-action-bar { position: sticky; bottom: 0; background: #ffffff; padding: 14px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: center; z-index: 20; }
+        .btn-save { background: var(--success-color); color: #fff; border: none; padding: 16px 28px; border-radius: 8px; font-size: 1.15rem; font-weight: 700; width: 100%; max-width: 1000px; cursor: pointer; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2); }
 
         #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 50000; }
-        .toast { background: #1e293b; color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 0.95rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; box-shadow: var(--shadow-sm); text-align: center; }
+        .toast { background: #1e293b; color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 0.95rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; }
         .toast.show { opacity: 1; }
-
-        .svg-icon { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     </style>
 
     <!-- FIREBASE COMPAT SDK -->
@@ -111,67 +92,55 @@
     <header class="app-header">
         <div class="header-left">
             <button class="back-btn" onclick="window.location.href='tablet_hub.html'">
-                <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg> Reparto
+                ← Reparto
             </button>
             <div class="patient-title" id="headerPatientName">Caricamento...</div>
         </div>
-        <div style="font-size:0.85rem; font-weight:700; color:var(--brand-primary); background:#f0fdfa; padding:6px 14px; border-radius:20px; border:1px solid #ccfbf1;">
-            Check-in e Mappatura Lesioni
-        </div>
+        <div style="font-size:0.85rem; font-weight:700; color:var(--primary-color);">Check-in e Mappatura Lesioni</div>
     </header>
 
     <main class="main-container">
         <div class="content-wrapper">
 
-            <div class="checkin-grid">
-
-                <!-- 1. MAPPA CORPOREA IDENTICA AL DESKTOP -->
-                <div class="card-box">
-                    <h3 class="card-title">
-                        <span>🧍 Mappa Anatomica (Clicca per segnare)</span>
-                    </h3>
-
-                    <!-- ID esatti del desktop: bodyMapWrapper e bodyMarkersLayer -->
-                    <div id="bodyMapWrapper" onclick="window.handleBodyMapClick(event)">
-                        <img src="corpo_umano.png" alt="Mappa Corpo Umano Fronte Retro" class="body-map-img">
-                        <div id="bodyMarkersLayer" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></div>
-                    </div>
-
-                    <div class="map-actions">
-                        <span id="markersCountLabel" style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">0 punti segnati</span>
-                        <button type="button" class="btn-clear-points" onclick="window.clearBodyMarkers()">🗑 Cancella Punti</button>
-                    </div>
+            <!-- 1. MAPPA ANATOMICA CON IMMAGINE DEL CORPO UMANO -->
+            <div class="card">
+                <h3>🧍 Mappa Anatomica (Clicca per segnare)</h3>
+                
+                <div id="bodyMapWrapper" onclick="window.handleBodyMapClick(event)">
+                    <img src="corpo_umano.png" alt="Mappa Corpo Umano" class="body-map-img" id="imgMappa">
+                    <div id="bodyMarkersLayer" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></div>
                 </div>
 
-                <!-- 2. CAMPI IDENTICI DEL DESKTOP (chkGen, chkPiaghe) -->
-                <div class="card-box">
-                    <h3 class="card-title">
-                        <span>📋 Check-in e Mappatura Lesioni</span>
-                    </h3>
+                <div class="map-actions">
+                    <span id="markersCountLabel" style="font-size:0.85rem; font-weight:700; color:#64748b;">0 punti</span>
+                    <button type="button" class="btn-clear" onclick="window.clearBodyMarkers()">Cancella Punti</button>
+                </div>
+            </div>
 
-                    <div class="form-group">
-                        <label>Condizioni Generali all'Arrivo</label>
-                        <textarea id="chkGen" class="touch-input" rows="3" placeholder="Descrizione condizioni generali..."></textarea>
-                    </div>
+            <!-- 2. CAMPI IDENTICI DEL DESKTOP (chkGen, chkPiaghe) -->
+            <div class="card">
+                <h3>📋 Scheda Clinica Check-in</h3>
 
-                    <div class="form-group">
-                        <label>Piaghe/Lesioni</label>
-                        <textarea id="chkPiaghe" class="touch-input" rows="3" placeholder="Sede, grado piaga, medicazioni..."></textarea>
-                    </div>
-
-                    <div style="background:#f8fafc; padding:12px 14px; border-radius:var(--radius-md); font-size:0.85rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; border:1px solid var(--border);">
-                        <span>Operatore Incaricato:</span>
-                        <strong id="labelOperatorBadge" style="color:var(--brand-primary);">-</strong>
-                    </div>
+                <div class="form-group">
+                    <label>Condizioni Generali all'Arrivo</label>
+                    <textarea id="chkGen" class="touch-input" rows="4" placeholder="Condizioni generali..."></textarea>
                 </div>
 
+                <div class="form-group">
+                    <label>Piaghe/Lesioni</label>
+                    <textarea id="chkPiaghe" class="touch-input" rows="4" placeholder="Sede, stadio, medicazione..."></textarea>
+                </div>
+
+                <div style="font-size:0.85rem; color:#64748b; margin-top:10px;">
+                    Operatore attivo: <strong id="lblOp">-</strong>
+                </div>
             </div>
 
         </div>
     </main>
 
     <div class="bottom-action-bar">
-        <button class="btn-save-checkin" onclick="window.saveClinicalData()">💾 Salva Check-in</button>
+        <button class="btn-save" onclick="window.saveClinicalData()">💾 Salva Check-in</button>
     </div>
 
     <script>
@@ -190,7 +159,7 @@
         const db = firebase.firestore();
 
         window.activeOperator = sessionStorage.getItem("activeOperator") || localStorage.getItem("activeOperator") || "Operatore";
-        document.getElementById('labelOperatorBadge').innerText = window.activeOperator;
+        document.getElementById('lblOp').innerText = window.activeOperator;
 
         const urlParams = new URLSearchParams(window.location.search);
         window.targetPatient = urlParams.get('ospite') || sessionStorage.getItem('globalSelectedPatient') || "";
@@ -201,7 +170,7 @@
             document.getElementById('headerPatientName').innerText = window.targetPatient;
         }
 
-        // Variabile globale esattamente con lo stesso nome del gestionale desktop
+        // Variabile identica al desktop
         window.currentBodyMarkers = [];
 
         window.showToast = (m) => {
@@ -210,16 +179,17 @@
             t.className = 'toast'; t.innerText = m;
             c.appendChild(t);
             setTimeout(() => t.classList.add('show'), 10);
-            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2200);
+            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2000);
         };
 
-        // GESTIONE CLICK SULLA MAPPA (LOGICA ESATTA DEL DESKTOP)
+        // GESTIONE CLICK SULLA SAGOMA (IDENTICA AL DESKTOP)
         window.handleBodyMapClick = (e) => {
             const w = document.getElementById('bodyMapWrapper');
             if (!w) return;
             const r = w.getBoundingClientRect();
-            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            
+            const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0].clientY);
 
             const x = ((clientX - r.left) / r.width) * 100;
             const y = ((clientY - r.top) / r.height) * 100;
@@ -230,10 +200,9 @@
             });
 
             window.renderBodyMarkers();
-            window.showToast("Punto lesione aggiunto!");
         };
 
-        // RENDER DEI MARKER (LOGICA ESATTA DEL DESKTOP)
+        // RENDER DEI MARKER (IDENTICO AL DESKTOP)
         window.renderBodyMarkers = () => {
             const l = document.getElementById('bodyMarkersLayer');
             if (!l) return;
@@ -245,87 +214,66 @@
                 d.style.left = m.x + '%';
                 d.style.top = m.y + '%';
                 d.style.pointerEvents = 'auto';
-                d.innerText = i + 1;
                 d.onclick = (ev) => {
                     ev.stopPropagation();
                     window.currentBodyMarkers.splice(i, 1);
                     window.renderBodyMarkers();
-                    window.showToast("Punto rimosso.");
                 };
                 l.appendChild(d);
             });
 
-            document.getElementById('markersCountLabel').innerText = `${window.currentBodyMarkers.length} punti segnati`;
+            document.getElementById('markersCountLabel').innerText = `${window.currentBodyMarkers.length} punti`;
         };
 
-        // RESET MARKER (LOGICA ESATTA DEL DESKTOP)
         window.clearBodyMarkers = () => {
             if (window.currentBodyMarkers.length === 0) return;
             if (confirm('Svuotare la mappa?')) {
                 window.currentBodyMarkers = [];
                 window.renderBodyMarkers();
-                window.showToast("Mappa ripulita.");
             }
         };
 
-        // CARICAMENTO REALTIME DA FIRESTORE (LEGGE chkMarkers E I CAMPI DEL DESKTOP)
-        const caricaDatiCheckin = () => {
+        // CARICAMENTO DA: cartelle_cliniche / targetPatient
+        const caricaDati = () => {
             db.collection("cartelle_cliniche").doc(window.targetPatient).onSnapshot(docSnap => {
                 if (docSnap.exists) {
                     const data = docSnap.data();
-
                     if (data.chkGen) document.getElementById('chkGen').value = data.chkGen;
                     if (data.chkPiaghe) document.getElementById('chkPiaghe').value = data.chkPiaghe;
 
-                    // Supporta sia chkMarkers (desktop) che bodyMarkers (fallback)
-                    const markersSalvati = data.chkMarkers || data.bodyMarkers || [];
-                    if (Array.isArray(markersSalvati)) {
-                        window.currentBodyMarkers = [...markersSalvati];
+                    if (Array.isArray(data.chkMarkers)) {
+                        window.currentBodyMarkers = [...data.chkMarkers];
                         window.renderBodyMarkers();
                     }
                 }
             });
         };
 
-        // SALVATAGGIO DEI DATI (SALVA SIA chkMarkers CHE bodyMarkers PER PIENA COMPATIBILITÀ)
+        // SALVATAGGIO ALLINEATO A: d.chkMarkers, d.chkGen, d.chkPiaghe
         window.saveClinicalData = async () => {
-            const genVal = document.getElementById('chkGen').value.trim();
-            const piagheVal = document.getElementById('chkPiaghe').value.trim();
-            const timeStr = `${new Date().toLocaleDateString('it-IT')} ore ${new Date().toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'})}`;
+            const gen = document.getElementById('chkGen').value.trim();
+            const piaghe = document.getElementById('chkPiaghe').value.trim();
 
             try {
-                window.showToast("⏳ Salvataggio in corso...");
+                window.showToast("Salvataggio in corso...");
 
-                // Aggiorna cartelle_cliniche salvando contemporaneamente chkMarkers e bodyMarkers
+                // Aggiornamento su cartelle_cliniche
                 await db.collection("cartelle_cliniche").doc(window.targetPatient).set({
-                    chkGen: genVal,
-                    chkPiaghe: piagheVal,
-                    chkMarkers: window.currentBodyMarkers ? [...window.currentBodyMarkers] : [],
-                    bodyMarkers: window.currentBodyMarkers ? [...window.currentBodyMarkers] : [],
-                    tsUltimoCheckin: Date.now(),
-                    ultimoOperatoreCheckin: window.activeOperator
+                    chkGen: gen,
+                    chkPiaghe: piaghe,
+                    chkMarkers: window.currentBodyMarkers ? [...window.currentBodyMarkers] : []
                 }, { merge: true });
 
-                // Aggiunge la nota nel diario clinico
-                await db.collection("diario_clinico").add({
-                    data: timeStr,
-                    ospite: window.targetPatient,
-                    tipo: 'Clinica',
-                    nota: `Check-in / Lesioni ➔ Condizioni: ${genVal || 'Stabili'} | Piaghe: ${piagheVal || 'Nessuna'} | Mappa: ${window.currentBodyMarkers.length} punti`,
-                    op: window.activeOperator,
-                    ts: Date.now()
-                });
+                window.showToast("✅ Check-in e Mappa Salvati!");
+                setTimeout(() => { window.location.href = 'tablet_hub.html'; }, 900);
 
-                window.showToast("✅ Dati Salvati!");
-                setTimeout(() => { window.location.href = 'tablet_hub.html'; }, 1000);
-
-            } catch (e) {
-                console.error("Errore salvataggio check-in:", e);
-                window.showToast("❌ Errore durante il salvataggio.");
+            } catch (err) {
+                console.error("Errore salvataggio:", err);
+                window.showToast("Errore durante il salvataggio.");
             }
         };
 
-        caricaDatiCheckin();
+        caricaDati();
     </script>
 </body>
 </html>

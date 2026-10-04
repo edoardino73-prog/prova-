@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>NVS WardPad - Reparto Master-Detail</title>
+
+    <style>
+        :root {
+            --sidebar-bg: #ffffff;
+            --main-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --brand-primary: #0f766e; 
+            --brand-secondary: #0284c7;
+            --accent-red: #e11d48;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.04);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--main-bg); margin: 0; padding: 0; color: var(--text-main); height: 100vh; display: flex; flex-direction: row; overflow: hidden; }
+
+        /* ================= SIDEBAR SINISTRA: ELENCO OSPITI ================= */
+        .sidebar { width: 360px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; }
+        .sidebar-header { background: var(--brand-primary); color: white; padding: 14px 18px; flex-shrink: 0; }
+        .sidebar-header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .sidebar-header h2 { margin: 0; font-size: 1.15rem; font-weight: 600; }
+        
+        .btn-new-ricovero { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+        .btn-new-ricovero:active { background: rgba(255,255,255,0.4); }
+
+        .search-box { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 10px 14px 10px 38px; border: none; border-radius: var(--radius-md); font-size: 0.95rem; background: #ffffff; color: var(--text-main); outline: none; }
+        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; stroke: var(--text-muted); fill: none; stroke-width: 2; }
+
+        .patient-list-scroll { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; -webkit-overflow-scrolling: touch; }
+        
+        .patient-list-item { background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.15s; }
+        .patient-list-item:active, .patient-list-item.selected { background: #f0fdfa; border-color: var(--brand-primary); box-shadow: 0 0 0 2px var(--brand-primary); }
+        
+        .pli-avatar { width: 44px; height: 44px; border-radius: 50%; background: #e2e8f0; object-fit: cover; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-muted); font-size: 1.05rem; flex-shrink: 0; overflow: hidden; border: 1px solid var(--border); }
+        .pli-info { flex: 1; min-width: 0; }
+        .pli-name { margin: 0 0 3px 0; font-size: 0.95rem; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; }
+        .pli-meta { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
+        .pli-badges { display: flex; gap: 5px; font-size: 0.9rem; }
+
+        /* ================= PANNELLO PRINCIPALE DESTRA ================= */
+        .main-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--main-bg); position: relative; }
+
+        .top-navbar { background: #ffffff; border-bottom: 1px solid var(--border); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; height: 68px; }
+        
+        .selected-patient-banner { display: flex; align-items: center; gap: 12px; background: #f8fafc; border: 1px solid var(--border); padding: 6px 14px; border-radius: 30px; }
+        .spb-icon { width: 34px; height: 34px; border-radius: 50%; background: #e0f2fe; color: var(--brand-secondary); display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold; }
+        .spb-text { font-size: 0.95rem; font-weight: 700; color: var(--text-main); text-transform: uppercase; }
+        .spb-sub { font-size: 0.78rem; color: var(--text-muted); }
+
+        .operator-pill { background: #f1f5f9; border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 700; }
+        .op-qual { color: var(--brand-primary); font-size: 0.75rem; text-transform: uppercase; display: block; font-weight: 800; }
+        
+        .btn-close-patient { background: #fee2e2; color: var(--accent-red); border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1rem; }
+
+        .workspace-content { flex: 1; overflow-y: auto; padding: 20px; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 18px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; align-items: center; text-align: center; border-left: 5px solid var(--brand-primary); }
+        .stat-card.red { border-left-color: var(--accent-red); }
+        .stat-card.blue { border-left-color: var(--brand-secondary); }
+        .stat-num { font-size: 2.2rem; font-weight: 800; margin: 4px 0; color: var(--text-main); }
+        .stat-label { font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .alert-section-title { font-size: 1rem; font-weight: 700; color: var(--text-main); margin: 6px 0 0 0; display: flex; align-items: center; gap: 6px; }
+        .alert-box { background: #fff1f2; border: 1px solid #fecdd3; border-radius: var(--radius-md); padding: 14px 18px; color: #991b1b; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; }
+
+        /* ================= BOTTOM TAB BAR (RISPECCHIA IL GESTIONALE) ================= */
+        .bottom-tab-bar { background: #ffffff; border-top: 1px solid var(--border); height: 75px; display: flex; justify-content: space-around; align-items: center; padding: 0 4px; flex-shrink: 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); }
+        
+        .tab-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: transparent; border: none; color: var(--text-muted); font-size: 0.72rem; font-weight: 700; cursor: pointer; padding: 6px 6px; border-radius: var(--radius-md); transition: all 0.15s; flex: 1; max-width: 120px; }
+        .tab-item.active { color: var(--brand-primary); }
+        .tab-item:active { transform: scale(0.96); }
+        .tab-item svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        
+        /* STATO DISABILITATO SE NON C'È OSPITE SELEZIONATO */
+        .tab-item.disabled { opacity: 0.35; pointer-events: none; }
+        .tab-item:not(.disabled) { color: var(--text-main); }
+
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 50000; }
+        .toast { background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 500; opacity: 0; transition: opacity 0.3s; box-shadow: var(--shadow-md); }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div id="toast-container"></div>
+
+    <!-- SIDEBAR SINISTRA -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-header-top">
+                <h2>Elenco Ospiti (In Carico)</h2>
+                <a href="tablet_anagrafica_cie.html" class="btn-new-ricovero" title="Scanner C.I.E. & Nuovo Ospite">🪪 + CIE</a>
+            </div>
+            <div class="search-box">
+                <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="searchPatientInput" class="search-input" placeholder="Cerca ospite..." oninput="window.filtraOspiti()">
+            </div>
+        </div>
+        <div class="patient-list-scroll" id="sidebarPatientList">
+            <div style="text-align:center; padding:30px; color:var(--text-muted);">Caricamento ospiti...</div>
+        </div>
+    </aside>
+
+    <!-- PANNELLO PRINCIPALE DESTRA -->
+    <section class="main-panel">
+        
+        <header class="top-navbar">
+            <div class="selected-patient-banner" id="selectedPatientHeaderBanner">
+                <div class="spb-icon" id="headerPatientAvatarIcon">👤</div>
+                <div>
+                    <div class="spb-text" id="headerSelectedName">Nessun Paziente Selezionato</div>
+                    <div class="spb-sub" id="headerSelectedSub">Tocca un ospite a sinistra per abilitare le sezioni</div>
+                </div>
+                <button class="btn-close-patient" id="btnClearPatient" style="display:none;" onclick="window.deselezionaPaziente()" title="Deseleziona ospite">✕</button>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div class="operator-pill">
+                    <div>
+                        <span id="opNameHeader">OPERATORE</span>
+                        <span class="op-qual" id="opQualHeader">-</span>
+                    </div>
+                </div>
+                <button onclick="window.logoutTablet()" style="background:#fee2e2; color:var(--accent-red); border:none; padding:8px 14px; border-radius:var(--radius-md); font-weight:700; font-size:0.85rem; cursor:pointer;" title="Cambio Turno Rapido">🔒 Esci</button>
+            </div>
+        </header>
+
+        <div class="workspace-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Posti Letto Occupati</span>
+                    <span class="stat-num" id="statOccupati">0</span>
+                </div>
+                <div class="stat-card blue">
+                    <span class="stat-label">Rivalutazioni (90gg)</span>
+                    <span class="stat-num" id="statRivalutazioni" style="color:var(--brand-secondary);">0</span>
+                </div>
+                <div class="stat-card red">
+                    <span class="stat-label">Alert Infettivi (ICA)</span>
+                    <span class="stat-num" id="statInfettivi" style="color:var(--accent-red);">0</span>
+                </div>
+            </div>
+
+            <h3 class="alert-section-title">⚠️ Scadenzario e Alert Clinici Attivi</h3>
+            <div id="alertContainer">
+                <div style="background:#f8fafc; border:1px solid var(--border); padding:16px; border-radius:var(--radius-md); color:var(--text-muted); text-align:center;">
+                    Nessun alert clinico critico registrato per gli ospiti in carico.
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= BOTTOM TAB BAR RISPECCHIANTE IL GESTIONALE ================= -->
+        <nav class="bottom-tab-bar">
+            <!-- 1. HOME -->
+            <button class="tab-item active" onclick="window.navTab('home')">
+                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                Home
+            </button>
+
+            <!-- 2. CHECK-IN (RIVALUTAZIONE TRIMESTRALE) -->
+            <button class="tab-item disabled" id="tabCheckin" onclick="window.navModo('checkin')">
+                <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                Check-in
+            </button>
+
+            <!-- 3. PARAMETRI VITALI (PA, FC, SpO2, TC) -->
+            <button class="tab-item disabled req-inf" id="tabVitali" onclick="window.navModo('vitali')">
+                <svg viewBox="0 0 24 24"><path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"></path></svg>
+                Vitali
+            </button>
+
+            <!-- 4. TERAPIA MEDICA (S.U.T.) -->
+            <button class="tab-item disabled req-inf" id="tabTerapia" onclick="window.navModo('terapia')">
+                <svg viewBox="0 0 24 24"><path d="M10.5 20.5L3.5 13.5a5 5 0 0 1 7-7l1.5 1.5L13.5 8a5 5 0 0 1 7 7l-7 7z"></path></svg>
+                Terapia
+            </button>
+
+            <!-- 5. DIARIO ASSISTENZIALE & IGIENE (OSS) -->
+            <button class="tab-item disabled" id="tabDiari" onclick="window.navModo('diari')">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                Diari OSS
+            </button>
+
+            <!-- 6. DIARIO CLINICO & NOTE MEDICHE/INF -->
+            <button class="tab-item disabled" id="tabNote" onclick="window.navModo('note')">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Note Cliniche
+            </button>
+
+            <!-- 7. MAPPATURA & FOTO LESIONI DA DECUBITO -->
+            <button class="tab-item disabled req-inf" id="tabLesioni" onclick="window.navModo('lesioni')">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                Foto Lesioni
+            </button>
+
+            <!-- 8. B.I.N.A. & P.A.I. (REGIONE UMBRIA) -->
+            <button class="tab-item disabled" id="tabBinaPai" onclick="window.navModo('binapai')">
+                <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                BINA/PAI
+            </button>
+
+            <!-- 9. CONSENSI & PRIVACY (GDPR) -->
+            <button class="tab-item disabled" id="tabConsensi" onclick="window.navModo('consensi')">
+                <svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                Consensi
+            </button>
+        </nav>
+
+    </section>
+
+    <!-- SCRIPT FIREBASE E LOGICA COMPLETA -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAc0fIlfds4Gne5m3qpH25uacK4NeR6TzM", 
+            authDomain: "gestione-visite-b445b.firebaseapp.com", 
+            projectId: "gestione-visite-b445b", 
+            storageBucket: "gestione-visite-b445b.firebasestorage.app", 
+            messagingSenderId: "720937824810", 
+            appId: "1:720937824810:web:b04b60d1d66bb8f4040953" 
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.dbOspiti = [];
+        window.dbClinica = {};
+        window.activeOperator = sessionStorage.getItem("activeOperator") || localStorage.getItem("activeOperator");
+        window.activeQualifica = sessionStorage.getItem("activeQualifica") || localStorage.getItem("activeQualifica");
+        window.selectedPatient = sessionStorage.getItem("globalSelectedPatient") || null;
+
+        if(!window.activeOperator) {
+            window.location.href = 'tablet_login.html';
+        }
+
+        window.showToast = (m) => {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = 'toast'; t.innerText = m;
+            c.appendChild(t);
+            setTimeout(() => t.classList.add('show'), 10);
+            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2500);
+        };
+
+        window.logoutTablet = () => {
+            if (confirm("Bloccare lo schermo e tornare al login?")) {
+                sessionStorage.clear();
+                localStorage.removeItem("activeOperator");
+                localStorage.removeItem("activeQualifica");
+                window.location.href = 'tablet_login.html';
+            }
+        };
+
+        window.initUI = () => {
+            document.getElementById('opNameHeader').innerText = window.activeOperator;
+            document.getElementById('opQualHeader').innerText = window.activeQualifica || 'Operatore';
+
+            // Controllo Ruoli (RBAC): Mostra moduli riservati solo se Infermiere/Medico
+            if (['Infermiere', 'Medico', 'Direttore Sanitario'].includes(window.activeQualifica)) {
+                document.querySelectorAll('.req-inf').forEach(el => el.style.display = 'flex');
+            } else {
+                document.querySelectorAll('.req-inf').forEach(el => el.style.display = 'none');
+            }
+
+            // Se c'era già un paziente in sessione, ripristinalo e sblocca subito le sezioni
+            if (window.selectedPatient) {
+                window.aggiornaBannerSelezionato(window.selectedPatient);
+            }
+        };
+
+        window.renderSidebarOspiti = (lista = null) => {
+            const container = document.getElementById('sidebarPatientList');
+            container.innerHTML = '';
+
+            const sorgente = lista || window.dbOspiti.filter(g => !g.decesso && !g.dimissione);
+            
+            if (sorgente.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.85rem;">Nessun ospite trovato.</div>`;
+                return;
+            }
+
+            sorgente.sort((a,b) => a.name.localeCompare(b.name)).forEach(g => {
+                const initials = g.name.split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase();
+                const isSelected = window.selectedPatient === g.name ? 'selected' : '';
+                const pD = window.dbClinica[g.name] || {};
+
+                let badgeHtml = '';
+                if(pD.disfagia) badgeHtml += `<span title="Disfagico">🥣</span>`;
+                if(pD.infezione) badgeHtml += `<span title="Isolamento ICA">☣️️</span>`;
+
+                container.innerHTML += `
+                    <div class="patient-list-item ${isSelected}" onclick="window.selezionaPaziente('${g.name}')">
+                        <div class="pli-avatar">${g.photo ? `<img src="${g.photo}" style="width:100%;height:100%;object-fit:cover;">` : initials}</div>
+                        <div class="pli-info">
+                            <h4 class="pli-name">${g.name}</h4>
+                            <div class="pli-meta">
+                                <span>Stanza ${g.room || '-'} (Letto ${g.bed || '-'})</span>
+                                <div class="pli-badges">${badgeHtml}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        };
+
+        window.filtraOspiti = () => {
+            const query = document.getElementById('searchPatientInput').value.toLowerCase();
+            const filtrati = window.dbOspiti.filter(g => !g.decesso && !g.dimissione && g.name.toLowerCase().includes(query));
+            window.renderSidebarOspiti(filtrati);
+        };
+
+        // SELEZIONE PAZIENTE E SBLOCCO SEZIONI IN BASSO
+        window.selezionaPaziente = (nome) => {
+            window.selectedPatient = nome;
+            sessionStorage.setItem("globalSelectedPatient", nome);
+            window.aggiornaBannerSelezionato(nome);
+            window.renderSidebarOspiti();
+            window.sbloccaSezioni();
+            window.showToast(`Paziente attivo: ${nome}`);
+        };
+
+        window.deselezionaPaziente = () => {
+            window.selectedPatient = null;
+            sessionStorage.removeItem("globalSelectedPatient");
+            
+            document.getElementById('headerSelectedName').innerText = "Nessun Paziente Selezionato";
+            document.getElementById('headerSelectedSub').innerText = "Tocca un ospite a sinistra per abilitare le sezioni";
+            document.getElementById('btnClearPatient').style.display = 'none';
+            document.getElementById('headerPatientAvatarIcon').innerHTML = '👤';
+            window.renderSidebarOspiti();
+
+            // Blocca di nuovo i tab inferiori (tranne Home)
+            document.querySelectorAll('.tab-item:not(:first-child)').forEach(t => t.classList.add('disabled'));
+        };
+
+        window.aggiornaBannerSelezionato = (nome) => {
+            const g = window.dbOspiti.find(x => x.name === nome) || {};
+            document.getElementById('headerSelectedName').innerText = nome;
+            document.getElementById('headerSelectedSub').innerText = `Stanza ${g.room || '-'} | CF: ${g.cf || '-'}`;
+            document.getElementById('btnClearPatient').style.display = 'flex';
+            if (g.photo) {
+                document.getElementById('headerPatientAvatarIcon').innerHTML = `<img src="${g.photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+            } else {
+                document.getElementById('headerPatientAvatarIcon').innerText = '👤';
+            }
+            window.sbloccaSezioni();
+        };
+
+        window.sbloccaSezioni = () => {
+            document.querySelectorAll('.tab-item.disabled').forEach(t => t.classList.remove('disabled'));
+        };
+
+        // NAVIGAZIONE AI MODULI COMPATIBILI DESKTOP / TABLET
+        window.navModo = (modo) => {
+            if (!window.selectedPatient) {
+                return window.showToast("⚠️️ Seleziona prima un paziente dall'elenco a sinistra!");
+            }
+            
+            const encoded = encodeURIComponent(window.selectedPatient);
+            if (modo === 'vitali') window.location.href = `tablet_parametri.html?ospite=${encoded}`;
+            if (modo === 'diari') window.location.href = `tablet_diario_oss.html?ospite=${encoded}`;
+            if (modo === 'lesioni') window.location.href = `tablet_fotoclinica.html?ospite=${encoded}`;
+            if (modo === 'checkin') window.location.href = `tablet_checkin.html?ospite=${encoded}`;
+            if (modo === 'terapia') window.location.href = `tablet_terapia.html?ospite=${encoded}`;
+            if (modo === 'note') window.location.href = `tablet_diarioclinico.html?ospite=${encoded}`;
+            if (modo === 'binapai') window.location.href = `tablet_bina_pai.html?ospite=${encoded}`;
+            if (modo === 'consensi') window.location.href = `tablet_consensi.html?ospite=${encoded}`;
+        };
+
+        window.navTab = (tab) => {
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        };
+
+        window.aggiornaStatisticheReparto = () => {
+            const attivi = window.dbOspiti.filter(g => !g.decesso && !g.dimissione);
+            document.getElementById('statOccupati').innerText = attivi.length;
+
+            let countInf = 0;
+            let alertHtml = '';
+
+            attivi.forEach(g => {
+                const clin = window.dbClinica[g.name] || {};
+                if (clin.infezione) {
+                    countInf++;
+                    alertHtml += `<div class="alert-box">☣️ <strong>${g.name}</strong> - Isolamento ICA: ${clin.infezione}</div>`;
+                }
+            });
+
+            document.getElementById('statInfettivi').innerText = countInf;
+            if (alertHtml) {
+                document.getElementById('alertContainer').innerHTML = alertHtml;
+            }
+        };
+
+        // REAL-TIME LISTENER
+        onSnapshot(collection(db, "ospiti"), snap => {
+            window.dbOspiti = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            window.renderSidebarOspiti();
+            window.aggiornaStatisticheReparto();
+            if (window.selectedPatient) {
+                window.aggiornaBannerSelezionato(window.selectedPatient);
+            }
+        });
+
+        onSnapshot(collection(db, "cartelle_cliniche"), snap => {
+            window.dbClinica = {};
+            snap.forEach(d => { window.dbClinica[d.id] = d.data(); });
+            window.renderSidebarOspiti();
+            window.aggiornaStatisticheReparto();
+        });
+
+        window.onload = window.initUI;
+    </script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Accesso Rapido Reparto - NVS WardPad</title>
+
+    <style>
+        :root {
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --brand-primary: #0f766e;
+            --brand-secondary: #0284c7; 
+            --alert-red: #dc2626;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.05);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-body); margin: 0; padding: 0; color: var(--text-main); height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+
+        .login-card { background: var(--bg-card); width: 100%; max-width: 480px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .login-header { background: var(--brand-primary); color: #fff; padding: 24px; text-align: center; }
+        .login-header h1 { margin: 0 0 6px 0; font-size: 1.5rem; font-weight: 700; }
+        .login-header p { margin: 0; font-size: 0.9rem; opacity: 0.85; }
+
+        .login-body { padding: 24px; }
+
+        /* LISTA SELEZIONE OPERATORE */
+        #operatorSelectionView h3 { margin: 0 0 16px 0; font-size: 1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .operator-list { display: flex; flex-direction: column; gap: 10px; max-height: 320px; overflow-y: auto; }
+        
+        .operator-btn { background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 20px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.15s; }
+        .operator-btn:active { background: #f0fdfa; border-color: var(--brand-primary); transform: scale(0.98); }
+        .op-name { font-size: 1.15rem; font-weight: 600; color: var(--text-main); }
+        .op-qualifica { font-size: 0.85rem; color: var(--brand-primary); background: #ccfbf1; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+
+        /* VISTA PIN PAD (NUMERICO GIGANTE A 5 CIFRE) */
+        #pinPadView { display: none; text-align: center; }
+        .selected-op-title { font-size: 1.2rem; font-weight: 700; color: var(--text-main); margin-bottom: 20px; }
+        
+        /* DISPLAY PIN (5 PALLINI) */
+        .pin-dots { display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; }
+        .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--brand-primary); background: transparent; transition: background 0.15s; }
+        .pin-dot.filled { background: var(--brand-primary); }
+
+        /* TASTIERINO NUMERICO GRID */
+        .keypad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 320px; margin: 0 auto; }
+        .key-btn { background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); height: 64px; font-size: 1.5rem; font-weight: 700; color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; user-select: none; transition: background 0.1s; }
+        .key-btn:active { background: #e2e8f0; }
+        .key-btn.action { background: #f1f5f9; color: var(--text-muted); font-size: 0.9rem; }
+
+        .back-to-list { margin-top: 20px; background: none; border: none; color: var(--brand-secondary); font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+
+        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 50000; }
+        .toast { background: #1e293b; color: #fff; padding: 14px 24px; border-radius: 30px; font-size: 1rem; font-weight: 500; opacity: 0; transition: opacity 0.3s; box-shadow: var(--shadow-md); text-align: center; }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div id="toast-container"></div>
+
+    <div class="login-card">
+        <div class="login-header">
+            <h1>NVS WardPad</h1>
+            <p>Seleziona il tuo profilo e inserisci il PIN a 5 cifre</p>
+        </div>
+
+        <div class="login-body">
+            
+            <!-- SCHERMATA 1: LISTA OPERATORI -->
+            <div id="operatorSelectionView">
+                <h3>Personale in Servizio</h3>
+                <div class="operator-list" id="operatorListContainer">
+                    <div style="text-align:center; padding:30px; color:var(--text-muted);">Caricamento operatori...</div>
+                </div>
+            </div>
+
+            <!-- SCHERMATA 2: INSERIMENTO PIN A 5 CIFRE -->
+            <div id="pinPadView">
+                <div class="selected-op-title" id="selectedOpNameLabel">Operatore</div>
+                
+                <div class="pin-dots">
+                    <div class="pin-dot" id="dot-0"></div>
+                    <div class="pin-dot" id="dot-1"></div>
+                    <div class="pin-dot" id="dot-2"></div>
+                    <div class="pin-dot" id="dot-3"></div>
+                    <div class="pin-dot" id="dot-4"></div>
+                </div>
+
+                <div class="keypad-grid">
+                    <div class="key-btn" onclick="window.pressKey('1')">1</div>
+                    <div class="key-btn" onclick="window.pressKey('2')">2</div>
+                    <div class="key-btn" onclick="window.pressKey('3')">3</div>
+                    <div class="key-btn" onclick="window.pressKey('4')">4</div>
+                    <div class="key-btn" onclick="window.pressKey('5')">5</div>
+                    <div class="key-btn" onclick="window.pressKey('6')">6</div>
+                    <div class="key-btn" onclick="window.pressKey('7')">7</div>
+                    <div class="key-btn" onclick="window.pressKey('8')">8</div>
+                    <div class="key-btn" onclick="window.pressKey('9')">9</div>
+                    <div class="key-btn action" onclick="window.clearPin()">CANCELLA</div>
+                    <div class="key-btn" onclick="window.pressKey('0')">0</div>
+                    <div class="key-btn action" onclick="window.deleteKey()">⌫</div>
+                </div>
+
+                <button class="back-to-list" onclick="window.tornaAllaLista()">← Cambia Operatore</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SCRIPT FIREBASE E LOGICA LOGIN -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAc0fIlfds4Gne5m3qpH25uacK4NeR6TzM", 
+            authDomain: "gestione-visite-b445b.firebaseapp.com", 
+            projectId: "gestione-visite-b445b", 
+            storageBucket: "gestione-visite-b445b.firebasestorage.app", 
+            messagingSenderId: "720937824810", 
+            appId: "1:720937824810:web:b04b60d1d66bb8f4040953" 
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.dbOperatori = [];
+        window.currentSelectedOp = null;
+        window.currentPinInput = "";
+
+        window.showToast = (m) => {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = 'toast'; t.innerText = m;
+            c.appendChild(t);
+            setTimeout(() => t.classList.add('show'), 10);
+            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2500);
+        };
+
+        // CARICAMENTO OPERATORI DA FIRESTORE
+        onSnapshot(collection(db, "operatori"), snap => {
+            window.dbOperatori = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            window.renderOperatorList();
+        });
+
+        window.renderOperatorList = () => {
+            const container = document.getElementById('operatorListContainer');
+            container.innerHTML = '';
+
+            const lista = window.dbOperatori.length > 0 ? window.dbOperatori : [
+                { id: '1', name: 'Mario Rossi', qualifica: 'Infermiere', pin: '12345' },
+                { id: '2', name: 'Laura Bianchi', qualifica: 'OSS', pin: '00000' }
+            ];
+
+            lista.sort((a,b) => (a.name||'').localeCompare(b.name||'')).forEach(op => {
+                container.innerHTML += `
+                    <div class="operator-btn" onclick="window.selezionaOperatore('${op.name}', '${op.qualifica || 'Operatore'}', '${op.pin || ''}')">
+                        <span class="op-name">${op.name}</span>
+                        <span class="op-qualifica">${op.qualifica || 'Operatore'}</span>
+                    </div>
+                `;
+            });
+        };
+
+        window.selezionaOperatore = (name, qualifica, pin) => {
+            window.currentSelectedOp = { name, qualifica, pin };
+            window.currentPinInput = "";
+            window.updatePinDots();
+
+            document.getElementById('selectedOpNameLabel').innerText = name;
+            document.getElementById('operatorSelectionView').style.display = 'none';
+            document.getElementById('pinPadView').style.display = 'block';
+        };
+
+        window.tornaAllaLista = () => {
+            window.currentSelectedOp = null;
+            window.currentPinInput = "";
+            document.getElementById('pinPadView').style.display = 'none';
+            document.getElementById('operatorSelectionView').style.display = 'block';
+        };
+
+        window.pressKey = (digit) => {
+            if (window.currentPinInput.length < 5) {
+                window.currentPinInput += digit;
+                window.updatePinDots();
+
+                if (window.currentPinInput.length === 5) {
+                    window.verificaPin();
+                }
+            }
+        };
+
+        window.deleteKey = () => {
+            if (window.currentPinInput.length > 0) {
+                window.currentPinInput = window.currentPinInput.slice(0, -1);
+                window.updatePinDots();
+            }
+        };
+
+        window.clearPin = () => {
+            window.currentPinInput = "";
+            window.updatePinDots();
+        };
+
+        window.updatePinDots = () => {
+            for (let i = 0; i < 5; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i < window.currentPinInput.length) {
+                    dot.classList.add('filled');
+                } else {
+                    dot.classList.remove('filled');
+                }
+            }
+        };
+
+        window.verificaPin = () => {
+            const op = window.currentSelectedOp;
+            
+            const pinValido = !op.pin || op.pin.trim() === "" || op.pin === window.currentPinInput;
+
+            if (pinValido || window.currentPinInput === "99999") { // Master PIN a 5 cifre di emergenza
+                sessionStorage.setItem("activeOperator", op.name);
+                localStorage.setItem("activeOperator", op.name);
+                sessionStorage.setItem("activeQualifica", op.qualifica);
+                localStorage.setItem("activeQualifica", op.qualifica);
+
+                window.showToast(`✅ Benvenuto, ${op.name}`);
+                
+                setTimeout(() => {
+                    window.location.href = 'tablet_hub.html';
+                }, 800);
+            } else {
+                window.showToast("❌ PIN Errato. Riprova.");
+                window.currentPinInput = "";
+                window.updatePinDots();
+            }
+        };
+    </script>
+</body>
+</html>

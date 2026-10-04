@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NVS Masterpiece - Diari Integrati Tablet (10/11")</title>
+
+    <style>
+        :root {
+            --bg-body: #f1f5f9;
+            --surface: #ffffff;
+            --primary: #0d9488;
+            --primary-dark: #0f766e;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            
+            /* COLORI COORDINATI DIARI */
+            --med-color: #15803d;
+            --med-bg: #f0fdf4;
+            --inf-color: #0284c7;
+            --inf-bg: #f0f9ff;
+            --oss-color: #d97706;
+            --oss-bg: #fffbeb;
+
+            --radius: 8px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0; padding: 0;
+            background: var(--bg-body);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        /* HEADER TOUCH */
+        .topbar {
+            background: var(--primary-dark);
+            color: #ffffff;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .topbar-brand { font-size: 1.15em; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .topbar-op-badge {
+            background: rgba(255,255,255,0.18);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.88em;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        /* LAYOUT PRINCIPALE TABLET A 2 PANNELLI */
+        .tablet-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* PANNELLO SINISTRO: OSPITI */
+        .sidebar-guests {
+            width: 30%;
+            max-width: 340px;
+            min-width: 260px;
+            background: #ffffff;
+            border-right: 2px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .search-area {
+            padding: 10px 12px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+        }
+        .search-area input {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 0.95em;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+        }
+        .search-area input:focus { border-color: var(--primary); }
+
+        .guests-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .touch-guest-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+        .touch-guest-card.gender-m { border-left: 5px solid #0284c7; background: #f0f9ff; }
+        .touch-guest-card.gender-f { border-left: 5px solid #db2777; background: #fdf2f8; }
+        .touch-guest-card.active {
+            border-color: var(--primary);
+            background: #ccfbf1 !important;
+            box-shadow: 0 2px 6px rgba(13,148,136,0.25);
+            transform: scale(0.99);
+        }
+        .guest-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5em;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+        }
+        .guest-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .guest-info h4 { margin: 0; font-size: 0.95em; font-weight: 700; color: var(--text-dark); }
+        .guest-info small { color: var(--text-muted); font-size: 0.8em; }
+
+        /* PANNELLO DESTRO: CRUSCOTTO DEI 3 DIARI */
+        .workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+
+        .patient-banner {
+            background: #ffffff;
+            border-bottom: 2px solid var(--border);
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .pb-name { font-size: 1.18em; font-weight: 800; color: var(--primary-dark); }
+        .pb-sub { font-size: 0.85em; color: var(--text-muted); }
+
+        /* SELETTORE VISTA: 3 COLONNE (LANDSCAPE) O SCHEDE (PORTRAIT) */
+        .view-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 6px 12px;
+            flex-shrink: 0;
+        }
+        .tab-nav {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #f1f5f9;
+            font-size: 0.88em;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary-dark);
+        }
+
+        /* GRIGLIA 3 DIARI AFFIANCATI SU 10/11 POLLICI */
+        .diari-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            padding: 12px;
+            overflow: hidden;
+        }
+        @media (max-width: 900px) {
+            .diari-grid.split-mode { grid-template-columns: 1fr; overflow-y: auto; }
+        }
+
+        .diario-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .diario-card.medico { border-top: 5px solid var(--med-color); }
+        .diario-card.inf { border-top: 5px solid var(--inf-color); }
+        .diario-card.oss { border-top: 5px solid var(--oss-color); }
+
+        .diario-header {
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .diario-header h3 { margin: 0; font-size: 0.98em; font-weight: 800; display: flex; align-items: center; gap: 6px; }
+
+        .editor-box {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        .editor-box textarea, .editor-box input, .editor-box select {
+            width: 100%;
+            padding: 8px 10px;
+            font-size: 0.92em;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+        }
+        .editor-box textarea:focus, .editor-box input:focus, .editor-box select:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .btn-post {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            border: none;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 0.92em;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .btn-post:active { transform: translateY(1px); }
+
+        /* BADGE BLOCCO READ-ONLY */
+        .readonly-box {
+            padding: 12px 10px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+            font-size: 0.82em;
+            font-weight: 700;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* FLUSSO FEED DELLE NOTE */
+        .feed-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .note-card {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 9px 10px;
+            font-size: 0.88em;
+            line-height: 1.45;
+        }
+        .note-card.med { background: var(--med-bg); border-left: 4px solid var(--med-color); }
+        .note-card.inf { background: var(--inf-bg); border-left: 4px solid var(--inf-color); }
+        .note-card.oss { background: var(--oss-bg); border-left: 4px solid var(--oss-color); }
+        .note-meta {
+            font-size: 0.8em;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #toast-box {
+            position: fixed; bottom: 20px; right: 20px;
+            background: #0f172a; color: #ffffff;
+            padding: 10px 18px; border-radius: 6px; font-weight: 700;
+            z-index: 100000; opacity: 0; transition: opacity 0.2s; pointer-events: none;
+        }
+        #toast-box.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div id="toast-box"></div>
+
+    <!-- TOPBAR CON IDENTITÀ OPERATORE -->
+    <div class="topbar">
+        <div class="topbar-brand">
+            <span>📝 NVS Tablet - Diari Integrati di Reparto</span>
+            <small style="font-weight:normal; opacity:0.85;">[10/11"]</small>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+            <div id="badgeOpTop" class="topbar-op-badge" onclick="window.cambiaOperatoreRapido()">
+                👤 Caricamento...
+            </div>
+            <button onclick="window.location.href='tablet_nvs.html'" style="background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:7px 12px; border-radius:6px; font-weight:bold; cursor:pointer;">
+                📱 Carrello Giro
+            </button>
+            <button onclick="window.location.href='index.html'" style="background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:7px 12px; border-radius:6px; font-weight:bold; cursor:pointer;">
+                🏠 Home
+            </button>
+        </div>
+    </div>
+
+    <div class="tablet-layout">
+        
+        <!-- PANE OSPITI -->
+        <div class="sidebar-guests">
+            <div class="search-area">
+                <input type="text" id="guestSearch" placeholder="🔍 Cerca paziente / stanza..." oninput="window.renderGuests()">
+            </div>
+            <div class="guests-scroll" id="guestList">Caricamento ospiti...</div>
+        </div>
+
+        <!-- PANE OPERATIVO DIARI -->
+        <div class="workspace">
+            
+            <div class="patient-banner">
+                <div>
+                    <div class="pb-name" id="bannerGuestName">Nessun ospite selezionato</div>
+                    <div class="pb-sub" id="bannerGuestMeta">Tocca un ospite dall'elenco a sinistra</div>
+                </div>
+                <div id="bannerBadges" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+            </div>
+
+            <!-- CONTROLLO VISTA: TUTTI I 3 DIARI AFFIANCATI O SINGOLO -->
+            <div class="view-controls">
+                <span style="font-weight:700; color:var(--text-muted); font-size:0.88em;">Vista Diari Reparto:</span>
+                <div class="tab-nav">
+                    <button class="tab-btn active" id="btnViewAll" onclick="window.setViewMode('all')">📑 Tutti i 3 Diari Affiancati</button>
+                    <button class="tab-btn" id="btnViewMed" onclick="window.setViewMode('med')">🩺 Solo Medico</button>
+                    <button class="tab-btn" id="btnViewInf" onclick="window.setViewMode('inf')">💉 Solo Infermiere</button>
+                    <button class="tab-btn" id="btnViewOss" onclick="window.setViewMode('oss')">🧻 Solo OSS</button>
+                </div>
+            </div>
+
+            <!-- I TRE DIARI: VISIBILI A TUTTI, EDITABILI SOLO DALLA QUALIFICA -->
+            <div class="diari-grid" id="diariContainer">
+                
+                <!-- 1. DIARIO MEDICO -->
+                <div class="diario-card medico" id="cardDiarioMed">
+                    <div class="diario-header" style="background:#f0fdf4;">
+                        <h3 style="color:var(--med-color);">👨‍⚕️ Diario Medico</h3>
+                        <span id="roleBadgeMed" style="font-size:0.75em; font-weight:800; padding:2px 6px; border-radius:4px; background:#dcfce7; color:#15803d;">Lettura per Tutti</span>
+                    </div>
+
+                    <!-- BOX INSERIMENTO: SOLO MEDICO / DIR. SANITARIO / ADMIN -->
+                    <div id="editorMedBox" class="editor-box" style="background:#f0fdf4;">
+                        <textarea id="txtNotaMed" rows="3" placeholder="Scrivi referto clinico, visita o variazione medica..."></textarea>
+                        <button class="btn-post" style="background:var(--med-color);" onclick="window.salvaNotaMedica()">
+                            ➕ Pubblica Nota Medica
+                        </button>
+                    </div>
+                    <div id="readonlyMedBox" class="readonly-box" style="display:none;">
+                        🔒 Inserimento riservato al Medico Curante o Direttore Sanitario.
+                    </div>
+
+                    <!-- CRONOLOGIA VISIBILE A TUTTI -->
+                    <div class="feed-scroll" id="feedMedList">
+                        <small style="color:var(--text-muted);">Nessuna nota medica registrata.</small>
+                    </div>
+                </div>
+
+                <!-- 2. DIARIO INFERMIERISTICO -->
+                <div class="diario-card inf" id="cardDiarioInf">
+                    <div class="diario-header" style="background:#f0f9ff;">
+                        <h3 style="color:var(--inf-color);">💉 Diario Infermieristico</h3>
+                        <span id="roleBadgeInf" style="font-size:0.75em; font-weight:800; padding:2px 6px; border-radius:4px; background:#e0f2fe; color:#0369a1;">Lettura per Tutti</span>
+                    </div>
+
+                    <!-- BOX INSERIMENTO: SOLO INFERMIERE / MEDICO / ADMIN -->
+                    <div id="editorInfBox" class="editor-box" style="background:#f0f9ff;">
+                        <textarea id="txtNotaInf" rows="3" placeholder="Scrivi consegna, medicazione o osservazione infermieristica..."></textarea>
+                        <button class="btn-post" style="background:var(--inf-color);" onclick="window.salvaNotaInfermieristica()">
+                            ➕ Pubblica Nota Infermieristica
+                        </button>
+                    </div>
+                    <div id="readonlyInfBox" class="readonly-box" style="display:none;">
+                        🔒 Inserimento riservato all'Infermiere Professionale.
+                    </div>
+
+                    <!-- CRONOLOGIA VISIBILE A TUTTI -->
+                    <div class="feed-scroll" id="feedInfList">
+                        <small style="color:var(--text-muted);">Nessuna nota infermieristica registrata.</small>
+                    </div>
+                </div>
+
+                <!-- 3. DIARIO ASSISTENZIALE (OSS) -->
+                <div class="diario-card oss" id="cardDiarioOss">
+                    <div class="diario-header" style="background:#fffbeb;">
+                        <h3 style="color:var(--oss-color);">🧻 Diario Assistenziale (OSS)</h3>
+                        <span id="roleBadgeOss" style="font-size:0.75em; font-weight:800; padding:2px 6px; border-radius:4px; background:#fef3c7; color:#b45309;">Lettura per Tutti</span>
+                    </div>
+
+                    <!-- BOX INSERIMENTO: SOLO OSS / ADMIN -->
+                    <div id="editorOssBox" class="editor-box" style="background:#fffbeb;">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px;">
+                            <div>
+                                <label style="font-size:0.72em; font-weight:800; display:block; color:#78350f;">Alvo</label>
+                                <select id="ossAlvo">
+                                    <option value="Regolare">Regolare</option>
+                                    <option value="Assente">Assente</option>
+                                    <option value="Diarroico">Diarroico</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size:0.72em; font-weight:800; display:block; color:#78350f;">Diuresi</label>
+                                <select id="ossDiuresi">
+                                    <option value="Regolare">Regolare</option>
+                                    <option value="Scarsa">Scarsa</option>
+                                    <option value="Catetere">Catetere</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size:0.72em; font-weight:800; display:block; color:#78350f;">Idratazione (ml)</label>
+                                <input type="number" id="ossIdr" placeholder="400" inputmode="numeric">
+                            </div>
+                            <div>
+                                <label style="font-size:0.72em; font-weight:800; display:block; color:#78350f;">Igiene</label>
+                                <select id="ossIgiene">
+                                    <option value="A letto">A letto</option>
+                                    <option value="Bagno assistito">Bagno assistito</option>
+                                    <option value="Autonomo">Autonomo</option>
+                                </select>
+                            </div>
+                        </div>
+                        <input type="text" id="ossNote" placeholder="Note alimentazione, sonno, riposo..." style="margin-bottom:6px;">
+                        <button class="btn-post" style="background:var(--oss-color);" onclick="window.salvaNotaOSS()">
+                            ➕ Registra Scheda Assistenza OSS
+                        </button>
+                    </div>
+                    <div id="readonlyOssBox" class="readonly-box" style="display:none;">
+                        🔒 Inserimento riservato all'Operatore Socio Sanitario (OSS).
+                    </div>
+
+                    <!-- CRONOLOGIA VISIBILE A TUTTI -->
+                    <div class="feed-scroll" id="feedOssList">
+                        <small style="color:var(--text-muted);">Nessuna scheda OSS registrata.</small>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SCRIPT FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAc0fIlfds4Gne5m3qpH25uacK4NeR6TzM", 
+            authDomain: "gestione-visite-b445b.firebaseapp.com", 
+            projectId: "gestione-visite-b445b", 
+            storageBucket: "gestione-visite-b445b.firebasestorage.app", 
+            messagingSenderId: "720937824810", 
+            appId: "1:720937824810:web:b04b60d1d66bb8f4040953" 
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.dbOperatori = [];
+        window.dbOspiti = [];
+        window.dbClinica = {};
+        window.dbContenzioni = [];
+
+        window.activeOp = sessionStorage.getItem("activeOperator") || "Operatore";
+        window.activeRole = sessionStorage.getItem("activeRole") || "user";
+        window.activeQualifica = sessionStorage.getItem("activeQualifica") || "Operatore";
+        window.currentPatient = sessionStorage.getItem("globalSelectedPatient") || "";
+        window.currentView = "all";
+
+        window.showToast = (msg) => {
+            const t = document.getElementById('toast-box');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        };
+
+        window.getTimestamp = () => {
+            const n = new Date();
+            return `${n.toLocaleDateString('it-IT')} alle ${n.toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'})}`;
+        };
+
+        // GESTIONE VISTA (3 COLONNE O SINGOLA COLONNA)
+        window.setViewMode = (mode) => {
+            window.currentView = mode;
+            document.querySelectorAll('.tab-nav .tab-btn').forEach(b => b.classList.remove('active'));
+
+            const cardMed = document.getElementById('cardDiarioMed');
+            const cardInf = document.getElementById('cardDiarioInf');
+            const cardOss = document.getElementById('cardDiarioOss');
+            const grid = document.getElementById('diariContainer');
+
+            if(mode === 'all') {
+                document.getElementById('btnViewAll').classList.add('active');
+                grid.style.gridTemplateColumns = '1fr 1fr 1fr';
+                cardMed.style.display = 'flex';
+                cardInf.style.display = 'flex';
+                cardOss.style.display = 'flex';
+            } else if(mode === 'med') {
+                document.getElementById('btnViewMed').classList.add('active');
+                grid.style.gridTemplateColumns = '1fr';
+                cardMed.style.display = 'flex';
+                cardInf.style.display = 'none';
+                cardOss.style.display = 'none';
+            } else if(mode === 'inf') {
+                document.getElementById('btnViewInf').classList.add('active');
+                grid.style.gridTemplateColumns = '1fr';
+                cardMed.style.display = 'none';
+                cardInf.style.display = 'flex';
+                cardOss.style.display = 'none';
+            } else if(mode === 'oss') {
+                document.getElementById('btnViewOss').classList.add('active');
+                grid.style.gridTemplateColumns = '1fr';
+                cardMed.style.display = 'none';
+                cardInf.style.display = 'none';
+                cardOss.style.display = 'flex';
+            }
+        };
+
+        // GESTIONE ACCESSO & CAMBIO OPERATORE RAPIDO
+        window.aggiornaUIOperatore = () => {
+            document.getElementById('badgeOpTop').innerText = `👤 ${window.activeOp} (${window.activeQualifica})`;
+
+            const q = window.activeQualifica;
+            const r = window.activeRole;
+
+            // 1. Permessi Medico: Medico, Direttore Sanitario, admin
+            const canEditMed = (q === 'Medico' || q === 'Direttore Sanitario' || r === 'admin');
+            document.getElementById('editorMedBox').style.display = canEditMed ? 'block' : 'none';
+            document.getElementById('readonlyMedBox').style.display = canEditMed ? 'none' : 'flex';
+
+            // 2. Permessi Infermiere: Infermiere, Medico, Direttore Sanitario, admin
+            const canEditInf = (q === 'Infermiere' || canEditMed);
+            document.getElementById('editorInfBox').style.display = canEditInf ? 'block' : 'none';
+            document.getElementById('readonlyInfBox').style.display = canEditInf ? 'none' : 'flex';
+
+            // 3. Permessi OSS: OSS, admin
+            const canEditOss = (q === 'OSS' || r === 'admin');
+            document.getElementById('editorOssBox').style.display = canEditOss ? 'block' : 'none';
+            document.getElementById('readonlyOssBox').style.display = canEditOss ? 'none' : 'flex';
+        };
+
+        window.cambiaOperatoreRapido = () => {
+            let ops = window.dbOperatori.filter(o => o && o.name);
+            if(ops.length === 0) return window.showToast("Nessun altro operatore censito");
+
+            let nomi = ops.map((o, idx) => `${idx + 1}. ${o.name} (${o.qualifica})`).join('\n');
+            let scelta = prompt(`Seleziona operatore in servizio inserendo il numero:\n\n${nomi}`);
+            let idx = parseInt(scelta, 10) - 1;
+
+            if(!isNaN(idx) && ops[idx]) {
+                const op = ops[idx];
+                if(op.pin && op.pin.trim() !== '') {
+                    let entered = prompt(`Inserisci PIN per ${op.name}:`);
+                    if(entered !== op.pin) return window.showToast("❌ PIN errato!");
+                }
+                window.activeOp = op.name;
+                window.activeRole = op.role || 'user';
+                window.activeQualifica = op.qualifica || 'Operatore';
+
+                sessionStorage.setItem("activeOperator", op.name);
+                sessionStorage.setItem("activeRole", window.activeRole);
+                sessionStorage.setItem("activeQualifica", window.activeQualifica);
+
+                window.aggiornaUIOperatore();
+                window.showToast(`Accesso confermato: ${op.name} (${op.qualifica})`);
+            }
+        };
+
+        // RENDERING OSPITI TOUCH
+        window.renderGuests = () => {
+            const list = document.getElementById('guestList');
+            const search = (document.getElementById('guestSearch')?.value || '').toLowerCase();
+            list.innerHTML = '';
+
+            const attivi = window.dbOspiti
+                .filter(g => !g.decesso && !g.dimissione)
+                .sort((a,b) => a.name.localeCompare(b.name));
+
+            attivi.forEach(g => {
+                if(search && !g.name.toLowerCase().includes(search) && !(g.room||'').toLowerCase().includes(search)) return;
+
+                const pD = window.dbClinica[g.name] || {};
+                const s = (g.sesso || '').toUpperCase();
+                const isM = s === 'M' || s === 'MASCHIO';
+                const genderClass = isM ? 'gender-m' : 'gender-f';
+                const isSelected = g.name === window.currentPatient;
+
+                const item = document.createElement('div');
+                item.className = `touch-guest-card ${genderClass} ${isSelected ? 'active' : ''}`;
+                item.onclick = () => window.selezionaPaziente(g.name);
+                item.innerHTML = `
+                    <div class="guest-avatar">
+                        ${g.photo ? `<img src="${g.photo}">` : (isM ? '👤' : '🌸')}
+                    </div>
+                    <div class="guest-info" style="flex:1; overflow:hidden;">
+                        <h4>${g.name}</h4>
+                        <small>Stanza: <strong>${g.room || '-'}</strong></small>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        };
+
+        window.selezionaPaziente = (n) => {
+            window.currentPatient = n;
+            sessionStorage.setItem("globalSelectedPatient", n);
+            window.renderGuests();
+            window.caricaDiariPaziente();
+        };
+
+        // CARICAMENTO ED ESPOSIZIONE DI TUTTI I 3 DIARI
+        window.caricaDiariPaziente = () => {
+            const n = window.currentPatient;
+            if(!n) return;
+
+            const g = window.dbOspiti.find(x => x.name === n) || {};
+            const pD = window.dbClinica[n] || {};
+
+            document.getElementById('bannerGuestName').innerText = n;
+            document.getElementById('bannerGuestMeta').innerText = `Camera: ${g.room || '-'} | CF: ${g.cf || '-'} | MMG: ${g.mmg || '-'}`;
+
+            let bHtml = '';
+            if(pD.infezione) bHtml += `<span style="background:#fee2e2; color:#991b1b; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:0.75em;">☣ ICA: ${pD.infezione}</span>`;
+            if(pD.disfagia) bHtml += `<span style="background:#fef3c7; color:#92400e; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:0.75em;">🥣 Disfagia</span>`;
+            if(window.dbContenzioni.some(c => c.ospite === n && c.stato === 'ATTIVA')) bHtml += `<span style="background:#ffe4e6; color:#be123c; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:0.75em;">🔒 Contenzione</span>`;
+            document.getElementById('bannerBadges').innerHTML = bHtml;
+
+            const allNotes = pD.diarioClinico || [];
+
+            // 1. DIARIO MEDICO
+            const feedMed = document.getElementById('feedMedList');
+            const notesMed = allNotes.filter(d => (d.tipo || '').includes('Medico'));
+            feedMed.innerHTML = notesMed.length === 0 ? '<small style="color:var(--text-muted);">Nessuna nota medica presente.</small>' : '';
+            notesMed.forEach(d => {
+                feedMed.innerHTML += `
+                    <div class="note-card med">
+                        <div class="note-meta">
+                            <strong style="color:var(--med-color);">👨‍⚕️ Dott. ${d.op}</strong>
+                            <span>${d.data}</span>
+                        </div>
+                        <div style="white-space:pre-wrap;">${d.testo}</div>
+                    </div>`;
+            });
+
+            // 2. DIARIO INFERMIERISTICO
+            const feedInf = document.getElementById('feedInfList');
+            const notesInf = allNotes.filter(d => (d.tipo || '').includes('Infermiere'));
+            feedInf.innerHTML = notesInf.length === 0 ? '<small style="color:var(--text-muted);">Nessuna nota infermieristica presente.</small>' : '';
+            notesInf.forEach(d => {
+                feedInf.innerHTML += `
+                    <div class="note-card inf">
+                        <div class="note-meta">
+                            <strong style="color:var(--inf-color);">💉 Inf. ${d.op}</strong>
+                            <span>${d.data}</span>
+                        </div>
+                        <div style="white-space:pre-wrap;">${d.testo}</div>
+                    </div>`;
+            });
+
+            // 3. DIARIO OSS (ASSISTENZA)
+            const feedOss = document.getElementById('feedOssList');
+            const listOss = pD.assistenza || [];
+            feedOss.innerHTML = listOss.length === 0 ? '<small style="color:var(--text-muted);">Nessuna scheda OSS presente.</small>' : '';
+            listOss.forEach(o => {
+                feedOss.innerHTML += `
+                    <div class="note-card oss">
+                        <div class="note-meta">
+                            <strong style="color:var(--oss-color);">🧻 OSS ${o.op}</strong>
+                            <span>${o.date}</span>
+                        </div>
+                        <div>
+                            Alvo: <strong>${o.alvo}</strong> | Diuresi: <strong>${o.diuresi}</strong> | Idratazione: <strong>${o.idratazione || '-'} ml</strong><br>
+                            Igiene: <strong>${o.igiene}</strong>
+                            ${o.note ? `<div style="margin-top:4px; font-style:italic;">"${o.note}"</div>` : ''}
+                        </div>
+                    </div>`;
+            });
+        };
+
+        // SALVATAGGIO NOTA MEDICA (CONTROLLO RUOLO)
+        window.salvaNotaMedica = async () => {
+            const q = window.activeQualifica;
+            const r = window.activeRole;
+            if(q !== 'Medico' && q !== 'Direttore Sanitario' && r !== 'admin') {
+                return window.showToast("🚫 Azione riservata a Medico o Direttore Sanitario");
+            }
+
+            const n = window.currentPatient;
+            if(!n) return window.showToast("⚠️ Seleziona prima un paziente!");
+
+            const txt = document.getElementById('txtNotaMed').value.trim();
+            if(!txt) return window.showToast("⚠️ Scrivi il contenuto della nota medica!");
+
+            let pD = window.dbClinica[n] || {};
+            if(!pD.diarioClinico) pD.diarioClinico = [];
+
+            pD.diarioClinico.unshift({
+                data: window.getTimestamp(),
+                op: window.activeOp,
+                tipo: 'Nota Medico',
+                testo: txt
+            });
+
+            await setDoc(doc(db, "cartelle_cliniche", n), pD, { merge: true });
+            document.getElementById('txtNotaMed').value = '';
+            window.showToast("✅ Nota medica pubblicata!");
+            window.caricaDiariPaziente();
+        };
+
+        // SALVATAGGIO NOTA INFERMIERISTICA (CONTROLLO RUOLO)
+        window.salvaNotaInfermieristica = async () => {
+            const q = window.activeQualifica;
+            const r = window.activeRole;
+            if(q !== 'Infermiere' && q !== 'Medico' && q !== 'Direttore Sanitario' && r !== 'admin') {
+                return window.showToast("🚫 Azione riservata al personale infermieristico o medico");
+            }
+
+            const n = window.currentPatient;
+            if(!n) return window.showToast("⚠️ Seleziona prima un paziente!");
+
+            const txt = document.getElementById('txtNotaInf').value.trim();
+            if(!txt) return window.showToast("⚠️ Scrivi il contenuto della consegna infermieristica!");
+
+            let pD = window.dbClinica[n] || {};
+            if(!pD.diarioClinico) pD.diarioClinico = [];
+
+            pD.diarioClinico.unshift({
+                data: window.getTimestamp(),
+                op: window.activeOp,
+                tipo: 'Nota Infermiere',
+                testo: txt
+            });
+
+            await setDoc(doc(db, "cartelle_cliniche", n), pD, { merge: true });
+            document.getElementById('txtNotaInf').value = '';
+            window.showToast("✅ Nota infermieristica pubblicata!");
+            window.caricaDiariPaziente();
+        };
+
+        // SALVATAGGIO SCHEDA ASSISTENZA OSS (CONTROLLO RUOLO)
+        window.salvaNotaOSS = async () => {
+            const q = window.activeQualifica;
+            const r = window.activeRole;
+            if(q !== 'OSS' && r !== 'admin') {
+                return window.showToast("🚫 Inserimento riservato all'operatore OSS");
+            }
+
+            const n = window.currentPatient;
+            if(!n) return window.showToast("⚠️ Seleziona prima un paziente!");
+
+            let pD = window.dbClinica[n] || {};
+            if(!pD.assistenza) pD.assistenza = [];
+
+            pD.assistenza.unshift({
+                date: window.getTimestamp(),
+                op: window.activeOp,
+                alvo: document.getElementById('ossAlvo').value,
+                diuresi: document.getElementById('ossDiuresi').value,
+                idratazione: document.getElementById('ossIdr').value.trim(),
+                igiene: document.getElementById('ossIgiene').value,
+                note: document.getElementById('ossNote').value.trim()
+            });
+
+            await setDoc(doc(db, "cartelle_cliniche", n), pD, { merge: true });
+            document.getElementById('ossIdr').value = '';
+            document.getElementById('ossNote').value = '';
+            window.showToast("✅ Scheda assistenza OSS salvata!");
+            window.caricaDiariPaziente();
+        };
+
+        // SNAPSHOT REAL-TIME FIRESTORE
+        onSnapshot(collection(db, "operatori"), snap => {
+            window.dbOperatori = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            window.aggiornaUIOperatore();
+        });
+
+        onSnapshot(collection(db, "ospiti"), snap => {
+            window.dbOspiti = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            window.renderGuests();
+        });
+
+        onSnapshot(collection(db, "cartelle_cliniche"), snap => {
+            window.dbClinica = {};
+            snap.forEach(d => { window.dbClinica[d.id] = d.data(); });
+            if(window.currentPatient) window.caricaDiariPaziente();
+        });
+
+        onSnapshot(collection(db, "contenzioni"), snap => {
+            window.dbContenzioni = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            if(window.currentPatient) window.caricaDiariPaziente();
+        });
+
+        window.onload = () => {
+            window.aggiornaUIOperatore();
+            if(window.currentPatient) {
+                window.caricaDiariPaziente();
+            }
+        };
+    </script>
+</body>
+</html>

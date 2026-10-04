@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NVS Masterpiece - CUP & Trasporti Tablet (10/11")</title>
+
+    <style>
+        :root {
+            --bg-body: #f1f5f9;
+            --surface: #ffffff;
+            --primary: #0d9488;
+            --primary-dark: #0f766e;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --danger: #e11d48;
+            --warning: #d97706;
+            --success: #059669;
+            --cup-color: #10b981;
+            --cup-dark: #047857;
+            --radius: 8px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0; padding: 0;
+            background: var(--bg-body);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        /* HEADER TOUCH */
+        .topbar {
+            background: var(--primary-dark);
+            color: #ffffff;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .topbar-brand { font-size: 1.15em; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .topbar-btns { display: flex; gap: 8px; align-items: center; }
+        .nav-btn {
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #ffffff;
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85em;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex; align-items: center;
+        }
+
+        /* LAYOUT SPLIT A DUE COLONNE */
+        .tablet-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* COLONNA SINISTRA: OSPITI */
+        .sidebar-guests {
+            width: 30%;
+            max-width: 340px;
+            min-width: 260px;
+            background: #ffffff;
+            border-right: 2px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .search-area {
+            padding: 10px 12px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+        }
+        .search-area input {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 0.95em;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+        }
+        .search-area input:focus { border-color: var(--primary); }
+
+        .guests-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .touch-guest-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+        .touch-guest-card.gender-m { border-left: 5px solid #0284c7; background: #f0f9ff; }
+        .touch-guest-card.gender-f { border-left: 5px solid #db2777; background: #fdf2f8; }
+        .touch-guest-card.active {
+            border-color: var(--primary);
+            background: #ccfbf1 !important;
+            box-shadow: 0 2px 6px rgba(13,148,136,0.25);
+            transform: scale(0.99);
+        }
+        .guest-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5em;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+        }
+        .guest-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .guest-info h4 { margin: 0; font-size: 0.95em; font-weight: 700; color: var(--text-dark); }
+        .guest-info small { color: var(--text-muted); font-size: 0.8em; }
+
+        /* COLONNA DESTRA: WORKSPACE CUP & TRASPORTI */
+        .workspace-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+
+        .patient-banner {
+            background: #ffffff;
+            border-bottom: 2px solid var(--border);
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .pb-name { font-size: 1.15em; font-weight: 800; color: var(--primary-dark); }
+        .pb-sub { font-size: 0.85em; color: var(--text-muted); }
+
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px;
+        }
+
+        /* CARDS TOUCH */
+        .card-touch {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            margin-bottom: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .card-touch h4 {
+            margin: 0 0 10px 0;
+            font-size: 1.05em;
+            color: var(--cup-dark);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .btn-full {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 800;
+            color: #ffffff;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .quick-btn {
+            padding: 6px 10px;
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--text-dark);
+        }
+        .quick-btn:hover { background: #e2e8f0; }
+
+        .cup-card-item {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--cup-color);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge-status {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: 800;
+        }
+
+        /* STAMPA SCHEDA VIAGGIO A4 */
+        #printArea { display: none; }
+        @media print {
+            body * { visibility: hidden; }
+            #printArea, #printArea * { visibility: visible; }
+            #printArea {
+                display: block !important; position: absolute; left: 0; top: 0; width: 100%;
+                background: white !important; color: black !important; padding: 25px;
+                box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            }
+            .print-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 9.5pt; }
+            .print-table th, .print-table td { border: 1px solid #94a3b8; padding: 6px 8px; text-align: left; }
+            .print-table th { background: #f1f5f9 !important; font-weight: bold; }
+        }
+
+        #toast-box {
+            position: fixed; bottom: 20px; right: 20px;
+            background: #0f172a; color: #ffffff;
+            padding: 10px 18px; border-radius: 6px; font-weight: 700;
+            z-index: 100000; opacity: 0; transition: opacity 0.2s; pointer-events: none;
+        }
+        #toast-box.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div id="toast-box"></div>
+    <div id="printArea"></div>
+
+    <!-- TOPBAR SUPERIORE -->
+    <div class="topbar">
+        <div class="topbar-brand">
+            <span>📅 NVS Tablet - Prenotazioni CUP & Trasporti Sanitari</span>
+            <small style="font-weight:normal; opacity:0.85;">[10/11"]</small>
+        </div>
+        <div class="topbar-btns">
+            <span id="badgeOpTop" style="font-weight:700; background:rgba(255,255,255,0.2); padding:5px 10px; border-radius:4px; font-size:0.85em;">👤 Op</span>
+            <button class="nav-btn" onclick="window.location.href='tablet_nvs.html'">📱 Carrello Giro</button>
+            <button class="nav-btn" onclick="window.location.href='tablet_presidi.html'">📦 Presidi</button>
+            <button class="nav-btn" onclick="window.location.href='index.html'">🏠 Home</button>
+        </div>
+    </div>
+
+    <div class="tablet-layout">
+        
+        <!-- PANE OSPITI -->
+        <div class="sidebar-guests">
+            <div class="search-area">
+                <input type="text" id="guestSearch" placeholder="🔍 Cerca paziente / stanza..." oninput="window.renderGuests()">
+            </div>
+            <div class="guests-scroll" id="guestList">Caricamento elenco...</div>
+        </div>
+
+        <!-- PANE OPERATIVO CUP -->
+        <div class="workspace-main">
+            
+            <div class="patient-banner">
+                <div>
+                    <div class="pb-name" id="bannerGuestName">Nessun ospite selezionato</div>
+                    <div class="pb-sub" id="bannerGuestMeta">Tocca un ospite dall'elenco a sinistra per pianificare la visita</div>
+                </div>
+                <div id="bannerBadges" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+            </div>
+
+            <div class="content-scroll">
+                
+                <!-- BOX REGISTRAZIONE VISITA & TRASPORTO (RISERVATO INF/MEDICO/ADMIN) -->
+                <div id="boxEditCup" class="card-touch" style="border-top:4px solid var(--cup-color);">
+                    <h4>
+                        <span>📅 Nuova Prenotazione CUP & Scheda di Viaggio</span>
+                        <span style="font-size:0.75em; color:var(--text-muted); font-weight:normal;">Editabile da Inf. / Medico</span>
+                    </h4>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">Prestazione / Esame Specialistico *</label>
+                            <input type="text" id="appType" list="prestazioniCUPList" placeholder="Es. Visita Cardiologica con ECG" autocomplete="off" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px;">
+                            <datalist id="prestazioniCUPList">
+                                <option value="Visita Cardiologica con ECG">
+                                <option value="Ecocardiogramma Color-Doppler">
+                                <option value="Visita Oculistica con Esame Fondo Oculare">
+                                <option value="Visita Ortopedica di Controllo">
+                                <option value="Visita Neurologica / Valutazione CDCD">
+                                <option value="Ecografia Addome Completo">
+                                <option value="Radiografia Torace 2P">
+                                <option value="Radiografia Bacino e Anca">
+                                <option value="Visita Fisiatrica per Prescrizione Ausili">
+                                <option value="Visita Dermatologica / Controllo Neoplasie">
+                                <option value="Visita Urologica con Cateterismo">
+                                <option value="Visita Pneumologica con Spirometria">
+                                <option value="Visita Diabetologica con Piano Terapeutico">
+                            </datalist>
+                        </div>
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">Luogo / Presidio Erogatore *</label>
+                            <input type="text" id="appLuogo" placeholder="Es. Ospedale S. Maria Terni - Pad. 4 Ambulatorio 12" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px;">
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:10px;">
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">Data Visita *</label>
+                            <input type="date" id="appDate" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px;">
+                        </div>
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">Ora Appuntamento *</label>
+                            <input type="time" id="appTime" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px;">
+                        </div>
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">Mezzo di Trasporto *</label>
+                            <select id="appTransport" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px; font-weight:bold;">
+                                <option value="In Sede">Visita Specialistica in Sede</option>
+                                <option value="Ambulanza con Barelliere">Ambulanza con Barelliere (Barellato)</option>
+                                <option value="Mezzo Attrezzato (Pedana/Carrozzina)">Mezzo Attrezzato Pedana (In Carrozzina)</option>
+                                <option value="Autovettura Volontari">Autovettura Volontari OdV (Deambulante)</option>
+                                <option value="A cura Famiglia">A cura dei Familiari / AdS</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:10px;">
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">Accompagnatore Designato</label>
+                            <select id="appAccompagnatore" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px;">
+                                <option value="Personale Sanitario NVS (Infermiere/OSS)">Personale NVS (Infermiere/OSS)</option>
+                                <option value="Volontario OdV Convenzionata">Volontario OdV Convenzionata</option>
+                                <option value="Familiare / Caregiver Delegato">Familiare / Caregiver Delegato</option>
+                                <option value="Amministratore di Sostegno">Amministratore di Sostegno (AdS)</option>
+                                <option value="Nessuno / Solo Conducente">Nessuno / Solo Conducente</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">Regime Economico</label>
+                            <select id="appRegime" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px;">
+                                <option value="SSN / Convenzionato">SSN / Convenzionato (Con Ticket)</option>
+                                <option value="Esente Totale / Patologia">Esente Totale / Patologia</option>
+                                <option value="Privato a Pagamento">Regime Privato a Pagamento</option>
+                                <option value="Controllo Gratuito">Controllo Post-Ricovero</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">N° Ricetta Elettronica (NRE)</label>
+                            <input type="text" id="appNRE" placeholder="Es. 1000A4000123456" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px; text-transform:uppercase;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:10px;">
+                        <label style="font-weight:700; font-size:0.85em;">Istruzioni & Preparazione all'Esame</label>
+                        <input type="text" id="appPrep" placeholder="Es. Digiuno da 8h, vescica piena, portare esami ematici recenti..." style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px;">
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+                        <label style="display:flex; align-items:center; gap:8px; font-weight:700; cursor:pointer;">
+                            <input type="checkbox" id="appDigiuno" style="transform:scale(1.3); accent-color:var(--danger);">
+                            <span>⚠️ Digiuno Obbligatorio</span>
+                        </label>
+                        <input type="text" id="appNote" placeholder="Note operative (contatto autista, sedia propria...)" style="flex:1; min-width:240px; padding:10px; border:2px solid var(--border); border-radius:6px;">
+                    </div>
+
+                    <button class="btn-full" style="background:var(--cup-color);" onclick="window.salvaAppuntamentoCUP()">
+                        📅 Registra Appuntamento CUP & Viaggio
+                    </button>
+                </div>
+
+                <!-- BOX CONSULTAZIONE OSS (SOLA LETTURA) -->
+                <div id="boxReadOnlyOSS" class="card-touch" style="display:none; background:#f8fafc; text-align:center; padding:16px;">
+                    <span style="font-weight:bold; color:var(--text-muted); font-size:0.95em;">
+                        🔒 Visualizzazione Visite e Trasporti abilitata a tutto il personale.<br>
+                        <small>L'inserimento e la modifica degli appuntamenti sono riservati al Personale Infermieristico o Medico.</small>
+                    </span>
+                </div>
+
+                <!-- AGENDA DEI PROSSIMI 15 GIORNI & STORICO -->
+                <div class="card-touch">
+                    <h4>
+                        <span>📅 Agenda Visite & Schede Viaggio (Prossimi 15 gg / Tutte)</span>
+                        <div style="display:flex; gap:6px;">
+                            <button class="quick-btn" id="btnFilter15" onclick="window.filtraCup('15gg')" style="background:#e0f2fe; color:#0369a1;">📅 Prossimi 15 gg</button>
+                            <button class="quick-btn" id="btnFilterTutti" onclick="window.filtraCup('tutti')">Tutte</button>
+                            <button class="quick-btn" id="btnFilterOspite" onclick="window.filtraCup('ospite')">Solo Ospite Attivo</button>
+                        </div>
+                    </h4>
+
+                    <div id="cupListContainer">Caricamento appuntamenti in corso...</div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SCRIPT FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAc0fIlfds4Gne5m3qpH25uacK4NeR6TzM", 
+            authDomain: "gestione-visite-b445b.firebaseapp.com", 
+            projectId: "gestione-visite-b445b", 
+            storageBucket: "gestione-visite-b445b.firebasestorage.app", 
+            messagingSenderId: "720937824810", 
+            appId: "1:720937824810:web:b04b60d1d66bb8f4040953" 
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.dbOperatori = [];
+        window.dbOspiti = [];
+        window.dbClinica = {};
+        window.dbCup = [];
+
+        window.activeOp = sessionStorage.getItem("activeOperator") || "Operatore";
+        window.activeRole = sessionStorage.getItem("activeRole") || "user";
+        window.activeQualifica = sessionStorage.getItem("activeQualifica") || "Operatore";
+        window.currentPatient = sessionStorage.getItem("globalSelectedPatient") || "";
+        window.filtroCupMode = '15gg';
+
+        window.showToast = (msg) => {
+            const t = document.getElementById('toast-box');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        };
+
+        window.getTimestamp = () => {
+            const n = new Date();
+            return `${n.toLocaleDateString('it-IT')} alle ${n.toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'})}`;
+        };
+
+        window.getTodayString = () => {
+            const n = new Date();
+            return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
+        };
+
+        window.formatDateSafe = (d) => {
+            if(!d) return "-";
+            if(typeof d === 'string' && d.includes('-')) return d.split('-').reverse().join('/');
+            return d;
+        };
+
+        // GESTIONE PERMESSI RUOLI
+        window.aggiornaPermessi = () => {
+            document.getElementById('badgeOpTop').innerText = `👤 ${window.activeOp} (${window.activeQualifica})`;
+            const canEdit = (window.activeQualifica !== 'OSS' || window.activeRole === 'admin');
+
+            document.getElementById('boxEditCup').style.display = canEdit ? 'block' : 'none';
+            document.getElementById('boxReadOnlyOSS').style.display = canEdit ? 'none' : 'block';
+        };
+
+        // RENDERING OSPITI
+        window.renderGuests = () => {
+            const list = document.getElementById('guestList');
+            const search = (document.getElementById('guestSearch')?.value || '').toLowerCase();
+            list.innerHTML = '';
+
+            const attivi = window.dbOspiti
+                .filter(g => !g.decesso && !g.dimissione)
+                .sort((a,b) => a.name.localeCompare(b.name));
+
+            attivi.forEach(g => {
+                if(search && !g.name.toLowerCase().includes(search) && !(g.room||'').toLowerCase().includes(search)) return;
+
+                const isM = (g.sesso || '').toUpperCase() === 'M';
+                const isSelected = g.name === window.currentPatient;
+
+                // Controllo appuntamenti pendenti per l'ospite
+                const hasApp = window.dbCup.some(c => c.guest === g.name && c.data >= window.getTodayString());
+
+                const item = document.createElement('div');
+                item.className = `touch-guest-card ${isM ? 'gender-m' : 'gender-f'} ${isSelected ? 'active' : ''}`;
+                item.onclick = () => window.selezionaPaziente(g.name);
+                item.innerHTML = `
+                    <div class="guest-avatar">
+                        ${g.photo ? `<img src="${g.photo}">` : (isM ? '👤' : '🌸')}
+                    </div>
+                    <div class="guest-info" style="flex:1; overflow:hidden;">
+                        <h4>${g.name}</h4>
+                        <small>Stanza: <strong>${g.room || '-'}</strong></small>
+                        <div style="margin-top:2px;">
+                            ${hasApp ? `<span style="background:#dcfce7; color:#15803d; padding:1px 5px; border-radius:3px; font-weight:800; font-size:0.7em;">📅 VISITA IN AGENDA</span>` : ''}
+                        </div>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        };
+
+        window.selezionaPaziente = (n) => {
+            window.currentPatient = n;
+            sessionStorage.setItem("globalSelectedPatient", n);
+            window.renderGuests();
+            window.aggiornaDatiPaziente();
+        };
+
+        window.aggiornaDatiPaziente = () => {
+            const n = window.currentPatient;
+            if(!n) return;
+
+            const g = window.dbOspiti.find(x => x.name === n) || {};
+            const pD = window.dbClinica[n] || {};
+
+            document.getElementById('bannerGuestName').innerText = n;
+            document.getElementById('bannerGuestMeta').innerText = `Camera: ${g.room || '-'} | CF: ${g.cf || '-'} | MMG: ${g.mmg || '-'}`;
+
+            let bHtml = '';
+            if(pD.infezione) bHtml += `<span style="background:#fee2e2; color:#991b1b; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:0.75em;">☣ ICA: ${pD.infezione}</span>`;
+            if(pD.disfagia) bHtml += `<span style="background:#fef3c7; color:#92400e; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:0.75em;">🥣 Disfagia</span>`;
+            document.getElementById('bannerBadges').innerHTML = bHtml;
+
+            window.renderCupList();
+        };
+
+        // SALVATAGGIO APPUNTAMENTO CUP & VIAGGIO
+        window.salvaAppuntamentoCUP = async () => {
+            const g = window.currentPatient;
+            if(!g) return window.showToast("⚠️ Seleziona prima un paziente dall'elenco!");
+
+            const ty = document.getElementById('appType').value.trim();
+            const lu = document.getElementById('appLuogo').value.trim();
+            const d = document.getElementById('appDate').value;
+            const tm = document.getElementById('appTime').value;
+
+            if(!ty || !d || !tm) {
+                return window.showToast("⚠️ Prestazione, data e ora sono obbligatori!");
+            }
+
+            await addDoc(collection(db, "cup"), {
+                guest: g,
+                type: ty,
+                luogo: lu || 'Non specificato',
+                data: d,
+                time: tm,
+                transport: document.getElementById('appTransport').value,
+                accompagnatore: document.getElementById('appAccompagnatore').value,
+                regime: document.getElementById('appRegime').value,
+                nre: document.getElementById('appNRE').value.trim().toUpperCase(),
+                preparazione: document.getElementById('appPrep').value.trim(),
+                digiuno: document.getElementById('appDigiuno').checked,
+                note: document.getElementById('appNote').value.trim(),
+                op: window.activeOp,
+                ts: window.getTimestamp()
+            });
+
+            document.getElementById('appType').value = '';
+            document.getElementById('appLuogo').value = '';
+            document.getElementById('appNRE').value = '';
+            document.getElementById('appPrep').value = '';
+            document.getElementById('appNote').value = '';
+            document.getElementById('appDigiuno').checked = false;
+
+            window.showToast("✅ Prenotazione CUP e scheda viaggio registrate!");
+            window.aggiornaDatiPaziente();
+        };
+
+        // ELIMINAZIONE APPUNTAMENTO
+        window.eliminaCup = async (id) => {
+            if(window.activeQualifica === 'OSS' && window.activeRole !== 'admin') {
+                return window.showToast("🚫 Azione riservata a personale infermieristico o medico.");
+            }
+            if(!confirm("Cancellare definitivamente questo appuntamento CUP?")) return;
+            await deleteDoc(doc(db, "cup", id));
+            window.showToast("Appuntamento rimosso");
+            window.aggiornaDatiPaziente();
+        };
+
+        // STAMPA SCHEDA PROMEMORIA VIAGGIO
+        window.stampaSchedaViaggio = (id) => {
+            const c = window.dbCup.find(x => x.id === id);
+            if(!c) return;
+            const g = window.dbOspiti.find(x => x.name === c.guest) || {};
+
+            let html = `
+                <div style="text-align:center; border-bottom:2px solid #047857; padding-bottom:12px; margin-bottom:16px;">
+                    <h1 style="margin:0; color:#047857; font-size:18pt; text-transform:uppercase;">NUOVA VILLA SILVANA S.R.L.</h1>
+                    <p style="margin:3px 0; font-size:9pt; color:#475569;">Residenza Protetta per Anziani | Terni (TR)</p>
+                    <h2 style="margin:6px 0 0 0; font-size:13pt; color:#0f172a; text-transform:uppercase;">
+                        SCHEDA PROMEMORIA VIAGGIO SANITARIO & VISITA CUP
+                    </h2>
+                </div>
+
+                <div style="border:1px solid #94a3b8; padding:10px 14px; margin-bottom:14px; border-radius:4px; font-size:9pt; background:#f8fafc;">
+                    <table style="width:100%; border-collapse:collapse;">
+                        <tr><td style="width:50%;">Paziente: <strong style="font-size:1.15em;">${c.guest}</strong></td><td>Stanza / Letto: <strong>${g.room||'-'}</strong></td></tr>
+                        <tr><td>Codice Fiscale: <strong>${g.cf||'-'}</strong></td><td>Data di Nascita: <strong>${window.formatDateSafe(g.dob)}</strong></td></tr>
+                        <tr><td>Medico Curante: <strong>${g.mmg||'-'}</strong> (${g.mmgTel||'-'})</td><td>Referente Fam.: <strong>${g.ref||'-'}</strong> (${g.refTel||'-'})</td></tr>
+                    </table>
+                </div>
+
+                <table class="print-table">
+                    <tr><th style="width:32%;">Data e Ora Visita</th><td><strong style="font-size:1.1em; color:#047857;">${window.formatDateSafe(c.data)} alle ore ${c.time}</strong></td></tr>
+                    <tr><th>Prestazione Specialistica</th><td><strong>${c.type}</strong></td></tr>
+                    <tr><th>Luogo / Presidio Erogatore</th><td><strong>${c.luogo}</strong></td></tr>
+                    <tr><th>Mezzo di Trasporto</th><td><strong>${c.transport}</strong></td></tr>
+                    <tr><th>Accompagnatore Incaricato</th><td>${c.accompagnatore||'N/D'}</td></tr>
+                    <tr><th>Regime / Codice Ricetta (NRE)</th><td>${c.regime||'-'} ${c.nre ? ' (NRE: '+c.nre+')' : ''}</td></tr>
+                    <tr><th>Preparazione all'Esame</th><td>${c.digiuno ? '<strong style="color:#b91c1c;">DIGIUNO OBBLIGATORIO. </strong>' : ''}${c.preparazione||'Nessuna istruzione particolare.'}</td></tr>
+                    <tr><th>Note Operative</th><td>${c.note||'Nessuna nota aggiuntiva.'}</td></tr>
+                </table>
+
+                <div style="margin-top:40px; display:flex; justify-content:space-between; font-size:8.5pt;">
+                    <div>Stampato il: ${window.getTimestamp()} da ${c.op}</div>
+                    <div style="text-align:center;">
+                        Firma Conducente / Accompagnatore:<br><br>
+                        ________________________________________
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('printArea').innerHTML = html;
+            setTimeout(() => window.print(), 250);
+        };
+
+        // RENDERING AGENDA
+        window.renderCupList = () => {
+            const container = document.getElementById('cupListContainer');
+            if(!container) return;
+
+            const today = new Date(); today.setHours(0,0,0,0);
+            const in15Days = new Date(today.getTime() + (15 * 24 * 60 * 60 * 1000)); in15Days.setHours(23,59,59,999);
+
+            let list = [...window.dbCup].sort((a,b) => new Date(a.data+'T'+(a.time||'00:00')) - new Date(b.data+'T'+(b.time||'00:00')));
+
+            if(window.filtroCupMode === 'ospite' && window.currentPatient) {
+                list = list.filter(c => c.guest === window.currentPatient);
+            } else if(window.filtroCupMode === '15gg') {
+                list = list.filter(c => {
+                    if(!c.data) return false;
+                    const d = new Date(c.data + 'T00:00:00');
+                    return d >= today && d <= in15Days;
+                });
+            }
+
+            if(list.length === 0) {
+                container.innerHTML = '<p style="color:#64748b; font-size:0.9em; margin:0;">Nessun appuntamento CUP trovato per il filtro attivo.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            const canDelete = (window.activeQualifica !== 'OSS' || window.activeRole === 'admin');
+
+            list.forEach(c => {
+                const appDate = new Date(c.data + 'T00:00:00');
+                const diffDays = Math.ceil((appDate - today) / (1000 * 60 * 60 * 24));
+
+                let dayLabel = `tra ${diffDays} gg`;
+                let badgeStyle = "background:#e0f2fe; color:#0369a1;";
+                if(diffDays === 0) { dayLabel = "OGGI"; badgeStyle = "background:#fee2e2; color:#991b1b; font-weight:bold;"; }
+                else if(diffDays === 1) { dayLabel = "DOMANI"; badgeStyle = "background:#fef3c7; color:#92400e; font-weight:bold;"; }
+
+                const delBtn = canDelete ? `
+                    <button onclick="window.eliminaCup('${c.id}')" style="background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; padding:4px 8px; border-radius:4px; font-weight:bold; cursor:pointer;">
+                        ✕
+                    </button>` : '';
+
+                container.innerHTML += `
+                    <div class="cup-card-item">
+                        <div style="flex:1;">
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:3px;">
+                                <strong>${c.guest}</strong>
+                                <span class="badge-status" style="${badgeStyle}">${dayLabel}</span>
+                                ${c.digiuno ? '<span style="background:#fee2e2; color:#991b1b; font-size:0.7em; padding:1px 5px; border-radius:3px; font-weight:bold;">DIGIUNO</span>' : ''}
+                            </div>
+                            <div style="color:var(--cup-dark); font-weight:bold; font-size:0.95em;">
+                                ${c.type}
+                            </div>
+                            <small style="color:var(--text-muted); display:block; margin-top:2px;">
+                                📅 <strong>${window.formatDateSafe(c.data)}</strong> ore <strong>${c.time||'-'}</strong> | 📍 ${c.luogo} | 🚐 <strong>${c.transport}</strong>
+                            </small>
+                            ${c.preparazione ? `<small style="display:block; margin-top:2px; color:#475569;">Prep: <em>${c.preparazione}</em></small>` : ''}
+                        </div>
+                        <div style="display:flex; gap:6px; align-items:center;">
+                            <button onclick="window.stampaSchedaViaggio('${c.id}')" style="background:#475569; color:#fff; border:none; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.85em;">
+                                🖨️ Scheda Viaggio
+                            </button>
+                            ${delBtn}
+                        </div>
+                    </div>`;
+            });
+        };
+
+        window.filtraCup = (mode) => {
+            window.filtroCupMode = mode;
+            window.renderCupList();
+        };
+
+        // REAL-TIME FIRESTORE LISTENERS
+        onSnapshot(collection(db, "ospiti"), snap => {
+            window.dbOspiti = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            window.renderGuests();
+        });
+
+        onSnapshot(collection(db, "cartelle_cliniche"), snap => {
+            window.dbClinica = {};
+            snap.forEach(d => { window.dbClinica[d.id] = d.data(); });
+            if(window.currentPatient) window.aggiornaDatiPaziente();
+        });
+
+        onSnapshot(collection(db, "cup"), snap => {
+            window.dbCup = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            if(window.currentPatient) window.aggiornaDatiPaziente();
+            else window.renderCupList();
+        });
+
+        window.onload = () => {
+            window.aggiornaPermessi();
+            document.getElementById('appDate').value = window.getTodayString();
+            document.getElementById('appTime').value = "09:00";
+
+            if(window.currentPatient) {
+                window.aggiornaDatiPaziente();
+            } else {
+                window.renderCupList();
+            }
+        };
+    </script>
+</body>
+</html>

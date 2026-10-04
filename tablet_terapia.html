@@ -3,82 +3,458 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>S.U.T. Terapia - NVS WardPad</title>
+    <title>NVS Masterpiece - Terapia & Stupefacenti Tablet (10/11")</title>
 
     <style>
         :root {
             --bg-body: #f1f5f9;
-            --bg-card: #ffffff;
-            --text-main: #0f172a;
+            --surface: #ffffff;
+            --primary: #0d9488;
+            --primary-dark: #0f766e;
+            --text-dark: #0f172a;
             --text-muted: #64748b;
             --border: #cbd5e1;
-            --brand-primary: #0f766e;
-            --brand-secondary: #0284c7; 
+            --danger: #e11d48;
+            --warning: #d97706;
             --success: #059669;
-            --alert-red: #e11d48;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --terapia: #0284c7;
+            --narc-color: #ef4444;
+            --radius: 8px;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-body); margin: 0; padding: 0; color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0; padding: 0;
+            background: var(--bg-body);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-size: 14px;
+        }
 
-        .app-header { background: #ffffff; color: var(--text-main); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); z-index: 10; flex-shrink: 0; }
-        .header-left { display: flex; align-items: center; gap: 12px; }
-        .back-btn { background: none; border: none; font-size: 1.15rem; color: var(--brand-primary); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 0; }
-        .patient-title { font-size: 1.1rem; font-weight: 800; text-transform: uppercase; color: var(--text-main); border-left: 2px solid var(--border); padding-left: 12px; }
-        .date-badge { background: #f8fafc; border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; color: var(--brand-primary); }
+        /* HEADER TOUCH */
+        .topbar {
+            background: var(--primary-dark);
+            color: #ffffff;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .topbar-brand { font-size: 1.15em; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .topbar-btns { display: flex; gap: 8px; align-items: center; }
+        .nav-btn {
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #ffffff;
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85em;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex; align-items: center;
+        }
 
-        .main-container { flex: 1; overflow-y: auto; padding: 18px 20px; -webkit-overflow-scrolling: touch; display: flex; justify-content: center; }
-        .content-wrapper { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 14px; padding-bottom: 40px; }
+        /* LAYOUT SPLIT A DUE COLONNE */
+        .tablet-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
 
-        .drug-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
-        .drug-row { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; gap: 14px; transition: background 0.15s; }
-        .drug-row.done { background: #f0fdf4; border-left: 5px solid var(--success); }
+        /* COLONNA SINISTRA: OSPITI */
+        .sidebar-guests {
+            width: 30%;
+            max-width: 340px;
+            min-width: 260px;
+            background: #ffffff;
+            border-right: 2px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .search-area {
+            padding: 10px 12px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+        }
+        .search-area input {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 0.95em;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+        }
+        .search-area input:focus { border-color: var(--primary); }
 
-        .drug-main h4 { margin: 0 0 6px 0; font-size: 1.15rem; color: var(--text-main); font-weight: 700; }
-        .drug-details { font-size: 0.9rem; color: var(--text-muted); line-height: 1.4; }
-        .drug-details strong { color: var(--text-main); }
+        .guests-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .touch-guest-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+        .touch-guest-card.gender-m { border-left: 5px solid #0284c7; background: #f0f9ff; }
+        .touch-guest-card.gender-f { border-left: 5px solid #db2777; background: #fdf2f8; }
+        .touch-guest-card.active {
+            border-color: var(--primary);
+            background: #ccfbf1 !important;
+            box-shadow: 0 2px 6px rgba(13,148,136,0.25);
+            transform: scale(0.99);
+        }
+        .guest-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5em;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+        }
+        .guest-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .guest-info h4 { margin: 0; font-size: 0.95em; font-weight: 700; color: var(--text-dark); }
+        .guest-info small { color: var(--text-muted); font-size: 0.8em; }
 
-        .drug-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
-        .btn-check { background: #f1f5f9; border: 2px solid var(--border); color: var(--text-muted); padding: 10px 18px; border-radius: var(--radius-md); font-weight: 800; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s; }
-        .btn-check:active { transform: scale(0.96); }
-        .btn-check.active { background: var(--success); border-color: var(--success); color: #ffffff; }
+        /* COLONNA DESTRA: AREA OPERATIVA TERAPIE */
+        .workspace-terapia {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #f8fafc;
+        }
 
-        .somministrato-meta { font-size: 0.78rem; color: #15803d; font-weight: 600; text-align: right; }
+        .patient-banner {
+            background: #ffffff;
+            border-bottom: 2px solid var(--border);
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .pb-name { font-size: 1.15em; font-weight: 800; color: var(--primary-dark); }
+        .pb-sub { font-size: 0.85em; color: var(--text-muted); }
 
-        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 50000; }
-        .toast { background: #1e293b; color: #fff; padding: 14px 24px; border-radius: 30px; font-size: 1rem; font-weight: 500; opacity: 0; transition: opacity 0.3s; box-shadow: var(--shadow-sm); text-align: center; }
-        .toast.show { opacity: 1; }
-        
-        .svg-icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        /* TABS VISTA */
+        .tab-bar {
+            display: flex;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px 8px;
+            border: none;
+            background: transparent;
+            font-size: 0.88em;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            text-align: center;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn.active {
+            color: var(--terapia);
+            border-bottom-color: var(--terapia);
+            background: #f0f9ff;
+        }
+
+        .tab-pane {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px;
+            display: none;
+        }
+        .tab-pane.active { display: block; }
+
+        /* CARDS */
+        .card-touch {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            margin-bottom: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .card-touch h4 { margin: 0 0 10px 0; font-size: 1em; color: var(--terapia); display: flex; align-items: center; justify-content: space-between; }
+
+        /* FARMACI CON SPUNTA DIRETTA */
+        .therapy-item {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--terapia);
+            padding: 12px 14px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+        .therapy-info strong { font-size: 1.05em; color: var(--text-dark); display: block; }
+        .therapy-info p { margin: 3px 0 0 0; font-size: 0.85em; color: var(--text-muted); }
+        .therapy-slots { display: flex; gap: 8px; flex-wrap: wrap; }
+        .slot-btn {
+            padding: 10px 14px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 0.85em;
+            cursor: pointer;
+            background: #ffffff;
+            color: var(--text-dark);
+            min-width: 75px;
+            text-align: center;
+            transition: all 0.1s ease;
+        }
+        .slot-btn.signed {
+            background: #d1fae5;
+            border-color: #059669;
+            color: #065f46;
+        }
+
+        .btn-full {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 800;
+            color: #ffffff;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* MODALE FIRMA TOUCH */
+        .signature-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.75);
+            z-index: 50000;
+            display: none; align-items: center; justify-content: center;
+            padding: 16px;
+        }
+        .signature-dialog {
+            background: #fff; border-radius: 10px; max-width: 480px; width: 100%;
+            padding: 20px; text-align: center;
+        }
+        .signature-pad { border: 2px dashed #94a3b8; border-radius: 6px; width: 100%; height: 180px; touch-action: none; background: #f8fafc; }
+
+        #toast-box {
+            position: fixed; bottom: 20px; right: 20px;
+            background: #0f172a; color: #ffffff;
+            padding: 10px 18px; border-radius: 6px; font-weight: 700;
+            z-index: 100000; opacity: 0; transition: opacity 0.2s; pointer-events: none;
+        }
+        #toast-box.show { opacity: 1; }
     </style>
-
-    <!-- FIREBASE COMPAT SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <div id="toast-container"></div>
+    <div id="toast-box"></div>
 
-    <header class="app-header">
-        <div class="header-left">
-            <button class="back-btn" onclick="window.location.href='tablet_hub.html'">
-                <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg> Reparto
-            </button>
-            <div class="patient-title" id="headerPatientName">Caricamento...</div>
+    <!-- MODAL FIRMA VALIDAZIONE PIANO MENSILE -->
+    <div id="sigModal" class="signature-overlay">
+        <div class="signature-dialog">
+            <h3 id="sigModalTitle" style="margin:0 0 8px 0; color:var(--primary-dark);">Validazione Piano Terapeutico</h3>
+            <p style="font-size:0.85em; color:var(--text-muted); margin:0 0 12px 0;">Firma del Medico Curante / Direttore Sanitario:</p>
+            <canvas id="canvasSig" class="signature-pad" width="420" height="180"></canvas>
+            <div style="display:flex; justify-content:space-between; margin-top:14px; gap:8px;">
+                <button onclick="window.clearSig()" style="padding:10px 14px; border:none; background:#64748b; color:#fff; border-radius:6px; font-weight:bold; cursor:pointer;">Pulisci</button>
+                <button onclick="document.getElementById('sigModal').style.display='none'" style="padding:10px 14px; border:none; background:#e11d48; color:#fff; border-radius:6px; font-weight:bold; cursor:pointer;">Annulla</button>
+                <button onclick="window.confirmPianoSig()" style="padding:10px 18px; border:none; background:var(--success); color:#fff; border-radius:6px; font-weight:bold; cursor:pointer;">Conferma e Sigilla</button>
+            </div>
         </div>
-        <div class="date-badge" id="todayDateBadge">-</div>
-    </header>
+    </div>
 
-    <main class="main-container">
-        <div class="content-wrapper" id="terapiaContainer">
-            <div style="text-align:center; padding:40px; color:var(--text-muted);">Sincronizzazione Scheda Unica di Terapia (S.U.T.)...</div>
+    <!-- TOPBAR SUPERIORE -->
+    <div class="topbar">
+        <div class="topbar-brand">
+            <span>💊 NVS Tablet - Terapia & Stupefacenti</span>
+            <small style="font-weight:normal; opacity:0.85;">[10/11"]</small>
         </div>
-    </main>
+        <div class="topbar-btns">
+            <span id="badgeOpTop" style="font-weight:700; background:rgba(255,255,255,0.2); padding:5px 10px; border-radius:4px; font-size:0.85em;">👤 Op</span>
+            <button class="nav-btn" onclick="window.location.href='tablet_nvs.html'">📱 Carrello Giro</button>
+            <button class="nav-btn" onclick="window.location.href='tablet_diari.html'">📖 Diari Reparto</button>
+            <button class="nav-btn" onclick="window.location.href='index.html'">🏠 Home</button>
+        </div>
+    </div>
 
-    <script>
+    <div class="tablet-layout">
+        
+        <!-- PANE OSPITI -->
+        <div class="sidebar-guests">
+            <div class="search-area">
+                <input type="text" id="guestSearch" placeholder="🔍 Cerca paziente / stanza..." oninput="window.renderGuests()">
+            </div>
+            <div class="guests-scroll" id="guestList">Caricamento ospiti...</div>
+        </div>
+
+        <!-- PANE OPERATIVO -->
+        <div class="workspace-terapia">
+            
+            <div class="patient-banner">
+                <div>
+                    <div class="pb-name" id="bannerGuestName">Nessun ospite selezionato</div>
+                    <div class="pb-sub" id="bannerGuestMeta">Tocca un ospite dall'elenco a sinistra</div>
+                </div>
+                <div id="bannerBadges" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+            </div>
+
+            <div class="tab-bar">
+                <button class="tab-btn active" onclick="window.switchTab('somministrazione', this)">🕒 Somministrazione Oggi</button>
+                <button class="tab-btn" onclick="window.switchTab('prescrizione', this)">🩺 Prescrizione Medica</button>
+                <button class="tab-btn" onclick="window.switchTab('stupefacenti', this)">🔒 Armadio Stupefacenti (309/90)</button>
+            </div>
+
+            <!-- TAB 1: SOMMINISTRAZIONE OGGI -->
+            <div id="pane-somministrazione" class="tab-pane active">
+                <div class="card-touch">
+                    <h4>
+                        <span>🕒 Somministrazioni Farmaci Programmate (Oggi)</span>
+                        <span id="todayLabel" style="font-size:0.85em; font-weight:bold; color:var(--text-muted);"></span>
+                    </h4>
+                    <div id="dailyTherapyList">Seleziona un paziente per visualizzare i farmaci.</div>
+                </div>
+
+                <!-- VALIDAZIONE MENSILE PIANO -->
+                <div class="card-touch" style="border-top:4px solid var(--success);">
+                    <h4><span>📑 Validazione Piano Mensile</span></h4>
+                    <div id="monthlySigStatus" style="font-size:0.9em; margin-bottom:8px;">⏳ In attesa di validazione medica per il mese corrente.</div>
+                    <button id="btnValidaPiano" class="btn-full" style="background:var(--success); display:none;" onclick="window.apriFirmaPiano()">
+                        ⚕️ Valida Piano Terapeutico con Firma (Medico / Dir. Sanitario)
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 2: PRESCRIZIONE MEDICA (RISERVATA MEDICO / DIR. SANITARIO / ADMIN) -->
+            <div id="pane-prescrizione" class="tab-pane">
+                <div id="medicoPrescriptionBox" class="card-touch" style="border-top:4px solid var(--terapia); display:none;">
+                    <h4>➕ Nuova Prescrizione Farmacologica</h4>
+                    
+                    <div style="margin-bottom:10px;">
+                        <label style="font-weight:700; font-size:0.85em;">Farmaco (Prontuario AIFA / Geriatria)</label>
+                        <input type="text" id="prescFarmaco" list="listaFarmaciAifa" placeholder="Cerca principio attivo o nome commerciale..." autocomplete="off" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px; font-size:1em;">
+                        <datalist id="listaFarmaciAifa"></datalist>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">Posologia</label>
+                            <input type="text" id="prescPosologia" placeholder="Es. 1 cpr, 20 gtt, 1 fl" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px;">
+                        </div>
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">Fasce Orarie</label>
+                            <select id="prescOrario" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px; font-weight:bold;">
+                                <option value="08:00">08:00 (Mattina)</option>
+                                <option value="12:00">12:00 (Pranzo)</option>
+                                <option value="18:00">18:00 (Pomeriggio)</option>
+                                <option value="20:00">20:00 (Cena)</option>
+                                <option value="22:00">22:00 (Notte / Riposo)</option>
+                                <option value="08:00 - 20:00">08:00 - 20:00 (B.I.D.)</option>
+                                <option value="08:00 - 12:00 - 20:00">08:00 - 12:00 - 20:00 (T.I.D.)</option>
+                                <option value="08:00 - 12:00 - 18:00 - 22:00">08:00 - 12:00 - 18:00 - 22:00 (Q.I.D.)</option>
+                                <option value="Al bisogno">Al bisogno (S.O.S.)</option>
+                                <option value="Firma">Firma Singola Giornaliera</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:10px;">
+                        <label style="font-weight:700; font-size:0.85em;">Note Cliniche & Indicazioni</label>
+                        <input type="text" id="prescNote" placeholder="A stomaco pieno, triturabile, a digiuno..." style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px;">
+                    </div>
+
+                    <button class="btn-full" style="background:var(--terapia);" onclick="window.salvaPrescrizioneMedica()">
+                        ➕ Prescrivi Farmaco nel Piano
+                    </button>
+                </div>
+
+                <div id="medicoRestrictedWarning" class="card-touch" style="display:none; background:#f8fafc; text-align:center; padding:25px;">
+                    <span style="font-size:1.1em; font-weight:bold; color:var(--text-muted);">
+                        🔒 La prescrizione e modifica dei piani terapeutici è riservata al Medico Curante o Direttore Sanitario.
+                    </span>
+                </div>
+
+                <!-- ELENCO PRESCRIZIONI ATTIVE CON TASTO ELIMINA -->
+                <div class="card-touch">
+                    <h4>📋 Prescrizioni Farmacologiche Attive per l'Ospite</h4>
+                    <div id="activePrescriptionsList">Seleziona un paziente.</div>
+                </div>
+            </div>
+
+            <!-- TAB 3: STUPEFACENTI (DPR 309/90) -->
+            <div id="pane-stupefacenti" class="tab-pane">
+                <div class="card-touch" style="border-top:4px solid var(--narc-color);">
+                    <h4 style="color:var(--narc-color);">💊 Registro Movimenti Stupefacenti & Sostanze Psicotrope</h4>
+                    
+                    <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:8px; margin-bottom:10px;">
+                        <div>
+                            <label style="font-weight:700; font-size:0.8em;">Farmaco Stupefacente</label>
+                            <input type="text" id="narcNome" placeholder="Es. Morfina fiale, Durogesic cerotti..." style="width:100%; padding:8px; border:2px solid var(--border); border-radius:6px;">
+                        </div>
+                        <div>
+                            <label style="font-weight:700; font-size:0.8em;">Operazione</label>
+                            <select id="narcTipoOp" style="width:100%; padding:8px; border:2px solid var(--border); border-radius:6px; font-weight:bold;">
+                                <option value="CARICO">🟢 CARICO</option>
+                                <option value="SCARICO">🔴 SCARICO</option>
+                                <option value="SCARTO">🟡 SCARTO</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-weight:700; font-size:0.8em;">Quantità</label>
+                            <input type="number" id="narcQta" min="1" value="1" style="width:100%; padding:8px; border:2px solid var(--border); border-radius:6px;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:10px;">
+                        <label style="font-weight:700; font-size:0.8em;">Riferimento Ricetta Sanitaria / Paziente *</label>
+                        <input type="text" id="narcRif" placeholder="N° Ricetta ministeriale o Cognome Paziente" style="width:100%; padding:8px; border:2px solid var(--border); border-radius:6px;">
+                    </div>
+
+                    <button class="btn-full" style="background:var(--narc-color);" onclick="window.salvaMovimentoStupefacenti()">
+                        🔒 Registra Movimento DPR 309/90
+                    </button>
+                </div>
+
+                <!-- GIACENZE ARMADIO -->
+                <div class="card-touch">
+                    <h4>📦 Giacenze Attuali Armadio Stupefacenti</h4>
+                    <div id="narcoticsInventoryList">Caricamento inventario...</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SCRIPT FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
         const firebaseConfig = { 
             apiKey: "AIzaSyAc0fIlfds4Gne5m3qpH25uacK4NeR6TzM", 
             authDomain: "gestione-visite-b445b.firebaseapp.com", 
@@ -87,162 +463,434 @@
             messagingSenderId: "720937824810", 
             appId: "1:720937824810:web:b04b60d1d66bb8f4040953" 
         };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const db = firebase.firestore();
+        // PRONTUARIO TERAPEUTICO
+        const prontuario = [
+            "Cardioaspirina (ASA 100mg)", "Lasix (Furosemide)", "Triatec (Ramipril)", "Norvasc (Amlodipina)",
+            "Torvast (Atorvastatina)", "Lantus (Insulina Glargine)", "Novorapid (Insulina Aspart)", "Dibase (Vitamina D3)",
+            "Pantorc (Pantoprazolo)", "Lucen (Esomeprazolo)", "Eliquis (Apixaban)", "Xarelto (Rivaroxaban)",
+            "Coumadin (Warfarin)", "Plavix (Clopidogrel)", "Tachipirina 1000mg (Paracetamolo)", "Brufen (Ibuprofene)",
+            "Toradol (Ketorolac)", "Oki bustine (Ketoprofene)", "Bentelan (Betametasone)", "Deltacortene (Prednisone)",
+            "Serenase (Aloperidolo)", "Haldol (Aloperidolo)", "Seroquel (Quetiapina)", "Zyprexa (Olanzapina)",
+            "Tavor (Lorazepam)", "En gocce (Delorazepam)", "Minias (Lormetazepam)", "Xanax (Alprazolam)",
+            "Valium (Diazepam)", "Trittico (Trazodone)", "Zoloft (Sertralina)", "Cipralex (Escitalopram)",
+            "Madopar (Levodopa)", "Sinemet (Levodopa)", "Keppra (Levetiracetam)", "Depakin Chrono (Sodio Valproato)",
+            "Lyrica (Pregabalin)", "Neurontin (Gabapentin)", "Lanoxin (Digossina)", "Cordarone (Amiodarone)",
+            "Cardicor (Bisoprololo)", "Dilatrend (Carvedilolo)", "Lobivon (Nebivololo)", "Omnic (Tamsulosina)",
+            "Avodart (Dutasteride)", "Duodart (Dutasteride + Tamsulosina)", "Eutirox (Levotiroxina)", "Movicol (Macrogol)",
+            "Laevolac (Lattulosio)", "Peridon (Domperidone)", "Plasil (Metoclopramide)", "Rocefin (Ceftriaxone)",
+            "Augmentin (Amoxicillina + Clavulanico)", "Ciproxin (Ciprofloxacina)", "Tavanic (Levofloxacina)",
+            "Durogesic (Fentanyl cerotti)", "Transtec (Buprenorfina cerotti)", "Contramal (Tramadolo)", "Oramorph gocce (Morfina)"
+        ];
 
-        window.activeOperator = sessionStorage.getItem("activeOperator") || localStorage.getItem("activeOperator") || "PASTORI EDOARDO";
-        window.activeQualifica = sessionStorage.getItem("activeQualifica") || localStorage.getItem("activeQualifica") || "Infermiere";
+        window.dbOperatori = [];
+        window.dbOspiti = [];
+        window.dbClinica = {};
+        window.dbContenzioni = [];
+        window.dbPresidi = [];
+        window.dbStupefacentiInv = [];
 
-        const urlParams = new URLSearchParams(window.location.search);
-        // Assicura il nome esatto dell'ospite in maiuscolo
-        window.targetPatient = (urlParams.get('ospite') || sessionStorage.getItem('globalSelectedPatient') || "PASTORI EDOARDO").trim().toUpperCase();
-        document.getElementById('headerPatientName').innerText = window.targetPatient;
+        window.activeOp = sessionStorage.getItem("activeOperator") || "Operatore";
+        window.activeRole = sessionStorage.getItem("activeRole") || "user";
+        window.activeQualifica = sessionStorage.getItem("activeQualifica") || "Operatore";
+        window.currentPatient = sessionStorage.getItem("globalSelectedPatient") || "";
 
-        const todayObj = new Date();
-        const todayStr = `${todayObj.getFullYear()}-${String(todayObj.getMonth()+1).padStart(2,'0')}-${String(todayObj.getDate()).padStart(2,'0')}`;
-        document.getElementById('todayDateBadge').innerText = `Oggi: ${todayObj.toLocaleDateString('it-IT')}`;
-
-        window.showToast = (m) => {
-            const c = document.getElementById('toast-container');
-            const t = document.createElement('div');
-            t.className = 'toast'; t.innerText = m;
-            c.appendChild(t);
-            setTimeout(() => t.classList.add('show'), 10);
-            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2200);
+        window.showToast = (msg) => {
+            const t = document.getElementById('toast-box');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
         };
 
-        let rawTerapiaList = [];
+        window.getTimestamp = () => {
+            const n = new Date();
+            return `${n.toLocaleDateString('it-IT')} alle ${n.toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'})}`;
+        };
 
-        // ASCOLTO ESATTO DA: cartelle_cliniche / PASTORI EDOARDO
-        const ascoltaTerapia = () => {
-            db.collection("cartelle_cliniche").doc(window.targetPatient).onSnapshot((docSnap) => {
-                if (docSnap.exists) {
-                    const data = docSnap.data();
-                    // Il campo accertato dallo screenshot di Firebase: terapiaList
-                    rawTerapiaList = data.terapiaList || [];
-                    console.log(`[WardPad] Trovate ${rawTerapiaList.length} prescrizioni in terapiaList:`, rawTerapiaList);
-                } else {
-                    rawTerapiaList = [];
-                }
-                renderSchedaTerapia();
-            }, (err) => {
-                console.error("Errore lettura cartella:", err);
+        window.getTodayString = () => {
+            const n = new Date();
+            return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
+        };
+
+        window.getInitials = (n) => {
+            if(!n) return "Op";
+            return n.replace(/Inf\.|Dr\.|OSS/gi,'').trim().split(' ').map(x=>x[0].toUpperCase()).join('') + '.';
+        };
+
+        window.switchTab = (id, btn) => {
+            document.querySelectorAll('.tab-pane, .tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('pane-' + id).classList.add('active');
+            if(btn) btn.classList.add('active');
+        };
+
+        // GESTIONE CANVAS FIRMA
+        const canvas = document.getElementById('canvasSig');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        const getPos = (e) => {
+            const r = canvas.getBoundingClientRect();
+            const cx = e.touches ? e.touches[0].clientX : e.clientX;
+            const cy = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: cx - r.left, y: cy - r.top };
+        };
+        canvas.addEventListener('mousedown', (e)=>{ isDrawing=true; const p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); });
+        canvas.addEventListener('mousemove', (e)=>{ if(!isDrawing) return; const p=getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke(); });
+        window.addEventListener('mouseup', ()=>isDrawing=false);
+        canvas.addEventListener('touchstart', (e)=>{ isDrawing=true; const p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); e.preventDefault(); }, {passive:false});
+        canvas.addEventListener('touchmove', (e)=>{ if(!isDrawing) return; const p=getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke(); e.preventDefault(); }, {passive:false});
+        canvas.addEventListener('touchend', ()=>isDrawing=false);
+
+        window.clearSig = () => { ctx.clearRect(0,0,canvas.width,canvas.height); };
+
+        window.apriFirmaPiano = () => {
+            window.clearSig();
+            document.getElementById('sigModal').style.display = 'flex';
+        };
+
+        window.confirmPianoSig = async () => {
+            const n = window.currentPatient;
+            if(!n) return;
+            const b64 = canvas.toDataURL('image/png');
+            let d = window.dbClinica[n] || {};
+            if(!d.terapiaFirmeMensili) d.terapiaFirmeMensili = {};
+
+            const date = new Date();
+            const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2,'0')}`;
+            d.terapiaFirmeMensili[monthKey] = {
+                op: window.activeOp,
+                data: window.getTimestamp(),
+                b64: b64
+            };
+
+            await setDoc(doc(db, "cartelle_cliniche", n), d, { merge: true });
+            document.getElementById('sigModal').style.display = 'none';
+            window.showToast("✅ Piano Terapeutico Validato e Sigillato con Successo!");
+            window.aggiornaDatiPaziente();
+        };
+
+        // GESTIONE PERMESSI RUOLI
+        window.aggiornaPermessi = () => {
+            document.getElementById('badgeOpTop').innerText = `👤 ${window.activeOp} (${window.activeQualifica})`;
+            const isMed = (window.activeQualifica === 'Medico' || window.activeQualifica === 'Direttore Sanitario' || window.activeRole === 'admin');
+
+            document.getElementById('medicoPrescriptionBox').style.display = isMed ? 'block' : 'none';
+            document.getElementById('medicoRestrictedWarning').style.display = isMed ? 'none' : 'block';
+            document.getElementById('btnValidaPiano').style.display = isMed ? 'block' : 'none';
+        };
+
+        // RENDERING OSPITI
+        window.renderGuests = () => {
+            const list = document.getElementById('guestList');
+            const search = (document.getElementById('guestSearch')?.value || '').toLowerCase();
+            list.innerHTML = '';
+
+            const attivi = window.dbOspiti
+                .filter(g => !g.decesso && !g.dimissione)
+                .sort((a,b) => a.name.localeCompare(b.name));
+
+            attivi.forEach(g => {
+                if(search && !g.name.toLowerCase().includes(search) && !(g.room||'').toLowerCase().includes(search)) return;
+
+                const isM = (g.sesso || '').toUpperCase() === 'M';
+                const isSelected = g.name === window.currentPatient;
+
+                const item = document.createElement('div');
+                item.className = `touch-guest-card ${isM ? 'gender-m' : 'gender-f'} ${isSelected ? 'active' : ''}`;
+                item.onclick = () => window.selezionaPaziente(g.name);
+                item.innerHTML = `
+                    <div class="guest-avatar">
+                        ${g.photo ? `<img src="${g.photo}">` : (isM ? '👤' : '🌸')}
+                    </div>
+                    <div class="guest-info" style="flex:1; overflow:hidden;">
+                        <h4>${g.name}</h4>
+                        <small>Stanza: <strong>${g.room || '-'}</strong></small>
+                    </div>
+                `;
+                list.appendChild(item);
             });
         };
 
-        const renderSchedaTerapia = () => {
-            const container = document.getElementById('terapiaContainer');
-            if (!container) return;
+        window.selezionaPaziente = (n) => {
+            window.currentPatient = n;
+            sessionStorage.setItem("globalSelectedPatient", n);
+            window.renderGuests();
+            window.aggiornaDatiPaziente();
+        };
 
-            if (rawTerapiaList.length === 0) {
-                container.innerHTML = `
-                    <div style="background:#fff; border:1px solid var(--border); padding:35px; border-radius:var(--radius-lg); text-align:center;">
-                        <h3 style="margin:0 0 6px 0; color:var(--text-main);">Nessuna prescrizione attiva</h3>
-                        <p style="margin:0; color:var(--text-muted); font-size:0.9rem;">Non risultano farmaci in <code>terapiaList</code> per <strong>${window.targetPatient}</strong>.</p>
-                    </div>`;
+        window.aggiornaDatiPaziente = () => {
+            const n = window.currentPatient;
+            if(!n) return;
+
+            const g = window.dbOspiti.find(x => x.name === n) || {};
+            const pD = window.dbClinica[n] || {};
+
+            document.getElementById('bannerGuestName').innerText = n;
+            document.getElementById('bannerGuestMeta').innerText = `Camera: ${g.room || '-'} | CF: ${g.cf || '-'} | MMG: ${g.mmg || '-'}`;
+
+            let bHtml = '';
+            if(pD.infezione) bHtml += `<span style="background:#fee2e2; color:#991b1b; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:0.75em;">☣ ICA: ${pD.infezione}</span>`;
+            if(pD.disfagia) bHtml += `<span style="background:#fef3c7; color:#92400e; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:0.75em;">🥣 Disfagia</span>`;
+            document.getElementById('bannerBadges').innerHTML = bHtml;
+
+            window.renderSomministrazioniOggi(pD);
+            window.renderPrescrizioniMediche(pD);
+        };
+
+        // RENDERING SOMMINISTRAZIONI DI OGGI
+        window.renderSomministrazioniOggi = (pD) => {
+            const container = document.getElementById('dailyTherapyList');
+            const list = pD.terapiaList || [];
+            document.getElementById('todayLabel').innerText = `Data: ${window.getTodayString()}`;
+
+            if(list.length === 0) {
+                container.innerHTML = '<p style="color:#64748b; font-size:0.9em; margin:0;">Nessun farmaco in prescrizione.</p>';
                 return;
             }
 
-            let cardsHtml = '';
+            const todayStr = window.getTodayString();
+            container.innerHTML = '';
 
-            rawTerapiaList.forEach((item, index) => {
-                const orario = item.orario || '08:00';
-                const sigs = item.signatures || {};
+            list.forEach((t, itemIndex) => {
+                const slots = (t.orario && t.orario !== 'Firma') ? t.orario.split('-').map(s=>s.trim()) : ["Firma"];
+                let slotsHtml = '';
 
-                // Verifica la chiave di firma: "YYYY-MM-DD_HH:mm" oppure solo data
-                const keySlot = `${todayStr}_${orario}`;
-                const sig = sigs[keySlot] || sigs[todayStr];
+                slots.forEach(slot => {
+                    const sigKey = `${todayStr}_${slot}`;
+                    const sig = t.signatures ? (t.signatures[sigKey] || t.signatures[todayStr]) : null;
 
-                let isSigned = !!(sig && sig.op);
-                let btnHtml = '';
-
-                if (isSigned) {
-                    btnHtml = `
-                        <button class="btn-check active" onclick="window.toggleFirmaTerapia(${index}, '${orario}')">
-                            ✓ Somministrato (${orario})
-                        </button>
-                        <span class="somministrato-meta">${sig.time || ''} (${sig.op})</span>
-                    `;
-                } else {
-                    btnHtml = `
-                        <button class="btn-check" onclick="window.toggleFirmaTerapia(${index}, '${orario}')">
-                            💊 Somministra (${orario})
-                        </button>
-                    `;
-                }
-
-                cardsHtml += `
-                    <div class="drug-card">
-                        <div class="drug-row ${isSigned ? 'done' : ''}">
-                            <div class="drug-main">
-                                <h4>💊 ${item.farmaco}</h4>
-                                <div class="drug-details">
-                                    Posologia: <strong>${item.posologia || '1 cp'}</strong> | Orario previsto: <strong>${orario}</strong>
-                                    ${item.id ? `<br><small style="color:var(--text-muted);">Cod: ${item.id}</small>` : ''}
-                                </div>
-                            </div>
-                            <div class="drug-actions">
-                                ${btnHtml}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <span style="font-size:0.9rem; font-weight:700; color:var(--text-muted);">Prescrizioni Farmacologiche Attive:</span>
-                    <span style="font-size:0.85rem; font-weight:800; background:#e0f2fe; color:var(--brand-secondary); padding:4px 12px; border-radius:20px;">
-                        ${rawTerapiaList.length} Farmaci
-                    </span>
-                </div>
-                ${cardsHtml}
-            `;
-        };
-
-        // SALVATAGGIO / REVOCA FIRMA SU terapiaList
-        window.toggleFirmaTerapia = async (index, orario) => {
-            if (!rawTerapiaList[index]) return;
-
-            let updatedList = [...rawTerapiaList];
-            let item = { ...updatedList[index] };
-            if (!item.signatures) item.signatures = {};
-
-            const keySlot = `${todayStr}_${orario}`;
-            const isSigned = !!(item.signatures[keySlot] || item.signatures[todayStr]);
-
-            try {
-                if (isSigned) {
-                    if (!confirm(`Revocare la somministrazione di ${item.farmaco}?`)) return;
-                    delete item.signatures[keySlot];
-                    if (item.signatures[todayStr]) delete item.signatures[todayStr];
-                    window.showToast("Somministrazione revocata.");
-                } else {
-                    const timeNow = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    item.signatures[keySlot] = {
-                        op: window.activeOperator,
-                        time: timeNow
-                    };
-                    window.showToast(`✅ ${item.farmaco} registrato alle ${timeNow}!`);
-                }
-
-                updatedList[index] = item;
-
-                // Aggiornamento diretto dell'array terapiaList su cartelle_cliniche / PASTORI EDOARDO
-                await db.collection("cartelle_cliniche").doc(window.targetPatient).update({
-                    terapiaList: updatedList
+                    if(sig) {
+                        slotsHtml += `
+                            <button class="slot-btn signed" onclick="window.revocaSomministrazione(${itemIndex}, '${sigKey}', '${slot}')" title="Somministrato alle ${sig.time||'-'}">
+                                ✓ ${slot}<br><small>${window.getInitials(sig.op)}</small>
+                            </button>`;
+                    } else {
+                        slotsHtml += `
+                            <button class="slot-btn" onclick="window.somministraFarmaco(${itemIndex}, '${sigKey}', '${slot}')">
+                                ${slot}
+                            </button>`;
+                    }
                 });
 
-            } catch (err) {
-                console.error("Errore salvataggio terapia:", err);
-                window.showToast("❌ Errore durante il salvataggio.");
+                container.innerHTML += `
+                    <div class="therapy-item">
+                        <div class="therapy-info">
+                            <strong>${t.farmaco}</strong>
+                            <p>${t.posologia || ''} ${t.note ? '• <em>' + t.note + '</em>' : ''}</p>
+                        </div>
+                        <div class="therapy-slots">${slotsHtml}</div>
+                    </div>`;
+            });
+
+            // Stato Validazione Mensile
+            const date = new Date();
+            const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2,'0')}`;
+            const firmaMese = pD.terapiaFirmeMensili ? pD.terapiaFirmeMensili[monthKey] : null;
+
+            const stBox = document.getElementById('monthlySigStatus');
+            if(firmaMese && firmaMese.op) {
+                stBox.innerHTML = `✅ <strong>Piano Validato</strong> da Dott. <u>${firmaMese.op}</u> il ${firmaMese.data}`;
+                document.getElementById('btnValidaPiano').style.display = 'none';
+            } else {
+                stBox.innerHTML = `⏳ In attesa di validazione medica per il mese in corso.`;
+                if(window.activeQualifica === 'Medico' || window.activeQualifica === 'Direttore Sanitario' || window.activeRole === 'admin') {
+                    document.getElementById('btnValidaPiano').style.display = 'block';
+                }
             }
         };
 
-        ascoltaTerapia();
+        window.somministraFarmaco = async (itemIdx, sigKey, slot) => {
+            if(['OSS'].includes(window.activeQualifica) && window.activeRole !== 'admin') {
+                return window.showToast("🚫 Somministrazione riservata al personale infermieristico o medico");
+            }
+            const n = window.currentPatient; if(!n) return;
+            let pD = window.dbClinica[n] || {};
+            if(!pD.terapiaList || !pD.terapiaList[itemIdx]) return;
+
+            if(!pD.terapiaList[itemIdx].signatures) pD.terapiaList[itemIdx].signatures = {};
+            pD.terapiaList[itemIdx].signatures[sigKey] = {
+                op: window.activeOp,
+                time: new Date().toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'})
+            };
+
+            await setDoc(doc(db, "cartelle_cliniche", n), pD, { merge: true });
+            window.showToast(`✅ Somministrato [${slot}] da ${window.activeOp}`);
+            window.renderSomministrazioniOggi(pD);
+        };
+
+        window.revocaSomministrazione = async (itemIdx, sigKey, slot) => {
+            if(!['Medico','Direttore Sanitario'].includes(window.activeQualifica) && window.activeRole !== 'admin') {
+                return window.showToast("🔒 Solo il Medico o Dir. Sanitario può revocare la somministrazione");
+            }
+            if(!confirm(`Revocare la somministrazione per lo slot ${slot}?`)) return;
+            const n = window.currentPatient; if(!n) return;
+            let pD = window.dbClinica[n] || {};
+            if(pD.terapiaList && pD.terapiaList[itemIdx] && pD.terapiaList[itemIdx].signatures) {
+                delete pD.terapiaList[itemIdx].signatures[sigKey];
+                await setDoc(doc(db, "cartelle_cliniche", n), pD, { merge: true });
+                window.showToast("Firma di somministrazione revocata");
+                window.renderSomministrazioniOggi(pD);
+            }
+        };
+
+        // PRESCRIZIONE MEDICA
+        window.salvaPrescrizioneMedica = async () => {
+            const n = window.currentPatient;
+            if(!n) return window.showToast("⚠️ Seleziona prima un paziente!");
+
+            const farmaco = document.getElementById('prescFarmaco').value.trim();
+            const posologia = document.getElementById('prescPosologia').value.trim();
+            const orario = document.getElementById('prescOrario').value;
+            const note = document.getElementById('prescNote').value.trim();
+
+            if(!farmaco) return window.showToast("⚠️ Inserisci il nome del farmaco!");
+
+            let pD = window.dbClinica[n] || {};
+            if(!pD.terapiaList) pD.terapiaList = [];
+
+            pD.terapiaList.push({
+                farmaco: farmaco,
+                posologia: posologia,
+                orario: orario,
+                note: note,
+                signatures: {}
+            });
+
+            await setDoc(doc(db, "cartelle_cliniche", n), pD, { merge: true });
+            document.getElementById('prescFarmaco').value = '';
+            document.getElementById('prescPosologia').value = '';
+            document.getElementById('prescNote').value = '';
+
+            window.showToast("✅ Prescrizione medica aggiunta al piano!");
+            window.aggiornaDatiPaziente();
+        };
+
+        window.renderPrescrizioniMediche = (pD) => {
+            const container = document.getElementById('activePrescriptionsList');
+            const list = pD.terapiaList || [];
+            if(list.length === 0) {
+                container.innerHTML = '<p style="color:#64748b; font-size:0.9em; margin:0;">Nessun farmaco prescritto.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            const canDelete = (window.activeQualifica === 'Medico' || window.activeQualifica === 'Direttore Sanitario' || window.activeRole === 'admin');
+
+            list.forEach((t, idx) => {
+                const delBtn = canDelete ? `<button onclick="window.eliminaPrescrizione(${idx})" style="background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; padding:4px 8px; border-radius:4px; font-weight:bold; cursor:pointer;">✕ Rimuovi</button>` : '';
+
+                container.innerHTML += `
+                    <div style="padding:10px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <strong>${t.farmaco}</strong> - <span style="color:var(--terapia);">${t.posologia||''}</span><br>
+                            <small>Orario: <strong>${t.orario}</strong> ${t.note ? '• <em>' + t.note + '</em>' : ''}</small>
+                        </div>
+                        <div>${delBtn}</div>
+                    </div>`;
+            });
+        };
+
+        window.eliminaPrescrizione = async (idx) => {
+            if(!confirm("Cancellare definitivamente questo farmaco dalla terapia?")) return;
+            const n = window.currentPatient; if(!n) return;
+            let pD = window.dbClinica[n] || {};
+            if(pD.terapiaList) {
+                pD.terapiaList.splice(idx, 1);
+                await setDoc(doc(db, "cartelle_cliniche", n), pD, { merge: true });
+                window.showToast("Prescrizione rimossa");
+                window.aggiornaDatiPaziente();
+            }
+        };
+
+        // GESTIONE STUPEFACENTI (DPR 309/90)
+        window.salvaMovimentoStupefacenti = async () => {
+            const nome = document.getElementById('narcNome').value.trim();
+            const tipoOp = document.getElementById('narcTipoOp').value;
+            const qta = parseFloat(document.getElementById('narcQta').value);
+            const rif = document.getElementById('narcRif').value.trim();
+
+            if(!nome || isNaN(qta) || qta <= 0 || !rif) {
+                return window.showToast("⚠️ Compila nome farmaco, quantità e causale ricetta!");
+            }
+
+            let invItem = window.dbStupefacentiInv.find(i => i.nome.toLowerCase() === nome.toLowerCase());
+
+            if(invItem) {
+                if(tipoOp === 'CARICO') {
+                    await updateDoc(doc(db, "stupefacenti_inv", invItem.id), { qta: invItem.qta + qta });
+                } else {
+                    if(invItem.qta < qta) return window.showToast("❌ Giacenza insufficiente nell'armadio!");
+                    await updateDoc(doc(db, "stupefacenti_inv", invItem.id), { qta: invItem.qta - qta });
+                }
+            } else {
+                if(tipoOp !== 'CARICO') return window.showToast("❌ Farmaco non presente in inventario");
+                await addDoc(collection(db, "stupefacenti_inv"), { nome: nome, qta: qta, barcode: "" });
+            }
+
+            await addDoc(collection(db, "stupefacenti_log"), {
+                nome: nome, tipo: tipoOp, qta: qta, rif: rif, op: window.activeOp, date: window.getTimestamp()
+            });
+
+            document.getElementById('narcNome').value = '';
+            document.getElementById('narcRif').value = '';
+            window.showToast("🔒 Movimento 309/90 Registrato!");
+        };
+
+        window.renderStupefacenti = () => {
+            const container = document.getElementById('narcoticsInventoryList');
+            if(!container) return;
+            if(window.dbStupefacentiInv.length === 0) {
+                container.innerHTML = '<p style="color:#64748b; font-size:0.9em; margin:0;">Nessun farmaco presente nell\'armadio.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            window.dbStupefacentiInv.sort((a,b) => a.nome.localeCompare(b.nome)).forEach(i => {
+                const badge = i.qta === 0 ? '🔴 Esaurito' : (i.qta <= 5 ? '🟡 Scorta Bassa' : '🟢 Disponibile');
+                container.innerHTML += `
+                    <div style="padding:8px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+                        <div><strong>${i.nome}</strong></div>
+                        <div style="font-weight:bold;">${i.qta} pz <span style="font-size:0.8em; color:var(--text-muted);">(${badge})</span></div>
+                    </div>`;
+            });
+        };
+
+        // REAL-TIME FIRESTORE LISTENERS
+        onSnapshot(collection(db, "ospiti"), snap => {
+            window.dbOspiti = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            window.renderGuests();
+        });
+
+        onSnapshot(collection(db, "cartelle_cliniche"), snap => {
+            window.dbClinica = {};
+            snap.forEach(d => { window.dbClinica[d.id] = d.data(); });
+            if(window.currentPatient) window.aggiornaDatiPaziente();
+        });
+
+        onSnapshot(collection(db, "stupefacenti_inv"), snap => {
+            window.dbStupefacentiInv = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            window.renderStupefacenti();
+        });
+
+        window.onload = () => {
+            window.aggiornaPermessi();
+
+            // Popola Datalist Prontuario
+            const dl = document.getElementById('listaFarmaciAifa');
+            if(dl) {
+                dl.innerHTML = '';
+                prontuario.forEach(f => {
+                    let opt = document.createElement('option');
+                    opt.value = f;
+                    dl.appendChild(opt);
+                });
+            }
+
+            if(window.currentPatient) {
+                window.aggiornaDatiPaziente();
+            }
+        };
     </script>
 </body>
 </html>

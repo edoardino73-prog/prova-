@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NVS Masterpiece - Anagrafica & Documenti Touch Tablet (10/11")</title>
+
+    <!-- MOTORE OCR TESSERACT.JS AD ALTA PRECISIONE -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+    <style>
+        :root {
+            --bg-body: #f1f5f9;
+            --surface: #ffffff;
+            --primary: #0d9488;
+            --primary-dark: #0f766e;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --danger: #e11d48;
+            --warning: #d97706;
+            --success: #059669;
+            --dir-color: #4f46e5;
+            --radius: 8px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0; padding: 0;
+            background: var(--bg-body);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        /* HEADER */
+        .topbar {
+            background: var(--primary-dark);
+            color: #ffffff;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .topbar-brand { font-size: 1.15em; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .topbar-btns { display: flex; gap: 8px; align-items: center; }
+        .nav-btn {
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #ffffff;
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85em;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex; align-items: center;
+        }
+
+        /* LAYOUT SPLIT A DUE COLONNE */
+        .tablet-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* COLONNA SINISTRA: RICERCA & LISTA OSPITI */
+        .sidebar-guests {
+            width: 30%;
+            max-width: 340px;
+            min-width: 260px;
+            background: #ffffff;
+            border-right: 2px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .search-area {
+            padding: 10px 12px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+        }
+        .search-area input {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 0.95em;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+        }
+        .search-area input:focus { border-color: var(--primary); }
+
+        .btn-new-guest {
+            width: 100%;
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: #ffffff;
+            font-weight: 800;
+            padding: 11px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 5px rgba(5, 150, 105, 0.3);
+        }
+
+        .guests-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .touch-guest-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+        .touch-guest-card.gender-m { border-left: 5px solid #0284c7; background: #f0f9ff; }
+        .touch-guest-card.gender-f { border-left: 5px solid #db2777; background: #fdf2f8; }
+        .touch-guest-card.active {
+            border-color: var(--primary);
+            background: #ccfbf1 !important;
+            box-shadow: 0 2px 6px rgba(13,148,136,0.25);
+            transform: scale(0.99);
+        }
+        .guest-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5em;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+        }
+        .guest-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .guest-info h4 { margin: 0; font-size: 0.95em; font-weight: 700; color: var(--text-dark); }
+        .guest-info small { color: var(--text-muted); font-size: 0.8em; }
+
+        /* COLONNA DESTRA: FORM TOUCH ANAGRAFICA & DOCUMENTI */
+        .workspace-anagrafica {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background: #f8fafc;
+        }
+
+        .card-touch {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .card-touch h3 {
+            margin: 0 0 12px 0;
+            font-size: 1.1em;
+            color: var(--primary-dark);
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 6px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+
+        .form-field { margin-bottom: 10px; }
+        .form-field label { display: block; font-size: 0.84em; font-weight: 700; color: #334155; margin-bottom: 4px; }
+        input[type="text"], input[type="date"], select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 0.98em;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            background: #ffffff;
+            font-family: inherit;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); outline: none; background: #f0fdfa; }
+
+        .btn-full {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.05em;
+            font-weight: 800;
+            color: #ffffff;
+            cursor: pointer;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+        .btn-full:active { transform: translateY(1px); }
+
+        /* BOX SCANNER RAPIDO OCR */
+        .scan-action-box {
+            background: #fefce8;
+            border: 2px solid #fde047;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+
+        /* GALLERIA TOUCH DEI DOCUMENTI DIGITALIZZATI */
+        .docs-touch-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .doc-touch-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.15s;
+        }
+        .doc-touch-card:hover { transform: translateY(-2px); border-color: var(--dir-color); }
+        .doc-touch-img {
+            width: 100%;
+            height: 115px;
+            object-fit: cover;
+            background: #f1f5f9;
+            cursor: pointer;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .doc-touch-body {
+            padding: 8px 10px;
+            font-size: 0.8em;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+        .doc-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: bold;
+            background: #e0f2fe;
+            color: #0369a1;
+            margin-bottom: 4px;
+        }
+
+        /* MODALE FOTOCAMERA OCR */
+        .ocr-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.88);
+            z-index: 60000;
+            display: none; align-items: center; justify-content: center;
+            padding: 16px;
+        }
+        .ocr-modal-content {
+            background: #ffffff;
+            border-radius: 10px;
+            max-width: 580px; width: 100%;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column;
+        }
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background: #000;
+            overflow: hidden;
+        }
+        .video-wrapper video {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .ocr-laser-frame {
+            position: absolute;
+            top: 50%; left: 6%; width: 88%; height: 85px;
+            transform: translateY(-50%);
+            border: 2px dashed #38bdf8;
+            border-radius: 6px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .ocr-laser-frame span {
+            background: rgba(15, 23, 42, 0.8);
+            color: #38bdf8;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        /* MODALE ANTEPRIMA LIGHTBOX DOCUMENTO */
+        .lightbox-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            z-index: 65000;
+            display: none; align-items: center; justify-content: center;
+            padding: 16px;
+        }
+        .lightbox-card {
+            background: #fff;
+            border-radius: 8px;
+            max-width: 720px;
+            width: 100%;
+            overflow: hidden;
+            display: flex; flex-direction: column;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+        }
+
+        #toast-box {
+            position: fixed; bottom: 20px; right: 20px;
+            background: #0f172a; color: #ffffff;
+            padding: 10px 18px; border-radius: 6px; font-weight: 700;
+            z-index: 100000; opacity: 0; transition: opacity 0.2s; pointer-events: none;
+        }
+        #toast-box.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div id="toast-box"></div>
+
+    <!-- MODALE FOTOCAMERA OCR MIRINO RETRO CIE -->
+    <div id="ocrModal" class="ocr-modal-overlay">
+        <div class="ocr-modal-content">
+            <div style="padding:12px 16px; background:#0f172a; color:#fff; display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="margin:0; font-size:1.05em; display:flex; align-items:center; gap:8px;">
+                    📷 Inquadra le 3 righe MRZ (Retro CIE)
+                </h4>
+                <button onclick="window.chiudiCameraOCR()" style="background:transparent; border:none; color:#fff; font-size:1.4em; cursor:pointer;">&times;</button>
+            </div>
+            
+            <div class="video-wrapper">
+                <video id="ocrVideo" autoplay playsinline></video>
+                <div class="ocr-laser-frame">
+                    <span>ALLINEA QUI LE 3 RIGHE DEL CODICE MRZ</span>
+                </div>
+            </div>
+
+            <div style="padding:12px 16px; background:#f8fafc; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                <span id="ocrStatusMsg" style="font-size:0.85em; color:var(--text-muted); font-weight:600;">
+                    Tieni ferma la carta ed evita riflessi di luce diretta.
+                </span>
+                <div style="display:flex; gap:8px;">
+                    <button class="nav-btn" style="background:#64748b;" onclick="window.chiudiCameraOCR()">Annulla</button>
+                    <button class="nav-btn" id="btnScattaOCR" style="background:var(--success);" onclick="window.catturaEdEstraiOCR()">
+                        📸 Scatta ed Estrai Dati
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE LIGHTBOX DOCUMENTO ALLEGATO -->
+    <div id="docLightboxModal" class="lightbox-overlay" onclick="document.getElementById('docLightboxModal').style.display='none'">
+        <div class="lightbox-card" onclick="event.stopPropagation()">
+            <div style="padding:12px 16px; background:#0f172a; color:#fff; display:flex; justify-content:space-between; align-items:center;">
+                <h4 id="lbDocTitle" style="margin:0; font-size:1.05em;">Documento Fascicolo</h4>
+                <button onclick="document.getElementById('docLightboxModal').style.display='none'" style="background:none; border:none; color:#fff; font-size:1.3em; cursor:pointer;">&times;</button>
+            </div>
+            <div style="padding:15px; background:#1e293b; text-align:center; max-height:480px; overflow-y:auto;">
+                <img id="lbDocImg" src="" style="max-height:450px; max-width:100%; object-fit:contain; border-radius:4px;">
+            </div>
+            <div id="lbDocMeta" style="padding:10px 16px; font-size:0.85em; background:#f8fafc; border-top:1px solid #e2e8f0;"></div>
+            <div style="padding:10px 16px; background:#fff; border-top:1px solid #cbd5e1; display:flex; justify-content:space-between; align-items:center;">
+                <button class="nav-btn" style="background:var(--danger);" id="lbBtnDelete">🗑️ Elimina Documento</button>
+                <button class="nav-btn" style="background:#475569;" onclick="document.getElementById('docLightboxModal').style.display='none'">Chiudi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOPBAR SUPERIORE -->
+    <div class="topbar">
+        <div class="topbar-brand">
+            <span>🛏️ Anagrafica & Documenti Touch Tablet</span>
+            <small style="font-weight:normal; opacity:0.85;">[10/11"]</small>
+        </div>
+        <div class="topbar-btns">
+            <span id="badgeOpTop" style="font-weight:700; background:rgba(255,255,255,0.2); padding:5px 10px; border-radius:4px; font-size:0.85em;">👤 Op</span>
+            <button class="nav-btn" onclick="window.location.href='tablet_nvs.html'">📱 Carrello Giro</button>
+            <button class="nav-btn" onclick="window.location.href='tablet_diari.html'">📖 Diari Reparto</button>
+            <button class="nav-btn" onclick="window.location.href='index.html'">🏠 Home</button>
+        </div>
+    </div>
+
+    <div class="tablet-layout">
+        
+        <!-- PANE SINISTRO: OSPITI -->
+        <div class="sidebar-guests">
+            <div class="search-area">
+                <button class="btn-new-guest" onclick="window.svuotaFormPerNuovo()">
+                    ➕ NUOVO OSPITE (SVUOTA)
+                </button>
+                <input type="text" id="guestSearch" placeholder="🔍 Cerca paziente / stanza..." oninput="window.renderGuests()">
+            </div>
+            <div class="guests-scroll" id="guestList">Caricamento elenco...</div>
+        </div>
+
+        <!-- PANE DESTRO: SCHEDA ANAGRAFICA COMPLETA -->
+        <div class="workspace-anagrafica">
+            
+            <!-- SEZIONE 1: SCANSIONE RAPIDA DA FOTOCAMERA OCR & CODICE FISCALE BARCODE -->
+            <div class="scan-action-box">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+                    <strong style="color:#854d0e; font-size:0.95em;">
+                        ⚡ Acquisizione Intelligente da Carta Identità (CIE) & Tessera Sanitaria (TS)
+                    </strong>
+                    <button class="nav-btn" style="background:#0284c7; padding:8px 14px;" onclick="window.apriCameraOCR()">
+                        📷 Inquadra Retro CIE (OCR Automatico)
+                    </button>
+                </div>
+                
+                <div class="form-grid-2">
+                    <div class="form-field" style="margin:0;">
+                        <label style="color:#854d0e;">Spara Barcode Retro TS (Codice Fiscale)</label>
+                        <input type="text" id="scanBarcodeCF" placeholder="Spara barcode o digita 16 caratteri..." onkeypress="window.gestisciBarcodeCF(event)">
+                    </div>
+                    <div class="form-field" style="margin:0;">
+                        <label style="color:#854d0e;">Incolla / Modifica Stringa MRZ Manuale</label>
+                        <input type="text" id="scanManualMRZ" placeholder="Incolla le 3 righe da 30 caratteri..." oninput="window.decodificaMRZ(this.value)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEZIONE 2: DATI GENERALI & FOTOTESSERA -->
+            <div class="card-touch">
+                <h3 id="formTitle">Nuovo Ingresso / Anagrafica Ospite</h3>
+                
+                <div style="display:flex; gap:16px; align-items:center; margin-bottom:14px; flex-wrap:wrap;">
+                    <div id="avatarPreview" style="width:70px; height:70px; border-radius:8px; background:#e2e8f0; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:2em; overflow:hidden; flex-shrink:0;">
+                        👤
+                    </div>
+                    <div style="flex:1; min-width:220px;">
+                        <label style="font-size:0.85em; font-weight:700; display:block; margin-bottom:4px;">Fototessera Ospite</label>
+                        <div style="display:flex; gap:8px;">
+                            <input type="file" id="avatarFileInput" accept="image/*" capture="user" onchange="window.processaAvatar(event)" style="flex:1;">
+                            <button class="nav-btn" style="background:#475569;" onclick="document.getElementById('avatarFileInput').click()">📷 Scatta</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid-3">
+                    <div class="form-field"><label>Cognome *</label><input type="text" id="guestCognome" style="text-transform:uppercase;"></div>
+                    <div class="form-field"><label>Nome *</label><input type="text" id="guestNome" style="text-transform:uppercase;"></div>
+                    <div class="form-field"><label>Sesso *</label><select id="guestSesso"><option value="M">M</option><option value="F">F</option></select></div>
+                </div>
+
+                <div class="form-grid-3">
+                    <div class="form-field"><label>Data di Nascita *</label><input type="date" id="guestDob"></div>
+                    <div class="form-field"><label>Codice Fiscale *</label><input type="text" id="guestCF" style="text-transform:uppercase;"></div>
+                    <div class="form-field"><label>Cittadinanza</label><input type="text" id="guestCittadinanza" value="100000100"></div>
+                </div>
+
+                <div class="form-grid-3">
+                    <div class="form-field"><label>Comune o Stato di Nascita *</label><input type="text" id="guestPob" list="comuniList" onchange="window.autocompletaComune('Pob')"></div>
+                    <div class="form-field"><label>Provincia</label><input type="text" id="guestPobProv" maxlength="2" readonly style="background:#f1f5f9;"></div>
+                    <div class="form-field"><label>Codice Alloggiati Nascita</label><input type="text" id="guestPobCod" readonly style="background:#f1f5f9;"></div>
+                </div>
+            </div>
+
+            <!-- SEZIONE 3: RESIDENZA, STANZA & INGRESSO -->
+            <div class="card-touch">
+                <h3>🏠 Residenza & Collocazione in Struttura</h3>
+                <div class="form-grid-3">
+                    <div class="form-field"><label>Indirizzo di Residenza</label><input type="text" id="guestResInd" placeholder="Via/Piazza e Civico"></div>
+                    <div class="form-field"><label>Comune di Residenza *</label><input type="text" id="guestResCom" list="comuniList" onchange="window.autocompletaComune('Res')"></div>
+                    <div class="form-field"><label>Provincia</label><input type="text" id="guestResProv" maxlength="2" readonly style="background:#f1f5f9;"></div>
+                </div>
+                <div class="form-grid-2">
+                    <div class="form-field"><label>Data Ingresso in Struttura *</label><input type="date" id="guestIngresso"></div>
+                    <div class="form-field"><label>Stanza Assegnata (Camera e Letto)</label><input type="text" id="guestRoom" placeholder="Es. Stanza 12 - Letto B"></div>
+                </div>
+            </div>
+
+            <!-- SEZIONE 4: ESTREMI DOCUMENTO DI IDENTITÀ -->
+            <div class="card-touch">
+                <h3>🆔 Estremi Documento d'Identità Riconosciuto</h3>
+                <div class="form-grid-3">
+                    <div class="form-field">
+                        <label>Tipo Documento *</label>
+                        <select id="guestDocTipo">
+                            <option value="IDENT">Carta d'Identità Elettronica (CIE / Cartacea)</option>
+                            <option value="PASSP">Passaporto</option>
+                            <option value="PATEN">Patente di Guida</option>
+                        </select>
+                    </div>
+                    <div class="form-field"><label>Numero Documento *</label><input type="text" id="guestDocNum" style="text-transform:uppercase;"></div>
+                    <div class="form-field"><label>Comune / Ente Rilascio *</label><input type="text" id="guestDocRilNome" list="comuniList" onchange="window.autocompletaComune('Doc')"></div>
+                </div>
+                <div class="form-grid-2">
+                    <div class="form-field"><label>Data Rilascio</label><input type="date" id="guestDocDataRil"></div>
+                    <div class="form-field"><label>Data Scadenza</label><input type="date" id="guestDocDataScad"></div>
+                </div>
+            </div>
+
+            <!-- SEZIONE 5: CONTATTI FAMIGLIA, MMG E TUTELA LEGALE -->
+            <div class="card-touch">
+                <h3>👥 Referenti Familiari, MMG & Tutela (AdS)</h3>
+                <div class="form-grid-3">
+                    <div class="form-field"><label>Referente Familiare</label><input type="text" id="guestRef" placeholder="Es. Rossi Marco"></div>
+                    <div class="form-field">
+                        <label>Grado di Parentela</label>
+                        <select id="guestRefPar">
+                            <option value="Figlio/a">Figlio/a</option>
+                            <option value="Coniuge">Coniuge</option>
+                            <option value="Fratello/Sorella">Fratello/Sorella</option>
+                            <option value="Nipote">Nipote</option>
+                            <option value="Altro">Altro</option>
+                        </select>
+                    </div>
+                    <div class="form-field"><label>Telefono Familiare</label><input type="text" id="guestRefTel" placeholder="333 1234567"></div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field"><label>Medico Curante (MMG)</label><input type="text" id="guestMMG" placeholder="Dott. Bianchi Franco"></div>
+                    <div class="form-field"><label>Telefono MMG</label><input type="text" id="guestMMGTel"></div>
+                </div>
+
+                <div class="form-grid-3">
+                    <div class="form-field"><label>Amministratore di Sostegno / Tutore</label><input type="text" id="guestTutore" placeholder="Avv. Verdi Luca"></div>
+                    <div class="form-field"><label>Recapito Tutore (Tel/Mail)</label><input type="text" id="guestTutoreTel"></div>
+                    <div class="form-field"><label>Scadenza Decreto Nomina</label><input type="date" id="guestTutoreScad"></div>
+                </div>
+            </div>
+
+            <button class="btn-full" style="background:var(--primary); margin-bottom:18px;" onclick="window.salvaAnagraficaTablet()">
+                💾 Registra / Aggiorna Anagrafica Ospite
+            </button>
+
+            <!-- SEZIONE 6: FOTOCOPIE DOCUMENTI, TS & ALLEGATI TOUCH -->
+            <div class="card-touch" style="border-top:4px solid var(--dir-color);">
+                <h3 style="color:var(--dir-color);">
+                    📁 Digitalizzazione Documenti, Copie CIE & Fascicolo Sociale
+                    <span id="activeDocGuestPill" style="font-size:0.8em; background:#f1f5f9; padding:2px 8px; border-radius:4px; color:#475569;">Nessun ospite selezionato</span>
+                </h3>
+
+                <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:14px; border-radius:6px; margin-bottom:12px;">
+                    <div class="form-grid-3">
+                        <div class="form-field" style="margin:0;">
+                            <label>Tipo Documento *</label>
+                            <select id="docAllegatoTipo">
+                                <option value="Carta Identità - Fronte">Carta d'Identità (Fronte)</option>
+                                <option value="Carta Identità - Retro (CIE)">Carta d'Identità (Retro con Barcode)</option>
+                                <option value="Tessera Sanitaria / TEAM">Tessera Sanitaria (CF / TEAM)</option>
+                                <option value="Decreto Nomina Tutore / AdS">Decreto Nomina Tutore / AdS</option>
+                                <option value="Verbale U.V.M. / Invalidità">Verbale U.V.M. / Invalidità</option>
+                                <option value="Esenzione Ticket / ASL">Attestato Esenzione ASL</option>
+                                <option value="Altro Documento">Altro Documento Rilevante</option>
+                            </select>
+                        </div>
+                        <div class="form-field" style="margin:0;">
+                            <label>Note o Descrizione</label>
+                            <input type="text" id="docAllegatoNote" placeholder="Es. Copia fronte/retro, scadenza 2030...">
+                        </div>
+                        <div class="form-field" style="margin:0;">
+                            <label>📷 Fotocamera / Scansione *</label>
+                            <input type="file" id="docAllegatoFile" accept="image/*" capture="environment" style="background:#fff;">
+                        </div>
+                    </div>
+                    <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+                        <button class="nav-btn" style="background:var(--dir-color); padding:10px 18px; font-weight:800;" onclick="window.salvaDocumentoAllegatoTablet()">
+                            📷 Acquisisci e Allega al Fascicolo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- GALLERIA MINIATURE DOCUMENTI ALLEGATI -->
+                <h4 style="margin:10px 0 6px 0; font-size:0.95em; color:var(--text-dark);">Archivio Miniature Documenti Digitalizzati</h4>
+                <div class="docs-touch-grid" id="docsTouchGallery">
+                    <p style="color:#64748b; font-size:0.85em; grid-column:1/-1;">Seleziona un ospite esistente per consultare i documenti scansionati.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- DATALIST COMUNI ITALIANI -->
+    <datalist id="comuniList"></datalist>
+
+    <!-- SCRIPT FIREBASE & LOGICA OCR/DOCUMENTI -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAc0fIlfds4Gne5m3qpH25uacK4NeR6TzM", 
+            authDomain: "gestione-visite-b445b.firebaseapp.com", 
+            projectId: "gestione-visite-b445b", 
+            storageBucket: "gestione-visite-b445b.firebasestorage.app", 
+            messagingSenderId: "720937824810", 
+            appId: "1:720937824810:web:b04b60d1d66bb8f4040953" 
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.dbOspiti = [];
+        window.activeOp = sessionStorage.getItem("activeOperator") || "Operatore";
+        window.activeQualifica = sessionStorage.getItem("activeQualifica") || "Operatore";
+        window.activeRole = sessionStorage.getItem("activeRole") || "user";
+        window.currentEditingId = null;
+        window.currentAvatarB64 = "";
+        window.cameraStream = null;
+        window.comuniData = [];
+
+        window.showToast = (msg) => {
+            const t = document.getElementById('toast-box');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        };
+
+        window.getTimestamp = () => {
+            const n = new Date();
+            return `${n.toLocaleDateString('it-IT')} alle ${n.toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'})}`;
+        };
+
+        // COMPRESSIONE IMMAGINI CANVAS
+        window.comprimiImmagineCanvas = (file, maxDim, quality) => {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width, h = img.height;
+                        if(w > maxDim || h > maxDim) {
+                            if(w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                            else { w = Math.round((w * maxDim) / h); h = maxDim; }
+                        }
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        };
+
+        // GESTIONE FOTOCAMERA OCR & PARSER ICAO 9303 (TD1 CIE 3 RIGHE)
+        window.apriCameraOCR = async () => {
+            const modal = document.getElementById('ocrModal');
+            const video = document.getElementById('ocrVideo');
+            try {
+                modal.style.display = 'flex';
+                document.getElementById('ocrStatusMsg').innerText = "Allinea le 3 righe nel mirino ed evita riflessi di luce.";
+                document.getElementById('btnScattaOCR').disabled = false;
+
+                window.cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 } },
+                    audio: false
+                });
+                video.srcObject = window.cameraStream;
+            } catch(err) {
+                console.error(err);
+                window.showToast("❌ Impossibile accedere alla fotocamera");
+                window.chiudiCameraOCR();
+            }
+        };
+
+        window.chiudiCameraOCR = () => {
+            if(window.cameraStream) {
+                window.cameraStream.getTracks().forEach(t => t.stop());
+                window.cameraStream = null;
+            }
+            document.getElementById('ocrModal').style.display = 'none';
+        };
+
+        window.catturaEdEstraiOCR = async () => {
+            const video = document.getElementById('ocrVideo');
+            const btn = document.getElementById('btnScattaOCR');
+            const statusMsg = document.getElementById('ocrStatusMsg');
+
+            btn.disabled = true;
+            statusMsg.innerText = "⏳ Binarizzazione ed estrazione caratteri OCR-B in corso...";
+
+            const canvas = document.createElement('canvas');
+            const vw = video.videoWidth || 1280;
+            const vh = video.videoHeight || 720;
+
+            const cropX = vw * 0.06;
+            const cropW = vw * 0.88;
+            const cropH = vh * 0.32;
+            const cropY = (vh - cropH) / 2;
+
+            canvas.width = cropW;
+            canvas.height = cropH;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const d = imgData.data;
+            for (let i = 0; i < d.length; i += 4) {
+                let lum = (d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114);
+                let b = lum < 125 ? 0 : 255;
+                d[i] = d[i+1] = d[i+2] = b;
+            }
+            ctx.putImageData(imgData, 0, 0);
+
+            try {
+                const worker = await Tesseract.createWorker('eng');
+                await worker.setParameters({
+                    tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<',
+                    tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK
+                });
+
+                const res = await worker.recognize(canvas);
+                await worker.terminate();
+
+                const text = res.data.text || "";
+                window.chiudiCameraOCR();
+                window.decodificaMRZ(text);
+            } catch (err) {
+                console.error(err);
+                statusMsg.innerText = "❌ Errore OCR. Riprova con luce più omogenea.";
+                btn.disabled = false;
+            }
+        };
+
+        window.decodificaMRZ = (raw) => {
+            if(!raw) return;
+            let clean = raw.toUpperCase().replace(/[\s\r\n]/g, '');
+            if(clean.length < 90) return;
+
+            try {
+                clean = clean.slice(-90);
+                const r1 = clean.substring(0, 30);
+                const r2 = clean.substring(30, 60);
+                const r3 = clean.substring(60, 90);
+
+                let numDoc = r1.substring(5, 14).replace(/</g, '').trim();
+
+                let dobRaw = r2.substring(0, 6).replace(/O/g, '0').replace(/I/g, '1');
+                let sesso = r2.charAt(7);
+                let scadRaw = r2.substring(8, 14).replace(/O/g, '0').replace(/I/g, '1');
+
+                let yyDob = parseInt(dobRaw.substring(0, 2), 10);
+                let currShort = new Date().getFullYear() % 100;
+                let fullYyDob = yyDob > currShort ? (1900 + yyDob) : (2000 + yyDob);
+                if (yyDob > 26 && fullYyDob > 2000) fullYyDob -= 100;
+                let dobIso = `${fullYyDob}-${dobRaw.substring(2, 4)}-${dobRaw.substring(4, 6)}`;
+
+                let yyScad = 2000 + parseInt(scadRaw.substring(0, 2), 10);
+                let scadIso = `${yyScad}-${scadRaw.substring(2, 4)}-${scadRaw.substring(4, 6)}`;
+
+                let parts = r3.split('<<');
+                let cognome = (parts[0] || '').replace(/</g, ' ').trim();
+                let nome = (parts[1] || '').replace(/</g, ' ').trim();
+
+                const applyValue = (id, val) => {
+                    const el = document.getElementById(id);
+                    if(el && val) {
+                        el.value = val;
+                        el.style.backgroundColor = '#dcfce7';
+                        setTimeout(() => el.style.backgroundColor = '', 2000);
+                    }
+                };
+
+                applyValue('guestCognome', cognome);
+                applyValue('guestNome', nome);
+                applyValue('guestSesso', (sesso === 'M' || sesso === 'F') ? sesso : 'M');
+                applyValue('guestDob', dobIso);
+                applyValue('guestDocNum', numDoc);
+                applyValue('guestDocDataScad', scadIso);
+                applyValue('guestDocTipo', 'IDENT');
+                applyValue('guestCittadinanza', '100000100');
+
+                document.getElementById('scanManualMRZ').value = '';
+                window.showToast(`✅ CIE Estratta: ${cognome} ${nome}`);
+            } catch(e) {
+                console.error("Errore decodifica MRZ:", e);
+            }
+        };
+
+        window.gestisciBarcodeCF = (e) => {
+            if(e.key === 'Enter') {
+                e.preventDefault();
+                let m = e.target.value.trim().match(/[A-Z0-9]{16}/i);
+                if(m) {
+                    const cf = m[0].toUpperCase();
+                    document.getElementById('guestCF').value = cf;
+                    window.estraiDatiDaCodiceFiscale(cf);
+                    window.showToast("✅ Codice Fiscale estratto da barcode!");
+                }
+                e.target.value = '';
+            }
+        };
+
+        window.estraiDatiDaCodiceFiscale = (cf) => {
+            if(!cf || cf.length !== 16) return;
+            try {
+                let yy = parseInt(cf.substring(6, 8), 10);
+                let meseChar = cf.charAt(8);
+                let ddRaw = parseInt(cf.substring(9, 11), 10);
+                let codCatastale = cf.substring(11, 15);
+
+                const mesi = { 'A':'01', 'B':'02', 'C':'03', 'D':'04', 'E':'05', 'H':'06', 'L':'07', 'M':'08', 'P':'09', 'R':'10', 'S':'11', 'T':'12' };
+                let mm = mesi[meseChar] || '01';
+
+                let sesso = 'M';
+                let dd = ddRaw;
+                if(ddRaw > 40) { sesso = 'F'; dd = ddRaw - 40; }
+
+                let currShort = new Date().getFullYear() % 100;
+                let fullYy = yy > currShort ? (1900 + yy) : (2000 + yy);
+                let dobIso = `${fullYy}-${mm}-${String(dd).padStart(2, '0')}`;
+
+                document.getElementById('guestSesso').value = sesso;
+                document.getElementById('guestDob').value = dobIso;
+
+                if(window.comuniData.length > 0) {
+                    const com = window.comuniData.find(c => c.codiceCatastale === codCatastale);
+                    if(com) {
+                        document.getElementById('guestPob').value = com.nome;
+                        document.getElementById('guestPobProv').value = com.sigla;
+                        document.getElementById('guestPobCod').value = "100" + com.codice;
+                    }
+                }
+            } catch(e) { console.error("Errore parsing CF:", e); }
+        };
+
+        window.processaAvatar = async (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+            const b64 = await window.comprimiImmagineCanvas(file, 400, 0.75);
+            window.currentAvatarB64 = b64;
+            document.getElementById('avatarPreview').innerHTML = `<img src="${b64}" style="width:100%;height:100%;object-fit:cover;">`;
+            window.showToast("📷 Fototessera acquisita!");
+        };
+
+        // GESTIONE GALLERIA DOCUMENTI ALLEGATI (SCANSIONI TOUCH)
+        window.salvaDocumentoAllegatoTablet = async () => {
+            const guestId = window.currentEditingId;
+            if(!guestId) return window.showToast("⚠️ Seleziona prima un ospite esistente dall'elenco a sinistra!");
+
+            const tipo = document.getElementById('docAllegatoTipo').value;
+            const note = document.getElementById('docAllegatoNote').value.trim();
+            const fileInput = document.getElementById('docAllegatoFile');
+
+            if(!fileInput.files || fileInput.files.length === 0) {
+                return window.showToast("⚠️ Seleziona o scatta una fotografia del documento!");
+            }
+
+            const file = fileInput.files[0];
+            const base64 = await window.comprimiImmagineCanvas(file, 1000, 0.70);
+
+            const g = window.dbOspiti.find(x => x.id === guestId);
+            if(!g) return;
+
+            let docs = g.documentiAllegati || [];
+            docs.push({
+                id: 'doc_' + Date.now(),
+                tipo: tipo,
+                note: note,
+                data: window.getTimestamp(),
+                op: window.activeOp,
+                imgBase64: base64
+            });
+
+            await updateDoc(doc(db, "ospiti", guestId), { documentiAllegati: docs });
+            fileInput.value = '';
+            document.getElementById('docAllegatoNote').value = '';
+            window.showToast("✅ Documento allegato al fascicolo con successo!");
+            window.renderDocsGallery(docs);
+        };
+
+        window.renderDocsGallery = (docs) => {
+            const gallery = document.getElementById('docsTouchGallery');
+            if(!gallery) return;
+
+            if(!docs || docs.length === 0) {
+                gallery.innerHTML = '<p style="color:#64748b; font-size:0.85em; grid-column:1/-1;">Nessun documento digitalizzato presente nel fascicolo.</p>';
+                return;
+            }
+
+            gallery.innerHTML = '';
+            docs.forEach((d) => {
+                const card = document.createElement('div');
+                card.className = 'doc-touch-card';
+                card.innerHTML = `
+                    <img src="${d.imgBase64}" class="doc-touch-img" onclick="window.apriLightboxDoc('${d.id}')" title="Tocca per ingrandire">
+                    <div class="doc-touch-body">
+                        <div>
+                            <span class="doc-badge">${d.tipo}</span><br>
+                            <strong>${d.note || 'Documento'}</strong><br>
+                            <small style="color:#64748b;">${d.data.split(' alle ')[0]} (${d.op})</small>
+                        </div>
+                        <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center;">
+                            <button class="nav-btn" style="padding:3px 8px; font-size:0.75em; background:#475569;" onclick="window.apriLightboxDoc('${d.id}')">🔍 Apri</button>
+                            <button class="nav-btn" style="padding:3px 8px; font-size:0.75em; background:var(--danger);" onclick="window.eliminaDocumentoAllegato('${d.id}')">🗑️</button>
+                        </div>
+                    </div>
+                `;
+                gallery.appendChild(card);
+            });
+        };
+
+        window.apriLightboxDoc = (docId) => {
+            const guestId = window.currentEditingId;
+            const g = window.dbOspiti.find(x => x.id === guestId);
+            if(!g) return;
+            const docObj = (g.documentiAllegati || []).find(d => d.id === docId);
+            if(!docObj) return;
+
+            document.getElementById('lbDocTitle').innerText = `${docObj.tipo} - ${g.name}`;
+            document.getElementById('lbDocImg').src = docObj.imgBase64;
+            document.getElementById('lbDocMeta').innerHTML = `
+                Ospite: <strong>${g.name}</strong> | Acquisito il: <strong>${docObj.data}</strong> da: <strong>${docObj.op}</strong><br>
+                Note: <em>${docObj.note || 'Nessuna specifica'}</em>
+            `;
+
+            document.getElementById('lbBtnDelete').onclick = () => window.eliminaDocumentoAllegato(docId);
+            document.getElementById('docLightboxModal').style.display = 'flex';
+        };
+
+        window.eliminaDocumentoAllegato = async (docId) => {
+            if(window.activeQualifica === 'OSS' && window.activeRole !== 'admin') {
+                return window.showToast("🚫 Azione riservata a personale infermieristico o amministrativo.");
+            }
+            if(!confirm("Eliminare definitivamente questo documento digitalizzato dal fascicolo?")) return;
+
+            const guestId = window.currentEditingId;
+            const g = window.dbOspiti.find(x => x.id === guestId);
+            if(!g) return;
+
+            let docs = (g.documentiAllegati || []).filter(d => d.id !== docId);
+            await updateDoc(doc(db, "ospiti", guestId), { documentiAllegati: docs });
+            document.getElementById('docLightboxModal').style.display = 'none';
+            window.showToast("Documento eliminato");
+            window.renderDocsGallery(docs);
+        };
+
+        // DATABASE COMUNI
+        window.caricaComuniItaliani = async () => {
+            try {
+                const res = await fetch('https://raw.githubusercontent.com/matteocontrini/comuni-json/master/comuni.json');
+                window.comuniData = await res.json();
+                const dl = document.getElementById('comuniList');
+                let opts = '';
+                window.comuniData.forEach(c => { opts += `<option value="${c.nome}">`; });
+                dl.innerHTML = opts;
+            } catch(e) { console.warn("Comuni JSON offline:", e); }
+        };
+
+        window.autocompletaComune = (tipo) => {
+            const val = document.getElementById(tipo === 'Pob' ? 'guestPob' : (tipo === 'Res' ? 'guestResCom' : 'guestDocRilNome'))?.value.trim().toUpperCase();
+            if(!val || window.comuniData.length === 0) return;
+
+            const com = window.comuniData.find(c => c.nome.toUpperCase() === val);
+            if(com) {
+                if(tipo === 'Pob') {
+                    document.getElementById('guestPobProv').value = com.sigla;
+                    document.getElementById('guestPobCod').value = "100" + com.codice;
+                    document.getElementById('guestCittadinanza').value = "100000100";
+                } else if(tipo === 'Res') {
+                    document.getElementById('guestResProv').value = com.sigla;
+                }
+            }
+        };
+
+        // RENDERING OSPITI
+        window.renderGuests = () => {
+            const list = document.getElementById('guestList');
+            const search = (document.getElementById('guestSearch')?.value || '').toLowerCase();
+            list.innerHTML = '';
+
+            const attivi = window.dbOspiti.filter(g => !g.decesso && !g.dimissione).sort((a,b) => a.name.localeCompare(b.name));
+
+            attivi.forEach(g => {
+                if(search && !g.name.toLowerCase().includes(search) && !(g.room||'').toLowerCase().includes(search)) return;
+
+                const isM = (g.sesso || '').toUpperCase() === 'M';
+                const isSelected = g.id === window.currentEditingId;
+
+                const item = document.createElement('div');
+                item.className = `touch-guest-card ${isM ? 'gender-m' : 'gender-f'} ${isSelected ? 'active' : ''}`;
+                item.onclick = () => window.caricaOspitePerModifica(g);
+                item.innerHTML = `
+                    <div class="guest-avatar">
+                        ${g.photo ? `<img src="${g.photo}">` : (isM ? '👤' : '🌸')}
+                    </div>
+                    <div class="guest-info" style="flex:1; overflow:hidden;">
+                        <h4>${g.name}</h4>
+                        <small>Stanza: <strong>${g.room || '-'}</strong> | CF: ${g.cf || '-'}</small>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        };
+
+        window.svuotaFormPerNuovo = () => {
+            window.currentEditingId = null;
+            window.currentAvatarB64 = "";
+            document.getElementById('formTitle').innerText = "Nuovo Ingresso / Anagrafica Ospite";
+            document.getElementById('avatarPreview').innerHTML = '👤';
+            document.getElementById('activeDocGuestPill').innerText = 'Nessun ospite selezionato';
+
+            ['guestCognome','guestNome','guestCF','guestPob','guestPobProv','guestPobCod','guestResInd','guestResCom','guestResProv','guestRoom','guestRef','guestRefTel','guestMMG','guestMMGTel','guestTutore','guestTutoreTel','guestTutoreScad','guestDocNum','guestDocRilNome','guestDocDataRil','guestDocDataScad','guestIngresso','guestDob'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) { el.value = ''; el.readOnly = false; }
+            });
+
+            document.getElementById('guestCittadinanza').value = '100000100';
+            document.getElementById('guestDocTipo').value = 'IDENT';
+            document.getElementById('guestSesso').value = 'M';
+            document.getElementById('docsTouchGallery').innerHTML = '<p style="color:#64748b; font-size:0.85em; grid-column:1/-1;">Seleziona un ospite esistente per consultare i documenti scansionati.</p>';
+            window.renderGuests();
+        };
+
+        window.caricaOspitePerModifica = (g) => {
+            window.currentEditingId = g.id;
+            document.getElementById('formTitle').innerText = `Modifica Anagrafica: ${g.name}`;
+            document.getElementById('activeDocGuestPill').innerText = `Ospite: ${g.name}`;
+            
+            const sV = (id, v) => { if(document.getElementById(id)) document.getElementById(id).value = v || ""; };
+
+            let parts = g.name.split(' ');
+            sV('guestCognome', g.cognome || parts[0] || '');
+            sV('guestNome', g.nome || parts.slice(1).join(' ') || '');
+            sV('guestSesso', g.sesso);
+            sV('guestDob', g.dob);
+            sV('guestCF', g.cf);
+            sV('guestCittadinanza', g.cittadinanza || '100000100');
+            sV('guestPob', g.pob);
+            sV('guestPobProv', g.pobProv);
+            sV('guestPobCod', g.pobCod);
+            sV('guestResInd', g.resIndirizzo);
+            sV('guestResCom', g.resComune);
+            sV('guestResProv', g.resProv);
+            sV('guestIngresso', g.ingresso);
+            sV('guestRoom', g.room);
+            sV('guestDocTipo', g.docTipo || 'IDENT');
+            sV('guestDocNum', g.docNum);
+            sV('guestDocRilNome', g.docRilascioNome);
+            sV('guestDocDataRil', g.docDataRil);
+            sV('guestDocDataScad', g.docDataScad);
+            sV('guestRef', g.ref);
+            sV('guestRefPar', g.refParentela);
+            sV('guestRefTel', g.refTel);
+            sV('guestMMG', g.mmg);
+            sV('guestMMGTel', g.mmgTel);
+            sV('guestTutore', g.tutore);
+            sV('guestTutoreTel', g.tutoreTel);
+            sV('guestTutoreScad', g.tutoreScadenza);
+
+            window.currentAvatarB64 = g.photo || "";
+            document.getElementById('avatarPreview').innerHTML = g.photo ? `<img src="${g.photo}" style="width:100%;height:100%;object-fit:cover;">` : '👤';
+
+            sessionStorage.setItem("globalSelectedPatient", g.name);
+            window.renderDocsGallery(g.documentiAllegati || []);
+            window.renderGuests();
+            window.showToast(`Dati e fascicolo caricati per: ${g.name}`);
+        };
+
+        // SALVATAGGIO ANAGRAFICA COMPLETA
+        window.salvaAnagraficaTablet = async () => {
+            const v = (id) => document.getElementById(id) ? document.getElementById(id).value.trim() : '';
+            const cog = v('guestCognome').toUpperCase();
+            const nom = v('guestNome').toUpperCase();
+            const nomeCompleto = `${cog} ${nom}`.trim();
+            const ingresso = v('guestIngresso');
+
+            if(!cog || !nom || !ingresso) {
+                return window.showToast("⚠️ Cognome, Nome e Data Ingresso sono obbligatori!");
+            }
+
+            const payload = {
+                name: nomeCompleto,
+                cognome: cog,
+                nome: nom,
+                sesso: v('guestSesso'),
+                dob: v('guestDob'),
+                cf: v('guestCF').toUpperCase(),
+                cittadinanza: v('guestCittadinanza'),
+                pob: v('guestPob'),
+                pobProv: v('guestPobProv'),
+                pobCod: v('guestPobCod'),
+                resIndirizzo: v('guestResInd'),
+                resComune: v('guestResCom'),
+                resProv: v('guestResProv'),
+                ingresso: ingresso,
+                room: v('guestRoom'),
+                docTipo: v('guestDocTipo'),
+                docNum: v('guestDocNum').toUpperCase(),
+                docRilascioNome: v('guestDocRilNome'),
+                docDataRil: v('guestDocDataRil'),
+                docDataScad: v('guestDocDataScad'),
+                ref: v('guestRef'),
+                refParentela: v('guestRefPar'),
+                refTel: v('guestRefTel'),
+                mmg: v('guestMMG'),
+                mmgTel: v('guestMMGTel'),
+                tutore: v('guestTutore'),
+                tutoreTel: v('guestTutoreTel'),
+                tutoreScadenza: v('guestTutoreScad'),
+                photo: window.currentAvatarB64 || ""
+            };
+
+            if(window.currentEditingId) {
+                await updateDoc(doc(db, "ospiti", window.currentEditingId), payload);
+                window.showToast("✅ Anagrafica Ospite Aggiornata!");
+            } else {
+                if(window.dbOspiti.some(x => x.name === nomeCompleto)) {
+                    return window.showToast("⚠️ Esiste già un ospite con questo nome!");
+                }
+                payload.documentiAllegati = [];
+                payload.ts = window.getTimestamp();
+                const newDoc = await addDoc(collection(db, "ospiti"), payload);
+                window.currentEditingId = newDoc.id;
+                document.getElementById('activeDocGuestPill').innerText = `Ospite: ${nomeCompleto}`;
+                window.showToast("✅ Nuovo Ospite Creato! Ora puoi allegare i documenti.");
+            }
+
+            sessionStorage.setItem("globalSelectedPatient", nomeCompleto);
+        };
+
+        // LISTENERS
+        onSnapshot(collection(db, "ospiti"), snap => {
+            window.dbOspiti = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            window.renderGuests();
+        });
+
+        window.onload = () => {
+            document.getElementById('badgeOpTop').innerText = `👤 ${window.activeOp}`;
+            window.caricaComuniItaliani();
+
+            const saved = sessionStorage.getItem("globalSelectedPatient");
+            if(saved) {
+                setTimeout(() => {
+                    const found = window.dbOspiti.find(x => x.name === saved);
+                    if(found) window.caricaOspitePerModifica(found);
+                }, 400);
+            }
+        };
+    </script>
+</body>
+</html>

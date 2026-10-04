@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NVS Masterpiece - Parametri Vitali Tablet (10/11")</title>
+
+    <!-- CHART.JS PER ANDAMENTO GRAFICO TOUCH -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --bg-body: #f1f5f9;
+            --surface: #ffffff;
+            --primary: #0d9488;
+            --primary-dark: #0f766e;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            
+            /* COLORI COORDINATI PARAMETRI VITALI */
+            --col-pa: #e11d48;
+            --col-fc: #c026d3;
+            --col-spo2: #0284c7;
+            --col-tc: #ea580c;
+            --col-gli: #8b5cf6;
+            --col-nrs: #d97706;
+
+            --radius: 8px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0; padding: 0;
+            background: var(--bg-body);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        /* HEADER TOUCH */
+        .topbar {
+            background: var(--primary-dark);
+            color: #ffffff;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .topbar-brand { font-size: 1.15em; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .topbar-btns { display: flex; gap: 8px; align-items: center; }
+        .nav-btn {
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #ffffff;
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85em;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex; align-items: center;
+        }
+
+        /* LAYOUT SPLIT A DUE COLONNE */
+        .tablet-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* COLONNA SINISTRA: OSPITI */
+        .sidebar-guests {
+            width: 30%;
+            max-width: 340px;
+            min-width: 260px;
+            background: #ffffff;
+            border-right: 2px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .search-area {
+            padding: 10px 12px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+        }
+        .search-area input {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 0.95em;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+        }
+        .search-area input:focus { border-color: var(--primary); }
+
+        .guests-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .touch-guest-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+        .touch-guest-card.gender-m { border-left: 5px solid #0284c7; background: #f0f9ff; }
+        .touch-guest-card.gender-f { border-left: 5px solid #db2777; background: #fdf2f8; }
+        .touch-guest-card.active {
+            border-color: var(--primary);
+            background: #ccfbf1 !important;
+            box-shadow: 0 2px 6px rgba(13,148,136,0.25);
+            transform: scale(0.99);
+        }
+        .guest-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5em;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+        }
+        .guest-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .guest-info h4 { margin: 0; font-size: 0.95em; font-weight: 700; color: var(--text-dark); }
+        .guest-info small { color: var(--text-muted); font-size: 0.8em; }
+
+        /* COLONNA DESTRA: WORKSPACE PARAMETRI VITALI */
+        .workspace-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+
+        .patient-banner {
+            background: #ffffff;
+            border-bottom: 2px solid var(--border);
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .pb-name { font-size: 1.15em; font-weight: 800; color: var(--primary-dark); }
+        .pb-sub { font-size: 0.85em; color: var(--text-muted); }
+
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px;
+        }
+
+        /* CARDS TOUCH */
+        .card-touch {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            margin-bottom: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .card-touch h4 {
+            margin: 0 0 12px 0;
+            font-size: 1.05em;
+            color: var(--col-pa);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        /* GRIGLIA INPUT PARAMETRI */
+        .vitals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+        }
+        .vitals-box {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .vitals-box label { font-size: 0.82em; font-weight: 800; }
+        .vitals-box input {
+            padding: 10px 8px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-size: 1.15em;
+            font-weight: 800;
+            text-align: center;
+            background: #ffffff;
+        }
+        .vitals-box input:focus { outline: none; }
+
+        .btn-full {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 800;
+            color: #ffffff;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-full:active { transform: translateY(1px); }
+
+        /* TABELLA ULTIME RILEVAZIONI */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.86em;
+            background: #ffffff;
+            text-align: center;
+        }
+        .data-table th, .data-table td {
+            border: 1px solid var(--border);
+            padding: 8px 6px;
+        }
+        .data-table th {
+            background: var(--primary-dark);
+            color: #ffffff;
+            font-size: 0.8em;
+            text-transform: uppercase;
+        }
+
+        /* STAMPA A4 */
+        #printArea { display: none; }
+        @media print {
+            body * { visibility: hidden; }
+            #printArea, #printArea * { visibility: visible; }
+            #printArea {
+                display: block !important; position: absolute; left: 0; top: 0; width: 100%;
+                background: white !important; color: black !important; padding: 25px;
+                box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            }
+            .print-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 9pt; }
+            .print-table th, .print-table td { border: 1px solid #94a3b8; padding: 6px 8px; text-align: center; }
+            .print-table th { background: #f1f5f9 !important; font-weight: bold; }
+        }
+
+        #toast-box {
+            position: fixed; bottom: 20px; right: 20px;
+            background: #0f172a; color: #ffffff;
+            padding: 10px 18px; border-radius: 6px; font-weight: 700;
+            z-index: 100000; opacity: 0; transition: opacity 0.2s; pointer-events: none;
+        }
+        #toast-box.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div id="toast-box"></div>
+    <div id="printArea"></div>
+
+    <!-- TOPBAR SUPERIORE -->
+    <div class="topbar">
+        <div class="topbar-brand">
+            <span>❤️ NVS Tablet - Rilevazione Parametri Vitali & Dolore</span>
+            <small style="font-weight:normal; opacity:0.85;">[10/11"]</small>
+        </div>
+        <div class="topbar-btns">
+            <span id="badgeOpTop" style="font-weight:700; background:rgba(255,255,255,0.2); padding:5px 10px; border-radius:4px; font-size:0.85em;">👤 Op</span>
+            <button class="nav-btn" onclick="window.location.href='tablet_hub.html'">📱 Launcher Hub</button>
+            <button class="nav-btn" onclick="window.location.href='tablet_nvs.html'">📱 Carrello Giro</button>
+            <button class="nav-btn" onclick="window.location.href='index.html'">🏠 Home</button>
+        </div>
+    </div>
+
+    <div class="tablet-layout">
+        
+        <!-- PANE OSPITI -->
+        <div class="sidebar-guests">
+            <div class="search-area">
+                <input type="text" id="guestSearch" placeholder="🔍 Cerca paziente / stanza..." oninput="window.renderGuests()">
+            </div>
+            <div class="guests-scroll" id="guestList">Caricamento elenco...</div>
+        </div>
+
+        <!-- PANE OPERATIVO PARAMETRI -->
+        <div class="workspace-main">
+            
+            <div class="patient-banner">
+                <div>
+                    <div class="pb-name" id="bannerGuestName">Nessun ospite selezionato</div>
+                    <div class="pb-sub" id="bannerGuestMeta">Tocca un ospite dall'elenco a sinistra</div>
+                </div>
+                <div id="bannerBadges" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+            </div>
+
+            <div class="content-scroll">
+                
+                <!-- BOX INSERIMENTO PARAMETRI (EDITABILE SOLO DA INF / MEDICO / ADMIN) -->
+                <div id="boxEditVitals" class="card-touch" style="border-top:4px solid var(--col-pa);">
+                    <h4>
+                        <span>🩺 Nuova Rilevazione Parametri Vitali</span>
+                        <span style="font-size:0.75em; color:var(--text-muted); font-weight:normal;">Editabile da Inf. / Medico</span>
+                    </h4>
+
+                    <div class="vitals-grid">
+                        <div class="vitals-box">
+                            <label style="color:var(--col-pa);">🩸 P.A. (Max/Min)</label>
+                            <input type="text" id="inpPA" placeholder="120/80" style="border-color:var(--col-pa);">
+                        </div>
+                        <div class="vitals-box">
+                            <label style="color:var(--col-fc);">❤️ F.C. (bpm)</label>
+                            <input type="number" id="inpFC" placeholder="75" inputmode="numeric" style="border-color:var(--col-fc);">
+                        </div>
+                        <div class="vitals-box">
+                            <label style="color:var(--col-spo2);">🫁 SpO2 (%)</label>
+                            <input type="number" id="inpSPO2" placeholder="98" inputmode="numeric" style="border-color:var(--col-spo2);">
+                        </div>
+                        <div class="vitals-box">
+                            <label style="color:var(--col-tc);">🌡️ T.C. (°C)</label>
+                            <input type="number" step="0.1" id="inpTC" placeholder="36.5" inputmode="decimal" style="border-color:var(--col-tc);">
+                        </div>
+                        <div class="vitals-box">
+                            <label style="color:var(--col-gli);">🍬 Glicemia (mg/dl)</label>
+                            <input type="number" id="inpGLI" placeholder="105" inputmode="numeric" style="border-color:var(--col-gli);">
+                        </div>
+                        <div class="vitals-box">
+                            <label style="color:var(--col-nrs);">⚡ Dolore (0-10)</label>
+                            <input type="number" id="inpNRS" min="0" max="10" placeholder="0" inputmode="numeric" style="border-color:var(--col-nrs);">
+                        </div>
+                    </div>
+
+                    <button class="btn-full" style="background:var(--col-pa);" onclick="window.salvaParametriVitali()">
+                        💾 Registra Parametri nel Fascicolo
+                    </button>
+                </div>
+
+                <!-- BOX CONSULTAZIONE OSS (SOLA LETTURA) -->
+                <div id="boxReadOnlyOSS" class="card-touch" style="display:none; background:#f8fafc; text-align:center; padding:16px;">
+                    <span style="font-weight:bold; color:var(--text-muted); font-size:0.95em;">
+                        🔒 Consultazione Parametri Vitali abilitata a tutto il personale.<br>
+                        <small>La registrazione clinica delle misurazioni è riservata al Personale Infermieristico o Medico.</small>
+                    </span>
+                </div>
+
+                <!-- TABELLA ULTIME RILEVAZIONI & TASTO STAMPA -->
+                <div class="card-touch">
+                    <h4>
+                        <span>📋 Ultime Rilevazioni Registrate</span>
+                        <button onclick="window.stampaFoglioParametri()" style="background:#475569; color:#fff; border:none; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.8em;">
+                            🖨️ Stampa Foglio Parametri
+                        </button>
+                    </h4>
+                    <div style="overflow-x:auto;">
+                        <table class="data-table" id="tableVitals">
+                            <thead>
+                                <tr>
+                                    <th>Data e Ora</th>
+                                    <th>Op</th>
+                                    <th style="color:#fecdd3;">🩸 P.A.</th>
+                                    <th style="color:#fbcfe8;">❤️ FC</th>
+                                    <th style="color:#bae6fd;">🫁 SpO2</th>
+                                    <th style="color:#fed7aa;">🌡️ TC</th>
+                                    <th style="color:#ede9fe;">🍬 Gli</th>
+                                    <th style="color:#fef3c7;">⚡ NRS</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ANDAMENTO GRAFICO DELLE ULTIME 14 RILEVAZIONI -->
+                <div class="card-touch">
+                    <h4><span>📊 Andamento Grafico Parametri Vitali (Ultime 14 Rilevazioni)</span></h4>
+                    <div style="position:relative; width:100%; height:260px; background:#fff; padding:6px; box-sizing:border-box;">
+                        <canvas id="vitalsChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SCRIPT FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAc0fIlfds4Gne5m3qpH25uacK4NeR6TzM", 
+            authDomain: "gestione-visite-b445b.firebaseapp.com", 
+            projectId: "gestione-visite-b445b", 
+            storageBucket: "gestione-visite-b445b.firebasestorage.app", 
+            messagingSenderId: "720937824810", 
+            appId: "1:720937824810:web:b04b60d1d66bb8f4040953" 
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.dbOperatori = [];
+        window.dbOspiti = [];
+        window.dbClinica = {};
+        window.dbContenzioni = [];
+        window.vitalsChartInstance = null;
+
+        window.activeOp = sessionStorage.getItem("activeOperator") || "Operatore";
+        window.activeRole = sessionStorage.getItem("activeRole") || "user";
+        window.activeQualifica = sessionStorage.getItem("activeQualifica") || "Operatore";
+        window.currentPatient = sessionStorage.getItem("globalSelectedPatient") || "";
+
+        window.showToast = (msg) => {
+            const t = document.getElementById('toast-box');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        };
+
+        window.getTimestamp = () => {
+            const n = new Date();
+            return `${n.toLocaleDateString('it-IT')} alle ${n.toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'})}`;
+        };
+
+        // GESTIONE PERMESSI RUOLI (EDITING RISERVATO)
+        window.aggiornaPermessi = () => {
+            document.getElementById('badgeOpTop').innerText = `👤 ${window.activeOp} (${window.activeQualifica})`;
+            const canEdit = (window.activeQualifica !== 'OSS' || window.activeRole === 'admin');
+
+            document.getElementById('boxEditVitals').style.display = canEdit ? 'block' : 'none';
+            document.getElementById('boxReadOnlyOSS').style.display = canEdit ? 'none' : 'block';
+        };
+
+        // RENDERING OSPITI
+        window.renderGuests = () => {
+            const list = document.getElementById('guestList');
+            const search = (document.getElementById('guestSearch')?.value || '').toLowerCase();
+            list.innerHTML = '';
+
+            const attivi = window.dbOspiti
+                .filter(g => !g.decesso && !g.dimissione)
+                .sort((a,b) => a.name.localeCompare(b.name));
+
+            attivi.forEach(g => {
+                if(search && !g.name.toLowerCase().includes(search) && !(g.room||'').toLowerCase().includes(search)) return;
+
+                const isM = (g.sesso || '').toUpperCase() === 'M';
+                const isSelected = g.name === window.currentPatient;
+
+                const item = document.createElement('div');
+                item.className = `touch-guest-card ${isM ? 'gender-m' : 'gender-f'} ${isSelected ? 'active' : ''}`;
+                item.onclick = () => window.selezionaPaziente(g.name);
+                item.innerHTML = `
+                    <div class="guest-avatar">
+                        ${g.photo ? `<img src="${g.photo}">` : (isM ? '👤' : '🌸')}
+                    </div>
+                    <div class="guest-info" style="flex:1; overflow:hidden;">
+                        <h4>${g.name}</h4>
+                        <small>Stanza: <strong>${g.room || '-'}</strong> | CF: ${g.cf || '-'}</small>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        };
+
+        window.selezionaPaziente = (n) => {
+            window.currentPatient = n;
+            sessionStorage.setItem("globalSelectedPatient", n);
+            window.renderGuests();
+            window.aggiornaDatiPaziente();
+        };
+
+        window.aggiornaDatiPaziente = () => {
+            const n = window.currentPatient;
+            if(!n) return;
+
+            const g = window.dbOspiti.find(x => x.name === n) || {};
+            const pD = window.dbClinica[n] || {};
+
+            document.getElementById('bannerGuestName').innerText = n;
+            document.getElementById('bannerGuestMeta').innerText = `Camera: ${g.room || '-'} | CF: ${g.cf || '-'} | MMG: ${g.mmg || '-'}`;
+
+            let bHtml = '';
+            if(pD.infezione) bHtml += `<span style="background:#fee2e2; color:#991b1b; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:0.75em;">☣ ICA: ${pD.infezione}</span>`;
+            if(pD.disfagia) bHtml += `<span style="background:#fef3c7; color:#92400e; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:0.75em;">🥣 Disfagia</span>`;
+            if(window.dbContenzioni.some(c => c.ospite === n && c.stato === 'ATTIVA')) bHtml += `<span style="background:#ffe4e6; color:#be123c; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:0.75em;">🔒 Contenzione</span>`;
+            document.getElementById('bannerBadges').innerHTML = bHtml;
+
+            window.renderVitalsTableAndChart(pD);
+        };
+
+        // SALVATAGGIO PARAMETRI VITALI
+        window.salvaParametriVitali = async () => {
+            const n = window.currentPatient;
+            if(!n) return window.showToast("⚠️ Seleziona prima un paziente dall'elenco!");
+
+            const pa = document.getElementById('inpPA').value.trim();
+            const fc = document.getElementById('inpFC').value.trim();
+            const spo2 = document.getElementById('inpSPO2').value.trim();
+            const tc = document.getElementById('inpTC').value.trim();
+            const gli = document.getElementById('inpGLI').value.trim();
+            const nrs = document.getElementById('inpNRS').value.trim();
+
+            if(!pa && !fc && !spo2 && !tc && !gli) {
+                return window.showToast("⚠️ Compila almeno un parametro vitale!");
+            }
+
+            let pD = window.dbClinica[n] || {};
+            if(!pD.vitals) pD.vitals = [];
+
+            pD.vitals.unshift({
+                date: window.getTimestamp(),
+                op: window.activeOp,
+                pa: pa,
+                fc: fc,
+                spo2: spo2,
+                tc: tc,
+                gli: gli,
+                nrs: nrs
+            });
+
+            await setDoc(doc(db, "cartelle_cliniche", n), pD, { merge: true });
+            ['inpPA','inpFC','inpSPO2','inpTC','inpGLI','inpNRS'].forEach(id => document.getElementById(id).value = '');
+            window.showToast("✅ Parametri Vitali Registrati con Successo!");
+            window.renderVitalsTableAndChart(pD);
+        };
+
+        // RENDERING TABELLA E GRAFICO
+        window.renderVitalsTableAndChart = (pD) => {
+            const tb = document.querySelector('#tableVitals tbody');
+            if(!tb) return;
+            const vitals = pD.vitals || [];
+
+            if(vitals.length === 0) {
+                tb.innerHTML = '<tr><td colspan="8" style="padding:15px; color:#64748b;">Nessun parametro registrato per questo ospite.</td></tr>';
+            } else {
+                tb.innerHTML = '';
+                vitals.forEach(v => {
+                    tb.innerHTML += `
+                        <tr>
+                            <td><strong>${v.date}</strong></td>
+                            <td>${v.op}</td>
+                            <td style="color:var(--col-pa); font-weight:800;">${v.pa || '-'}</td>
+                            <td style="color:var(--col-fc); font-weight:800;">${v.fc || '-'}</td>
+                            <td style="color:var(--col-spo2); font-weight:800;">${v.spo2 ? v.spo2 + '%' : '-'}</td>
+                            <td style="color:var(--col-tc); font-weight:800;">${v.tc ? v.tc + '°' : '-'}</td>
+                            <td style="color:var(--col-gli); font-weight:800;">${v.gli || '-'}</td>
+                            <td style="color:var(--col-nrs); font-weight:800;">${v.nrs || '-'}</td>
+                        </tr>`;
+                });
+            }
+
+            // Costruzione Grafico (Ultime 14 Rilevazioni cronologiche)
+            const ctx = document.getElementById('vitalsChart');
+            if(!ctx) return;
+            if(window.vitalsChartInstance) window.vitalsChartInstance.destroy();
+
+            let rev = [...vitals].reverse().slice(-14);
+            const paData = rev.map(v => {
+                if(!v.pa) return null;
+                const p = v.pa.split('/')[0];
+                return parseFloat(p) || null;
+            });
+
+            window.vitalsChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: rev.map(v => v.date.split(' alle ')[0].substring(0,5)),
+                    datasets: [
+                        { label: '🩸 PA Sistolica', data: paData, borderColor: '#e11d48', backgroundColor: '#e11d48', tension: 0.2, pointRadius: 4 },
+                        { label: '❤️ FC (bpm)', data: rev.map(v => parseFloat(v.fc)||null), borderColor: '#c026d3', backgroundColor: '#c026d3', tension: 0.2, pointRadius: 4 },
+                        { label: '🫁 SpO2 (%)', data: rev.map(v => parseFloat(v.spo2)||null), borderColor: '#0284c7', backgroundColor: '#0284c7', tension: 0.2, pointRadius: 4 },
+                        { label: '🌡️ TC (°C)', data: rev.map(v => parseFloat(v.tc)||null), borderColor: '#ea580c', backgroundColor: '#ea580c', tension: 0.2, pointRadius: 4 },
+                        { label: '🍬 Glicemia', data: rev.map(v => parseFloat(v.gli)||null), borderColor: '#8b5cf6', backgroundColor: '#8b5cf6', tension: 0.2, pointRadius: 4 },
+                        { label: '⚡ NRS (0-10)', data: rev.map(v => parseFloat(v.nrs)||null), borderColor: '#d97706', backgroundColor: '#d97706', tension: 0.2, pointRadius: 4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { boxWidth: 10, font: { size: 10 } } }
+                    },
+                    scales: {
+                        y: { beginAtZero: false, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        };
+
+        // STAMPA SCHEDA PARAMETRI
+        window.stampaFoglioParametri = () => {
+            const n = window.currentPatient;
+            if(!n) return window.showToast("⚠️ Seleziona prima un paziente!");
+            const g = window.dbOspiti.find(x => x.name === n) || {};
+            const d = window.dbClinica[n] || {};
+            const vitals = d.vitals || [];
+
+            let html = `
+                <div style="text-align:center; border-bottom:2px solid #e11d48; padding-bottom:12px;">
+                    <h2 style="margin:0; color:#e11d48;">NUOVA VILLA SILVANA S.R.L.</h2>
+                    <h3 style="margin:4px 0 0 0;">FOGLIO CLINICO RILEVAZIONE PARAMETRI VITALI & DOLORE</h3>
+                </div>
+                <div style="margin:15px 0; font-size:10pt;">
+                    Ospite: <strong>${n}</strong> | Stanza: <strong>${g.room || '-'}</strong> | CF: <strong>${g.cf || '-'}</strong> | MMG: <strong>${g.mmg || '-'}</strong>
+                </div>
+                <table class="print-table">
+                    <thead>
+                        <tr>
+                            <th>Data e Ora</th><th>Operatore</th><th>P.A. (mmHg)</th><th>F.C. (bpm)</th>
+                            <th>SpO2 (%)</th><th>T.C. (°C)</th><th>Glicemia</th><th>Dolore NRS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            vitals.forEach(v => {
+                html += `<tr><td>${v.date}</td><td>${v.op}</td><td>${v.pa||'-'}</td><td>${v.fc||'-'}</td><td>${v.spo2 ? v.spo2+'%' : '-'}</td><td>${v.tc ? v.tc+'°C' : '-'}</td><td>${v.gli||'-'}</td><td>${v.nrs||'-'}/10</td></tr>`;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+                <div style="margin-top:30px; display:flex; justify-content:space-between; font-size:9pt;">
+                    <div>Stampato il: ${window.getTimestamp()} da ${window.activeOp}</div>
+                    <div>Firma Infermiere / Medico: ___________________________</div>
+                </div>
+            `;
+
+            document.getElementById('printArea').innerHTML = html;
+            setTimeout(() => window.print(), 250);
+        };
+
+        // REAL-TIME FIRESTORE LISTENERS
+        onSnapshot(collection(db, "ospiti"), snap => {
+            window.dbOspiti = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            window.renderGuests();
+        });
+
+        onSnapshot(collection(db, "cartelle_cliniche"), snap => {
+            window.dbClinica = {};
+            snap.forEach(d => { window.dbClinica[d.id] = d.data(); });
+            if(window.currentPatient) window.aggiornaDatiPaziente();
+        });
+
+        onSnapshot(collection(db, "contenzioni"), snap => {
+            window.dbContenzioni = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            if(window.currentPatient) window.aggiornaDatiPaziente();
+        });
+
+        window.onload = () => {
+            window.aggiornaPermessi();
+            if(window.currentPatient) {
+                window.aggiornaDatiPaziente();
+            }
+        };
+    </script>
+</body>
+</html>

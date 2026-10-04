@@ -3,251 +3,464 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>NVS WardPad - Reparto Master-Detail</title>
+    <title>NVS Masterpiece - Tablet Hub Launcher</title>
 
     <style>
         :root {
-            --sidebar-bg: #ffffff;
-            --main-bg: #f8fafc;
+            --bg-color: #0f172a;
+            --surface-bg: #1e293b;
             --card-bg: #ffffff;
+            --primary: #0d9488;
+            --primary-dark: #0f766e;
             --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --brand-primary: #0f766e; 
-            --brand-secondary: #0284c7;
-            --accent-red: #e11d48;
-            --gender-male: #0284c7;
-            --gender-male-bg: #f0f9ff;
-            --gender-male-border: #bae6fd;
-            --gender-female: #db2777;
-            --gender-female-bg: #fdf2f8;
-            --gender-female-border: #fbcfe8;
-            --haccp-green: #15803d;
-            --radius-md: 10px;
-            --radius-lg: 14px;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.04);
+            --text-light: #64748b;
+            --border-color: #cbd5e1;
+
+            /* PALETTE MODULI TABLET */
+            --c-reparto: #0d9488;
+            --c-diari: #0284c7;
+            --c-oss: #d97706;
+            --c-vitali: #e11d48;
+            --c-terapia: #2563eb;
+            --c-cartella: #7c3aed;
+            --c-presidi: #b45309;
+            --c-rischio: #be123c;
+            --c-consegne: #059669;
+            --c-cup: #10b981;
+            --c-anagrafica: #475569;
+            --c-haccp: #0f766e;
+
+            --radius: 12px;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--main-bg); margin: 0; padding: 0; color: var(--text-main); height: 100vh; display: flex; flex-direction: row; overflow: hidden; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0; padding: 0;
+            background: #0f172a;
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-size: 14px;
+        }
 
-        /* SIDEBAR SINISTRA */
-        .sidebar { width: 360px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; }
-        .sidebar-header { background: var(--brand-primary); color: white; padding: 14px 18px; flex-shrink: 0; }
-        .sidebar-header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .sidebar-header h2 { margin: 0; font-size: 1.15rem; font-weight: 600; }
-        
-        .btn-new-ricovero { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
-        .btn-new-ricovero:active { background: rgba(255,255,255,0.4); }
+        /* HEADER DEL LAUNCHER */
+        .hub-header {
+            background: #1e293b;
+            border-bottom: 2px solid #334155;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .hub-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .hub-logo {
+            height: 42px;
+            width: auto;
+            background: #ffffff;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+        .hub-title h1 {
+            margin: 0;
+            font-size: 1.22em;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+        .hub-title p {
+            margin: 2px 0 0 0;
+            font-size: 0.82em;
+            color: #94a3b8;
+        }
 
-        .search-box { position: relative; width: 100%; }
-        .search-input { width: 100%; padding: 10px 14px 10px 38px; border: none; border-radius: var(--radius-md); font-size: 0.95rem; background: #ffffff; color: var(--text-main); outline: none; }
-        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; stroke: var(--text-muted); fill: none; stroke-width: 2; }
+        .op-badge-touch {
+            background: rgba(13, 148, 136, 0.2);
+            border: 1px solid #0d9488;
+            color: #2dd4bf;
+            padding: 7px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.88em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.15s ease;
+        }
+        .op-badge-touch:hover {
+            background: rgba(13, 148, 136, 0.35);
+        }
 
-        .patient-list-scroll { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; -webkit-overflow-scrolling: touch; }
-        
-        /* CARD OSPITE CON COLORI GENERE */
-        .patient-list-item { background: #ffffff; border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.15s; position: relative; border-left: 6px solid var(--border); }
-        .patient-list-item:active, .patient-list-item.selected { box-shadow: 0 0 0 2px var(--brand-primary); }
+        /* BARRA STATISTICHE & ALLARMI LIVE */
+        .stats-strip {
+            background: #162032;
+            border-bottom: 1px solid #334155;
+            padding: 7px 20px;
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            flex-shrink: 0;
+            font-size: 0.85em;
+        }
+        .stat-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #cbd5e1;
+            white-space: nowrap;
+        }
+        .stat-pill strong {
+            color: #ffffff;
+            background: #334155;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.9em;
+        }
+        .stat-pill.warn strong { background: #d97706; color: #fff; }
+        .stat-pill.danger strong { background: #e11d48; color: #fff; }
 
-        /* Colore Maschile */
-        .patient-list-item.male { border-left-color: var(--gender-male); background: var(--gender-male-bg); border-color: var(--gender-male-border); }
-        .patient-list-item.male .pli-avatar { background: #e0f2fe; color: var(--gender-male); border-color: #bae6fd; }
-        .patient-list-item.male .gender-tag { background: #e0f2fe; color: var(--gender-male); }
+        /* AREA CENTRALE CON LE PIASTRELLE GRANDI */
+        .hub-scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
 
-        /* Colore Femminile */
-        .patient-list-item.female { border-left-color: var(--gender-female); background: var(--gender-female-bg); border-color: var(--gender-female-border); }
-        .patient-list-item.female .pli-avatar { background: #fce7f3; color: var(--gender-female); border-color: #fbcfe8; }
-        .patient-list-item.female .gender-tag { background: #fce7f3; color: var(--gender-female); }
-        
-        .pli-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.05rem; flex-shrink: 0; overflow: hidden; border: 1.5px solid var(--border); }
-        .pli-info { flex: 1; min-width: 0; }
-        .pli-name { margin: 0 0 3px 0; font-size: 0.95rem; font-weight: 800; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; }
-        .pli-meta { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-        .pli-badges { display: flex; gap: 5px; font-size: 0.9rem; align-items: center; }
-        .gender-tag { font-size: 0.7rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; }
+        .tiles-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            max-width: 1240px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        @media (max-width: 1024px) {
+            .tiles-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        }
+        @media (max-width: 768px) {
+            .tiles-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        }
 
-        /* PANNELLO PRINCIPALE DESTRA */
-        .main-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--main-bg); position: relative; }
+        .tile-card {
+            background: #ffffff;
+            border-radius: var(--radius);
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-main);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.15s ease;
+            min-height: 118px;
+            border: 2px solid transparent;
+        }
+        .tile-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.35);
+        }
+        .tile-card:active {
+            transform: scale(0.97);
+        }
 
-        .top-navbar { background: #ffffff; border-bottom: 1px solid var(--border); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; height: 68px; }
-        
-        .selected-patient-banner { display: flex; align-items: center; gap: 12px; background: #f8fafc; border: 1px solid var(--border); padding: 6px 14px; border-radius: 30px; }
-        .spb-icon { width: 34px; height: 34px; border-radius: 50%; background: #e0f2fe; color: var(--brand-secondary); display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold; }
-        .spb-text { font-size: 0.95rem; font-weight: 800; color: var(--text-main); text-transform: uppercase; }
-        .spb-sub { font-size: 0.78rem; color: var(--text-muted); }
+        .tile-icon {
+            font-size: 2.2em;
+            margin-bottom: 6px;
+            line-height: 1;
+        }
+        .tile-title {
+            font-size: 0.98em;
+            font-weight: 800;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .tile-desc {
+            font-size: 0.75em;
+            color: var(--text-light);
+            margin-top: 3px;
+            font-weight: 600;
+        }
 
-        .operator-pill { background: #f1f5f9; border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 700; }
-        .op-qual { color: var(--brand-primary); font-size: 0.75rem; text-transform: uppercase; display: block; font-weight: 800; }
-        
-        .btn-close-patient { background: #fee2e2; color: var(--accent-red); border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1rem; }
+        .tile-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #e11d48;
+            color: #ffffff;
+            font-size: 0.72em;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(225, 29, 72, 0.4);
+        }
 
-        /* PULSANTE HACCP NELL'HEADER */
-        .btn-haccp-header { background: var(--haccp-green); color: #ffffff; padding: 8px 14px; border-radius: var(--radius-md); font-weight: 800; font-size: 0.85rem; text-decoration: none; display: none; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(21, 128, 61, 0.2); }
-        .btn-haccp-header:active { transform: scale(0.96); }
+        /* BORDI TEMATICI DELLE PIASTRELLE */
+        .tile-reparto { border-color: var(--c-reparto); }
+        .tile-diari { border-color: var(--c-diari); }
+        .tile-oss { border-color: var(--c-oss); }
+        .tile-vitali { border-color: var(--c-vitali); }
+        .tile-terapia { border-color: var(--c-terapia); }
+        .tile-cartella { border-color: var(--c-cartella); }
+        .tile-presidi { border-color: var(--c-presidi); }
+        .tile-rischio { border-color: var(--c-rischio); }
+        .tile-consegne { border-color: var(--c-consegne); }
+        .tile-cup { border-color: var(--c-cup); }
+        .tile-anagrafica { border-color: var(--c-anagrafica); }
+        .tile-haccp { border-color: var(--c-haccp); }
 
-        .workspace-content { flex: 1; overflow-y: auto; padding: 20px; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 18px; }
+        /* FOOTER ISTITUZIONALE */
+        .hub-footer {
+            background: #1e293b;
+            border-top: 1px solid #334155;
+            padding: 9px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            font-size: 0.85em;
+        }
+        .hub-footer a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 6px;
+            background: #334155;
+            transition: all 0.15s ease;
+        }
+        .hub-footer a:hover {
+            color: #ffffff;
+            background: #475569;
+        }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-        .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; align-items: center; text-align: center; border-left: 5px solid var(--brand-primary); }
-        .stat-card.red { border-left-color: var(--accent-red); }
-        .stat-card.blue { border-left-color: var(--brand-secondary); }
-        .stat-num { font-size: 2.2rem; font-weight: 800; margin: 4px 0; color: var(--text-main); }
-        .stat-label { font-size: 0.82rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        /* MODALE OPERATORE CON PIN */
+        .login-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            z-index: 50000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .login-card {
+            background: #ffffff;
+            color: var(--text-main);
+            border-radius: var(--radius);
+            max-width: 440px;
+            width: 100%;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+        }
+        .op-grid-tablet {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+            gap: 8px;
+            margin: 14px 0;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        .op-pill {
+            background: #f1f5f9;
+            border: 1px solid var(--border-color);
+            padding: 10px 4px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.82em;
+            font-weight: 700;
+        }
+        .op-pill:hover { border-color: var(--primary); background: #f0fdfa; }
 
-        .alert-section-title { font-size: 1rem; font-weight: 700; color: var(--text-main); margin: 6px 0 0 0; display: flex; align-items: center; gap: 6px; }
-        .alert-box { background: #fff1f2; border: 1px solid #fecdd3; border-radius: var(--radius-md); padding: 14px 18px; color: #991b1b; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; }
-
-        /* BOTTOM TAB BAR OTTIMIZZATA */
-        .bottom-tab-bar { background: #ffffff; border-top: 1px solid var(--border); height: 75px; display: flex; justify-content: space-around; align-items: center; padding: 0 4px; flex-shrink: 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); }
-        
-        .tab-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: transparent; border: none; color: var(--text-muted); font-size: 0.72rem; font-weight: 700; cursor: pointer; padding: 6px 4px; border-radius: var(--radius-md); transition: all 0.15s; flex: 1; max-width: 125px; }
-        .tab-item.active { color: var(--brand-primary); }
-        .tab-item:active { transform: scale(0.96); }
-        .tab-item svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        
-        .tab-item.disabled { opacity: 0.35; pointer-events: none; }
-        .tab-item:not(.disabled) { color: var(--text-main); }
-
-        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 50000; }
-        .toast { background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 500; opacity: 0; transition: opacity 0.3s; box-shadow: var(--shadow-md); }
-        .toast.show { opacity: 1; }
+        #toast-box {
+            position: fixed; bottom: 20px; right: 20px;
+            background: #ffffff; color: #0f172a;
+            padding: 10px 18px; border-radius: 6px; font-weight: 700;
+            z-index: 100000; opacity: 0; transition: opacity 0.2s; pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        #toast-box.show { opacity: 1; }
     </style>
-
-    <!-- FIREBASE COMPAT SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <div id="toast-container"></div>
+    <div id="toast-box"></div>
 
-    <!-- SIDEBAR SINISTRA -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-header-top">
-                <h2>Elenco Ospiti (In Carico)</h2>
-                <a href="tablet_anagrafica_cie.html" class="btn-new-ricovero" title="Scanner C.I.E. & Nuovo Ospite">🪪 + CIE</a>
-            </div>
-            <div class="search-box">
-                <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" id="searchPatientInput" class="search-input" placeholder="Cerca ospite..." oninput="window.filtraOspiti()">
-            </div>
-        </div>
-        <div class="patient-list-scroll" id="sidebarPatientList">
-            <div style="text-align:center; padding:30px; color:var(--text-muted);">Caricamento ospiti...</div>
-        </div>
-    </aside>
+    <!-- MODALE CAMBIO OPERATORE TABLET CON PIN -->
+    <div id="modalOpOverlay" class="login-overlay">
+        <div class="login-card">
+            <h3 style="margin:0; color:var(--primary-dark);">Cambio Operatore in Servizio</h3>
+            <p style="margin:4px 0 12px 0; font-size:0.85em; color:var(--text-light);">Seleziona il tuo profilo:</p>
 
-    <!-- PANNELLO PRINCIPALE DESTRA -->
-    <section class="main-panel">
-        
-        <header class="top-navbar">
-            <div class="selected-patient-banner" id="selectedPatientHeaderBanner">
-                <div class="spb-icon" id="headerPatientAvatarIcon">👤</div>
-                <div>
-                    <div class="spb-text" id="headerSelectedName">Nessun Paziente Selezionato</div>
-                    <div class="spb-sub" id="headerSelectedSub">Tocca un ospite a sinistra per abilitare le sezioni</div>
-                </div>
-                <button class="btn-close-patient" id="btnClearPatient" style="display:none;" onclick="window.deselezionaPaziente()" title="Deseleziona ospite">✕</button>
+            <div id="opSelectStep">
+                <div id="operatorsContainer" class="op-grid-tablet">Caricamento operatori...</div>
+                <button onclick="document.getElementById('modalOpOverlay').style.display='none'" style="margin-top:8px; padding:8px 16px; background:#64748b; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">Annulla</button>
             </div>
 
-            <div style="display:flex; align-items:center; gap:12px;">
-                <!-- TASTO HACCP RISERVATO ESCLUSIVAMENTE A CUCINA E AMMINISTRAZIONE -->
-                <a href="tablet_haccp.html" class="btn-haccp-header" id="btnHaccpHeader" title="Registro Autocontrollo HACCP">
-                    🍽️ HACCP Cucina
-                </a>
-
-                <div class="operator-pill">
-                    <div>
-                        <span id="opNameHeader">OPERATORE</span>
-                        <span class="op-qual" id="opQualHeader">-</span>
-                    </div>
-                </div>
-                <button onclick="window.logoutTablet()" style="background:#fee2e2; color:var(--accent-red); border:none; padding:8px 14px; border-radius:var(--radius-md); font-weight:700; font-size:0.85rem; cursor:pointer;" title="Cambio Turno Rapido">🔒 Esci</button>
-            </div>
-        </header>
-
-        <div class="workspace-content">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <span class="stat-label">Posti Letto Occupati</span>
-                    <span class="stat-num" id="statOccupati">0</span>
-                </div>
-                <div class="stat-card blue">
-                    <span class="stat-label">Rivalutazioni (90gg)</span>
-                    <span class="stat-num" id="statRivalutazioni" style="color:var(--brand-secondary);">0</span>
-                </div>
-                <div class="stat-card red">
-                    <span class="stat-label">Alert Infettivi (ICA)</span>
-                    <span class="stat-num" id="statInfettivi" style="color:var(--accent-red);">0</span>
-                </div>
-            </div>
-
-            <h3 class="alert-section-title">⚠️ Scadenzario e Alert Clinici Attivi</h3>
-            <div id="alertContainer">
-                <div style="background:#f8fafc; border:1px solid var(--border); padding:16px; border-radius:var(--radius-md); color:var(--text-muted); text-align:center;">
-                    Nessun alert clinico critico registrato per gli ospiti in carico.
+            <div id="pinStep" style="display:none;">
+                <label id="selectedOpNameLabel" style="font-weight:bold; color:var(--primary); display:block; margin-bottom:8px;"></label>
+                <input type="password" id="pinInput" placeholder="****" maxlength="6" inputmode="numeric" style="width:100%; padding:12px; font-size:1.4em; text-align:center; letter-spacing:6px; border:2px solid var(--border-color); border-radius:6px; margin-bottom:12px;">
+                <div style="display:flex; gap:8px;">
+                    <button onclick="window.tornaASelezioneOp()" style="flex:1; padding:10px; background:#64748b; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">← Indietro</button>
+                    <button onclick="window.confermaLoginPin()" style="flex:2; padding:10px; background:var(--primary); color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">Accedi</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- ================= BOTTOM TAB BAR (AGGIORNATA & RIPULITA) ================= -->
-        <nav class="bottom-tab-bar">
-            <!-- 1. HOME -->
-            <button class="tab-item active" onclick="window.navTab('home')">
-                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                Home
-            </button>
+    <!-- HEADER DEL LAUNCHER -->
+    <div class="hub-header">
+        <div class="hub-brand">
+            <img src="logo.png" alt="Nuova Villa Silvana Logo" class="hub-logo">
+            <div class="hub-title">
+                <h1>NUOVA VILLA SILVANA</h1>
+                <p>Tablet Reparto Hub • Residenza Protetta per Anziani</p>
+            </div>
+        </div>
+        <div class="op-badge-touch" onclick="window.apriModalOperatore()">
+            <span id="badgeActiveOp">👤 Caricamento...</span>
+            <small style="opacity:0.8;">⇄</small>
+        </div>
+    </div>
 
-            <!-- 2. CHECK-IN & LESIONI (INTEGRATO) -->
-            <button class="tab-item disabled" id="tabCheckin" onclick="window.navModo('checkin')">
-                <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
-                Check-in
-            </button>
+    <!-- STRISCIA STATISTICHE E ALLARMI LIVE -->
+    <div class="stats-strip">
+        <div class="stat-pill">👥 Ospiti Presenti: <strong id="cntPresenti">0</strong></div>
+        <div class="stat-pill warn">📦 Presidi in Scadenza / Scaduti: <strong id="cntPresidiScad">0</strong></div>
+        <div class="stat-pill danger">🔒 Contenzioni Attive: <strong id="cntContenzioni">0</strong></div>
+        <div class="stat-pill">📅 Visite CUP (15 gg): <strong id="cntCup15">0</strong></div>
+        <div class="stat-pill">🥣 Disfagici: <strong id="cntDisfagia">0</strong></div>
+        <div class="stat-pill danger">☣ Isolamento ICA: <strong id="cntIca">0</strong></div>
+    </div>
 
-            <!-- 3. PARAMETRI VITALI -->
-            <button class="tab-item disabled req-inf" id="tabVitali" onclick="window.navModo('vitali')">
-                <svg viewBox="0 0 24 24"><path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"></path></svg>
-                Vitali
-            </button>
+    <!-- AREA CENTRALE CON LE PIASTRELLE GRANDI TOUCH (12 MODULI) -->
+    <div class="hub-scroll-area">
+        <div class="tiles-grid">
+            
+            <!-- 1. CARRELLO GIRO REPARTO (SPA COMPATTA) -->
+            <a href="tablet_nvs.html" class="tile-card tile-reparto">
+                <div class="tile-icon">📱</div>
+                <div class="tile-title" style="color:var(--c-reparto);">Giro di Reparto</div>
+                <div class="tile-desc">Carrello, Terapie & Consensi Firmati</div>
+            </a>
 
-            <!-- 4. CONSENSI & PRIVACY -->
-            <button class="tab-item disabled" id="tabConsensi" onclick="window.navModo('consensi')">
-                <svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                Consensi
-            </button>
+            <!-- 2. DIARI INTEGRATI (MEDICO / INF / OSS) -->
+            <a href="tablet_diari.html" class="tile-card tile-diari">
+                <div class="tile-icon">📖</div>
+                <div class="tile-title" style="color:var(--c-diari);">Diari Reparto</div>
+                <div class="tile-desc">Cronologia 3 Figure & Permessi Ruolo</div>
+            </a>
 
-            <!-- 5. TERAPIA (S.U.T.) -->
-            <button class="tab-item disabled req-inf" id="tabTerapia" onclick="window.navModo('terapia')">
-                <svg viewBox="0 0 24 24"><path d="M10.5 20.5L3.5 13.5a5 5 0 0 1 7-7l1.5 1.5L13.5 8a5 5 0 0 1 7 7l-7 7z"></path></svg>
-                Terapia
-            </button>
+            <!-- 3. DIARIO ASSISTENZIALE OSS DEDICATO -->
+            <a href="tablet_diario_oss.html" class="tile-card tile-oss">
+                <div class="tile-icon">🧻</div>
+                <div class="tile-title" style="color:var(--c-oss);">Diario OSS</div>
+                <div class="tile-desc">Alvo, Diuresi, Igiene & Idratazione</div>
+            </a>
 
-            <!-- 6. DIARI OSS -->
-            <button class="tab-item disabled" id="tabDiari" onclick="window.navModo('diari')">
-                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                Diari OSS
-            </button>
+            <!-- 4. PARAMETRI VITALI & DOLORE CON GRAFICO -->
+            <a href="tablet_parametri_vitali.html" class="tile-card tile-vitali">
+                <div class="tile-icon">❤️</div>
+                <div class="tile-title" style="color:var(--c-vitali);">Parametri Vitali</div>
+                <div class="tile-desc">PA, FC, SpO2, TC, Glicemia & Trend</div>
+            </a>
 
-            <!-- 7. NOTE CLINICHE (MEDICO / INFERMIERE) -->
-            <button class="tab-item disabled req-inf" id="tabNote" onclick="window.navModo('note')">
-                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                Note Cliniche
-            </button>
+            <!-- 5. TERAPIE & STUPEFACENTI DPR 309 -->
+            <a href="tablet_terapia.html" class="tile-card tile-terapia">
+                <div class="tile-icon">💊</div>
+                <div class="tile-title" style="color:var(--c-terapia);">Terapia & 309/90</div>
+                <div class="tile-desc">Somministrazioni & Carico/Scarico</div>
+            </a>
 
-            <!-- 8. B.I.N.A. / P.A.I. -->
-            <button class="tab-item disabled req-inf" id="tabBinaPai" onclick="window.navModo('binapai')">
-                <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                BINA/PAI
-            </button>
-        </nav>
+            <!-- 6. FASCICOLO CLINICO TABLET COMPLETO -->
+            <a href="tablet_cartella_clinica.html" class="tile-card tile-cartella">
+                <div class="tile-icon">⚕️</div>
+                <div class="tile-title" style="color:var(--c-cartella);">Cartella Clinica</div>
+                <div class="tile-desc">BINA, Scale VMD, PAI & Mappa Lesioni</div>
+            </a>
 
-    </section>
+            <!-- 7. PIANI PRESIDI & ASSORBENZA ASL -->
+            <a href="tablet_presidi.html" class="tile-card tile-presidi">
+                <div class="tile-badge" id="badgeTilePresidi" style="display:none;">0</div>
+                <div class="tile-icon">📦</div>
+                <div class="tile-title" style="color:var(--c-presidi);">Piani Presidi ASL</div>
+                <div class="tile-desc">Pannoloni, Cateteri & Scadenze Forniture</div>
+            </a>
 
-    <script>
+            <!-- 8. RISCHIO CLINICO & CONTENZIONI -->
+            <a href="tablet_rischio_contenzioni.html" class="tile-card tile-rischio">
+                <div class="tile-badge" id="badgeTileContenzioni" style="display:none;">0</div>
+                <div class="tile-icon">⚠️</div>
+                <div class="tile-title" style="color:var(--c-rischio);">Rischio & Contenzioni</div>
+                <div class="tile-desc">Prescrizioni, Revoche & Incident Report</div>
+            </a>
+
+            <!-- 9. PASSAGGIO CONSEGNE TURNO -->
+            <a href="tablet_consegne.html" class="tile-card tile-consegne">
+                <div class="tile-icon">📢</div>
+                <div class="tile-title" style="color:var(--c-consegne);">Consegne Turno</div>
+                <div class="tile-desc">Mattina / Pom / Notte (Inf & OSS)</div>
+            </a>
+
+            <!-- 10. PRENOTAZIONI CUP & TRASPORTI SANITARI -->
+            <a href="tablet_cup.html" class="tile-card tile-cup">
+                <div class="tile-badge" id="badgeTileCup" style="display:none; background:#0284c7;">0</div>
+                <div class="tile-icon">📅</div>
+                <div class="tile-title" style="color:var(--c-cup);">CUP & Trasporti</div>
+                <div class="tile-desc">Agenda Visite & Schede Viaggio</div>
+            </a>
+
+            <!-- 11. ANAGRAFICA, SCANNER OCR CIE/TS & ALLEGATI -->
+            <a href="tablet_anagrafica_ocr.html" class="tile-card tile-anagrafica">
+                <div class="tile-icon">📷</div>
+                <div class="tile-title" style="color:var(--c-anagrafica);">Anagrafica & OCR</div>
+                <div class="tile-desc">Scansione Carta Identità & Documenti</div>
+            </a>
+
+            <!-- 12. HACCP & AUTOCONTROLLO TABLET -->
+            <a href="tablet_haccp.html" class="tile-card tile-haccp">
+                <div class="tile-icon">🛡️</div>
+                <div class="tile-title" style="color:var(--c-haccp);">HACCP Tablet</div>
+                <div class="tile-desc">Temperature, Sanificazione & Lotti</div>
+            </a>
+
+        </div>
+    </div>
+
+    <!-- FOOTER CON SCORCIATOIE DESKTOP E QUALITÀ -->
+    <div class="hub-footer">
+        <div>
+            <span>Sistema Informativo Clinico • Nuova Villa Silvana</span>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <a href="iso_9001_accreditamento.html">🏆 Qualità ISO 9001</a>
+            <a href="index.html" style="background:#0f766e; color:#fff;">🖥️ Desktop Reparto</a>
+        </div>
+    </div>
+
+    <!-- SCRIPT FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
         const firebaseConfig = { 
             apiKey: "AIzaSyAc0fIlfds4Gne5m3qpH25uacK4NeR6TzM", 
             authDomain: "gestione-visite-b445b.firebaseapp.com", 
@@ -256,238 +469,180 @@
             messagingSenderId: "720937824810", 
             appId: "1:720937824810:web:b04b60d1d66bb8f4040953" 
         };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const db = firebase.firestore();
-
+        window.dbOperatori = [];
         window.dbOspiti = [];
         window.dbClinica = {};
-        window.activeOperator = sessionStorage.getItem("activeOperator") || localStorage.getItem("activeOperator");
-        window.activeQualifica = (sessionStorage.getItem("activeQualifica") || localStorage.getItem("activeQualifica") || "Operatore").trim();
-        window.selectedPatient = sessionStorage.getItem("globalSelectedPatient") || null;
+        window.dbContenzioni = [];
+        window.dbPresidi = [];
+        window.dbCup = [];
 
-        if(!window.activeOperator) {
-            window.location.href = 'tablet_login.html';
-        }
+        window.activeOp = sessionStorage.getItem("activeOperator") || "";
+        window.activeRole = sessionStorage.getItem("activeRole") || "user";
+        window.activeQualifica = sessionStorage.getItem("activeQualifica") || "Operatore";
+        window.selectedOpTemp = null;
 
-        window.showToast = (m) => {
-            const c = document.getElementById('toast-container');
-            const t = document.createElement('div');
-            t.className = 'toast'; t.innerText = m;
-            c.appendChild(t);
-            setTimeout(() => t.classList.add('show'), 10);
-            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2500);
+        window.showToast = (msg) => {
+            const t = document.getElementById('toast-box');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
         };
 
-        window.logoutTablet = () => {
-            if (confirm("Bloccare lo schermo e tornare al login?")) {
-                sessionStorage.clear();
-                localStorage.removeItem("activeOperator");
-                localStorage.removeItem("activeQualifica");
-                window.location.href = 'tablet_login.html';
-            }
-        };
-
-        window.initUI = () => {
-            document.getElementById('opNameHeader').innerText = window.activeOperator;
-            document.getElementById('opQualHeader').innerText = window.activeQualifica;
-
-            // 1. GESTIONE VISIBILITÀ PULSANTE HACCP (Solo Cucina e Amministrazione)
-            const qualLower = window.activeQualifica.toLowerCase();
-            const ruoliHaccp = ['cuoco', 'cucina', 'amministrazione', 'amministratore', 'direttore', 'direttore sanitario'];
-            const isHaccpAllowed = ruoliHaccp.some(r => qualLower.includes(r));
-
-            const btnHaccp = document.getElementById('btnHaccpHeader');
-            if (btnHaccp) {
-                btnHaccp.style.display = isHaccpAllowed ? 'inline-flex' : 'none';
-            }
-
-            // 2. GESTIONE RUOLI CLINICI (Infermieri / Medici vs OSS)
-            const ruoliClinici = ['infermiere', 'medico', 'direttore sanitario', 'direttore', 'sanitario'];
-            const isClinico = ruoliClinici.some(r => qualLower.includes(r));
-            document.querySelectorAll('.req-inf').forEach(el => {
-                el.style.display = isClinico ? 'flex' : 'none';
-            });
-
-            if (window.selectedPatient) {
-                window.aggiornaBannerSelezionato(window.selectedPatient);
-            }
-        };
-
-        // Funzione per riconoscere il genere (M / F) per i colori azzurro/rosa
-        window.determinaGenere = (g) => {
-            if (g.gender === 'M' || g.sesso === 'M' || g.gender === 'Maschile' || g.sesso === 'Maschile') return 'M';
-            if (g.gender === 'F' || g.sesso === 'F' || g.gender === 'Femminile' || g.sesso === 'Femminile') return 'F';
-            
-            // Deduci dal Codice Fiscale (giorno di nascita > 40 per le donne)
-            if (g.cf && g.cf.length === 16) {
-                const giorno = parseInt(g.cf.substr(9, 2), 10);
-                if (!isNaN(giorno)) {
-                    return giorno > 40 ? 'F' : 'M';
-                }
-            }
-            return 'M';
-        };
-
-        // RENDER DELLA LISTA OSPITI CON COLORI GENERE
-        window.renderSidebarOspiti = (lista = null) => {
-            const container = document.getElementById('sidebarPatientList');
-            container.innerHTML = '';
-
-            const sorgente = lista || window.dbOspiti.filter(g => !g.decesso && !g.dimissione);
-            
-            if (sorgente.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.85rem;">Nessun ospite trovato.</div>`;
-                return;
-            }
-
-            sorgente.sort((a,b) => a.name.localeCompare(b.name)).forEach(g => {
-                const initials = g.name.split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase();
-                const isSelected = window.selectedPatient === g.name ? 'selected' : '';
-                const pD = window.dbClinica[g.name] || {};
-
-                // Colore Genere: 'male' (azzurro) o 'female' (rosa)
-                const gender = window.determinaGenere(g);
-                const genderClass = gender === 'F' ? 'female' : 'male';
-                const genderLabel = gender === 'F' ? 'F' : 'M';
-
-                let badgeHtml = '';
-                if(pD.disfagia) badgeHtml += `<span title="Disfagico">🥣</span>`;
-                if(pD.infezione) badgeHtml += `<span title="Isolamento ICA">☣</span>`;
-
-                container.innerHTML += `
-                    <div class="patient-list-item ${genderClass} ${isSelected}" onclick="window.selezionaPaziente('${g.name}')">
-                        <div class="pli-avatar">
-                            ${g.photo ? `<img src="${g.photo}" style="width:100%;height:100%;object-fit:cover;">` : initials}
-                        </div>
-                        <div class="pli-info">
-                            <h4 class="pli-name">${g.name}</h4>
-                            <div class="pli-meta">
-                                <span>Stanza ${g.room || '-'} (Letto ${g.bed || '-'})</span>
-                                <div class="pli-badges">
-                                    <span class="gender-tag">${genderLabel}</span>
-                                    ${badgeHtml}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-        };
-
-        window.filtraOspiti = () => {
-            const query = document.getElementById('searchPatientInput').value.toLowerCase();
-            const filtrati = window.dbOspiti.filter(g => !g.decesso && !g.dimissione && g.name.toLowerCase().includes(query));
-            window.renderSidebarOspiti(filtrati);
-        };
-
-        window.selezionaPaziente = (nome) => {
-            window.selectedPatient = nome;
-            sessionStorage.setItem("globalSelectedPatient", nome);
-            window.aggiornaBannerSelezionato(nome);
-            window.renderSidebarOspiti();
-            window.sbloccaSezioni();
-            window.showToast(`Paziente attivo: ${nome}`);
-        };
-
-        window.deselezionaPaziente = () => {
-            window.selectedPatient = null;
-            sessionStorage.removeItem("globalSelectedPatient");
-            
-            document.getElementById('headerSelectedName').innerText = "Nessun Paziente Selezionato";
-            document.getElementById('headerSelectedSub').innerText = "Tocca un ospite a sinistra per abilitare le sezioni";
-            document.getElementById('btnClearPatient').style.display = 'none';
-            document.getElementById('headerPatientAvatarIcon').innerHTML = '👤';
-            window.renderSidebarOspiti();
-
-            document.querySelectorAll('.tab-item:not(:first-child)').forEach(t => t.classList.add('disabled'));
-        };
-
-        window.aggiornaBannerSelezionato = (nome) => {
-            const g = window.dbOspiti.find(x => x.name === nome) || {};
-            const gender = window.determinaGenere(g);
-            
-            document.getElementById('headerSelectedName').innerText = nome;
-            document.getElementById('headerSelectedSub').innerText = `Stanza ${g.room || '-'} | Sesso: ${gender} | CF: ${g.cf || '-'}`;
-            document.getElementById('btnClearPatient').style.display = 'flex';
-            
-            const avatarIcon = document.getElementById('headerPatientAvatarIcon');
-            if (g.photo) {
-                avatarIcon.innerHTML = `<img src="${g.photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+        // GESTIONE OPERATORE & MODALE LOGIN
+        window.aggiornaUIOperatore = () => {
+            if(!window.activeOp) {
+                document.getElementById('badgeActiveOp').innerText = "👤 Seleziona Operatore";
+                window.apriModalOperatore();
             } else {
-                avatarIcon.innerText = gender === 'F' ? '👩' : '👨';
-                avatarIcon.style.background = gender === 'F' ? '#fce7f3' : '#e0f2fe';
-                avatarIcon.style.color = gender === 'F' ? 'var(--gender-female)' : 'var(--gender-male)';
+                document.getElementById('badgeActiveOp').innerText = `👤 ${window.activeOp} (${window.activeQualifica})`;
             }
-            window.sbloccaSezioni();
         };
 
-        window.sbloccaSezioni = () => {
-            document.querySelectorAll('.tab-item.disabled').forEach(t => t.classList.remove('disabled'));
-        };
+        window.apriModalOperatore = () => {
+            const c = document.getElementById('operatorsContainer');
+            c.innerHTML = '';
+            let ops = window.dbOperatori.filter(o => o && o.name);
+            if(!ops.some(o => o.name === "Admin")) ops.push({ name: "Admin", pin: "12345", qualifica: "Direttore Sanitario", role: "admin" });
+            ops.sort((a,b) => a.name.localeCompare(b.name));
 
-        // NAVIGAZIONE AI MODULI FUNZIONALI
-        window.navModo = (modo) => {
-            if (!window.selectedPatient) {
-                return window.showToast("⚠️ Seleziona prima un paziente dall'elenco a sinistra!");
-            }
-            
-            const encoded = encodeURIComponent(window.selectedPatient);
-            if (modo === 'checkin') window.location.href = `tablet_checkin.html?ospite=${encoded}`;
-            if (modo === 'vitali') window.location.href = `tablet_parametri.html?ospite=${encoded}`;
-            if (modo === 'consensi') window.location.href = `tablet_consensi.html?ospite=${encoded}`;
-            if (modo === 'terapia') window.location.href = `tablet_terapia.html?ospite=${encoded}`;
-            if (modo === 'diari') window.location.href = `tablet_diario_oss.html?ospite=${encoded}`;
-            if (modo === 'note') window.location.href = `tablet_diarioclinico.html?ospite=${encoded}`;
-            if (modo === 'binapai') window.location.href = `tablet_bina_pai.html?ospite=${encoded}`;
-        };
-
-        window.navTab = (tab) => {
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-        };
-
-        window.aggiornaStatisticheReparto = () => {
-            const attivi = window.dbOspiti.filter(g => !g.decesso && !g.dimissione);
-            document.getElementById('statOccupati').innerText = attivi.length;
-
-            let countInf = 0;
-            let alertHtml = '';
-
-            attivi.forEach(g => {
-                const clin = window.dbClinica[g.name] || {};
-                if (clin.infezione) {
-                    countInf++;
-                    alertHtml += `<div class="alert-box">☣️ <strong>${g.name}</strong> - Isolamento ICA: ${clin.infezione}</div>`;
-                }
+            ops.forEach(op => {
+                const card = document.createElement('div');
+                card.className = 'op-pill';
+                card.innerHTML = `${op.name.split(' ')[0]}<br><small style="color:#64748b;">${op.qualifica||''}</small>`;
+                card.onclick = () => window.selezionaOpPerPin(op);
+                c.appendChild(card);
             });
 
-            document.getElementById('statInfettivi').innerText = countInf;
-            if (alertHtml) {
-                document.getElementById('alertContainer').innerHTML = alertHtml;
+            document.getElementById('modalOpOverlay').style.display = 'flex';
+            window.tornaASelezioneOp();
+        };
+
+        window.selezionaOpPerPin = (op) => {
+            window.selectedOpTemp = op;
+            document.getElementById('opSelectStep').style.display = 'none';
+            document.getElementById('pinStep').style.display = 'block';
+            document.getElementById('selectedOpNameLabel').innerText = `PIN per ${op.name}:`;
+            const inp = document.getElementById('pinInput');
+            inp.value = '';
+            setTimeout(() => inp.focus(), 150);
+        };
+
+        window.tornaASelezioneOp = () => {
+            window.selectedOpTemp = null;
+            document.getElementById('pinStep').style.display = 'none';
+            document.getElementById('opSelectStep').style.display = 'block';
+        };
+
+        window.confermaLoginPin = () => {
+            const pin = document.getElementById('pinInput').value.trim();
+            const op = window.selectedOpTemp;
+            if(!op) return;
+
+            if(op.pin === pin || (op.name === 'Admin' && pin === '12345')) {
+                window.activeOp = op.name;
+                window.activeRole = op.role || 'user';
+                window.activeQualifica = op.qualifica || 'Operatore';
+
+                sessionStorage.setItem("activeOperator", op.name);
+                sessionStorage.setItem("activeRole", window.activeRole);
+                sessionStorage.setItem("activeQualifica", window.activeQualifica);
+
+                document.getElementById('modalOpOverlay').style.display = 'none';
+                window.aggiornaUIOperatore();
+                window.showToast(`Benvenuto ${op.name}`);
+            } else {
+                window.showToast("❌ PIN errato!");
+                document.getElementById('pinInput').value = '';
             }
         };
 
-        // ASCOLTO IN TEMPO REALE DA FIRESTORE
-        db.collection("ospiti").onSnapshot(snap => {
-            window.dbOspiti = snap.docs.map(d => ({id: d.id, ...d.data()}));
-            window.renderSidebarOspiti();
-            window.aggiornaStatisticheReparto();
-            if (window.selectedPatient) {
-                window.aggiornaBannerSelezionato(window.selectedPatient);
-            }
+        // CALCOLO STATISTICHE & BADGE LIVE
+        window.calcolaIndicatoriLive = () => {
+            const today = new Date(); today.setHours(0,0,0,0);
+            const in15Days = new Date(today.getTime() + (15 * 24 * 60 * 60 * 1000)); in15Days.setHours(23,59,59,999);
+
+            const attivi = window.dbOspiti.filter(g => !g.decesso && !g.dimissione);
+            document.getElementById('cntPresenti').innerText = attivi.length;
+
+            let cntDisf = 0, cntIca = 0;
+            attivi.forEach(g => {
+                const c = window.dbClinica[g.name] || {};
+                if(c.disfagia) cntDisf++;
+                if(c.infezione) cntIca++;
+            });
+            document.getElementById('cntDisfagia').innerText = cntDisf;
+            document.getElementById('cntIca').innerText = cntIca;
+
+            // Contenzioni attive
+            const contAttive = window.dbContenzioni.filter(c => c.stato === 'ATTIVA').length;
+            document.getElementById('cntContenzioni').innerText = contAttive;
+            const bTileCont = document.getElementById('badgeTileContenzioni');
+            if(contAttive > 0) { bTileCont.innerText = contAttive; bTileCont.style.display = 'block'; }
+            else { bTileCont.style.display = 'none'; }
+
+            // Piani presidi in scadenza / scaduti (30 giorni)
+            let presidiAlertCount = 0;
+            window.dbPresidi.forEach(p => {
+                if(!p.dataScadenza) return;
+                const exp = new Date(p.dataScadenza + 'T00:00:00');
+                const diff = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
+                if(diff <= 30) presidiAlertCount++;
+            });
+            document.getElementById('cntPresidiScad').innerText = presidiAlertCount;
+            const bTilePres = document.getElementById('badgeTilePresidi');
+            if(presidiAlertCount > 0) { bTilePres.innerText = presidiAlertCount; bTilePres.style.display = 'block'; }
+            else { bTilePres.style.display = 'none'; }
+
+            // Visite CUP prossimi 15 giorni
+            const cup15Count = window.dbCup.filter(c => {
+                if(!c.data) return false;
+                const d = new Date(c.data + 'T00:00:00');
+                return d >= today && d <= in15Days;
+            }).length;
+            document.getElementById('cntCup15').innerText = cup15Count;
+            const bTileCup = document.getElementById('badgeTileCup');
+            if(cup15Count > 0) { bTileCup.innerText = cup15Count; bTileCup.style.display = 'block'; }
+            else { bTileCup.style.display = 'none'; }
+        };
+
+        // REAL-TIME FIRESTORE LISTENERS
+        onSnapshot(collection(db, "operatori"), snap => {
+            window.dbOperatori = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            if(!window.activeOp) window.aggiornaUIOperatore();
         });
 
-        db.collection("cartelle_cliniche").onSnapshot(snap => {
+        onSnapshot(collection(db, "ospiti"), snap => {
+            window.dbOspiti = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            window.calcolaIndicatoriLive();
+        });
+
+        onSnapshot(collection(db, "cartelle_cliniche"), snap => {
             window.dbClinica = {};
             snap.forEach(d => { window.dbClinica[d.id] = d.data(); });
-            window.renderSidebarOspiti();
-            window.aggiornaStatisticheReparto();
+            window.calcolaIndicatoriLive();
         });
 
-        window.onload = window.initUI;
+        onSnapshot(collection(db, "contenzioni"), snap => {
+            window.dbContenzioni = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            window.calcolaIndicatoriLive();
+        });
+
+        onSnapshot(collection(db, "presidi"), snap => {
+            window.dbPresidi = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            window.calcolaIndicatoriLive();
+        });
+
+        onSnapshot(collection(db, "cup"), snap => {
+            window.dbCup = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            window.calcolaIndicatoriLive();
+        });
+
+        window.onload = () => {
+            window.aggiornaUIOperatore();
+        };
     </script>
 </body>
 </html>

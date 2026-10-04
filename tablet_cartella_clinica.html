@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NVS Masterpiece - Fascicolo Clinico Tablet (10/11")</title>
+
+    <style>
+        :root {
+            --bg-color: #f1f5f9;
+            --box-bg: #ffffff;
+            --primary: #0d9488;
+            --primary-dark: #0f766e;
+            --text-main: #0f172a;
+            --text-light: #475569;
+            --border-color: #cbd5e1;
+            --danger: #e11d48;
+            --warning: #d97706;
+            --success: #059669;
+            --terapia: #0284c7;
+            --dir-color: #4f46e5;
+            --radius: 8px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0; padding: 0;
+            color: var(--text-main);
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* NAVBAR TOUCH */
+        .navbar {
+            background: var(--primary);
+            color: white;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--primary-dark);
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .navbar-brand { font-weight: 800; font-size: 1.1em; display: flex; align-items: center; gap: 8px; }
+        .nav-btn {
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 14px;
+            border-radius: var(--radius);
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.88em;
+            cursor: pointer;
+        }
+
+        /* BANNER PERSISTENTE PAZIENTE */
+        .patient-banner {
+            background: #ffffff;
+            border-left: 8px solid var(--primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .pb-avatar {
+            width: 48px; height: 48px;
+            border-radius: 6px;
+            background: #e2e8f0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6em;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .pb-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .pb-name { font-size: 1.2em; font-weight: 800; color: var(--primary-dark); }
+        .pb-sub { font-size: 0.85em; color: var(--text-light); }
+
+        /* TABS SUB-NAVBAR SCORREVOLE TOUCH */
+        .sub-nav-tabs {
+            display: flex;
+            background: #ffffff;
+            border-bottom: 2px solid var(--border-color);
+            overflow-x: auto;
+            position: sticky; top: 53px; z-index: 900;
+            padding: 4px 8px;
+            gap: 6px;
+        }
+        .tab-btn {
+            padding: 10px 14px;
+            background: #f1f5f9;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.88em;
+            font-weight: 700;
+            color: var(--text-light);
+            cursor: pointer;
+            white-space: nowrap;
+            flex: 0 0 auto;
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary-dark);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 12px auto;
+            padding: 0 12px 40px 12px;
+            flex: 1;
+        }
+
+        .section-view { display: none; }
+        .section-view.active { display: block; }
+
+        /* CARDS ADATTATE PER TABLET 10/11" */
+        .card-tablet {
+            background: var(--box-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .card-tablet h3 {
+            margin: 0 0 12px 0;
+            font-size: 1.1em;
+            color: var(--primary-dark);
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 6px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+        
+        .form-field { margin-bottom: 10px; }
+        .form-field label { display: block; font-size: 0.84em; font-weight: 700; color: #334155; margin-bottom: 4px; }
+        input[type="text"], input[type="number"], input[type="date"], select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 1em;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background: #ffffff;
+            font-family: inherit;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); outline: none; background: #f0fdfa; }
+
+        /* PULSANTI TOUCH */
+        .btn-tablet {
+            padding: 12px 20px;
+            font-size: 1em;
+            font-weight: 800;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #ffffff;
+        }
+        .btn-save-main {
+            width: 100%;
+            background: var(--primary);
+            box-shadow: 0 4px 10px rgba(13, 148, 136, 0.25);
+            margin-top: 10px;
+        }
+
+        /* MAPPA ANATOMICA TABLET */
+        .bodymap-container {
+            position: relative;
+            max-width: 380px;
+            margin: 0 auto;
+            border: 2px solid var(--border-color);
+            background: #fff;
+            border-radius: 8px;
+            cursor: crosshair;
+            overflow: hidden;
+        }
+        .bodymap-container img { width: 100%; height: auto; display: block; pointer-events: none; }
+        .body-marker-touch {
+            position: absolute;
+            width: 24px; height: 24px;
+            background-color: var(--danger);
+            color: #ffffff;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 800;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .badge-alert { padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 0.85em; }
+        .alert-ica { background: #fee2e2; color: #991b1b; }
+        .alert-disfagia { background: #fef3c7; color: #92400e; }
+        .alert-cont { background: #ffe4e6; color: #be123c; }
+
+        /* FOTO GALLERY TABLET */
+        .photo-grid-touch { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 10px; }
+        .photo-card-touch { background: #fff; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; padding: 6px; font-size: 0.8em; }
+        .photo-card-touch img { width: 100%; height: 90px; object-fit: cover; border-radius: 4px; }
+
+        /* CANVAS FIRMA TABLET */
+        .signature-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.7);
+            z-index: 40000;
+            display: none; align-items: center; justify-content: center;
+            padding: 16px;
+        }
+        .signature-dialog {
+            background: #fff; border-radius: 10px; max-width: 460px; width: 100%;
+            padding: 20px; text-align: center;
+        }
+        .signature-pad { border: 2px dashed #94a3b8; border-radius: 6px; width: 100%; height: 180px; touch-action: none; background: #f8fafc; }
+
+        #toast-tablet {
+            position: fixed; bottom: 20px; right: 20px;
+            background: #0f172a; color: #fff;
+            padding: 12px 20px; border-radius: 6px; font-weight: bold;
+            z-index: 50000; opacity: 0; transition: opacity 0.2s; pointer-events: none;
+        }
+        #toast-tablet.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div id="toast-tablet"></div>
+
+    <!-- MODAL FIRMA TOUCH PAI -->
+    <div id="sigModal" class="signature-overlay">
+        <div class="signature-dialog">
+            <h3 id="sigRoleTitle" style="margin:0 0 8px 0; color:var(--primary-dark);">Firma P.A.I. Multidisciplinare</h3>
+            <p style="font-size:0.85em; color:var(--text-light); margin:0 0 12px 0;">Apponi la firma con il dito o pennino:</p>
+            <canvas id="canvasPaiSig" class="signature-pad" width="400" height="180"></canvas>
+            <div style="display:flex; justify-content:space-between; margin-top:14px; gap:8px;">
+                <button class="btn-tablet" style="background:#64748b;" onclick="window.clearSig()">Pulisci</button>
+                <button class="btn-tablet" style="background:#e11d48;" onclick="document.getElementById('sigModal').style.display='none'">Annulla</button>
+                <button class="btn-tablet" style="background:var(--success);" onclick="window.confirmPaiSig()">Conferma Firma</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOPBAR -->
+    <div class="navbar">
+        <div class="navbar-brand">
+            <span>⚕️ Cartella Clinica Tablet</span>
+            <small style="font-weight:400; opacity:0.85;">[10/11"]</small>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+            <span id="badgeCurrentOp" style="font-weight:700; background:rgba(255,255,255,0.2); padding:5px 10px; border-radius:4px; font-size:0.85em;">👤 Op</span>
+            <button class="nav-btn" onclick="window.location.href='tablet_nvs.html'">📱 Giro Reparto</button>
+            <button class="nav-btn" onclick="window.location.href='index.html'">🏠 Home Desktop</button>
+        </div>
+    </div>
+
+    <!-- BANNER PAZIENTE ATTIVO -->
+    <div class="patient-banner">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <div class="pb-avatar" id="patAvatar">👤</div>
+            <div>
+                <div class="pb-name" id="patName">Nessun paziente selezionato</div>
+                <div class="pb-sub" id="patMeta">Seleziona un paziente dal menu o dal giro reparto</div>
+            </div>
+        </div>
+        <div id="patBadges" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+    </div>
+
+    <!-- SOTTO-NAVIGAZIONE SCHEDE TABLET -->
+    <div class="sub-nav-tabs">
+        <button class="tab-btn active" onclick="window.switchTab('anamnesi', this)">🩺 Patologie & Anamnesi</button>
+        <button class="tab-btn" onclick="window.switchTab('obiettiva', this)">📏 Esame Obiettivo & BMI</button>
+        <button class="tab-btn" onclick="window.switchTab('lesioni', this)">🩹 Mappa Lesioni & Foto</button>
+        <button class="tab-btn" onclick="window.switchTab('bina', this)">🏛️ B.I.N.A. Umbria</button>
+        <button class="tab-btn" onclick="window.switchTab('vmd', this)">📊 Scale VMD Geriatriche</button>
+        <button class="tab-btn" onclick="window.switchTab('pai', this)">📋 P.A.I. & Firme Touch</button>
+    </div>
+
+    <div class="container">
+
+        <!-- 1. PATOLOGIE & ANAMNESI -->
+        <div id="sec-anamnesi" class="section-view active">
+            <div class="card-tablet">
+                <h3>🩺 Quadro Clinico & Patologie in Atto</h3>
+                <div class="form-field">
+                    <label style="color:#b91c1c;">Patologie in Atto / Diagnosi Attive di Ricovero *</label>
+                    <textarea id="clinPatologieAttive" rows="3" placeholder="Es. Ipertensione arteriosa, Diabete Mellito II, Decadimento vascolare..."></textarea>
+                </div>
+                <div class="form-field">
+                    <label style="color:#0369a1;">Anamnesi Patologica Remota (Patologie Pregresse)</label>
+                    <textarea id="clinPatologiePregresse" rows="3" placeholder="Es. Pregresso TIA nel 2021, colecistectomia, frattura femore..."></textarea>
+                </div>
+                <div class="form-grid-2">
+                    <div class="form-field"><label>Interventi Chirurgici</label><input type="text" id="clinInterventiChirurgici" placeholder="Es. Protesi anca dx (2018)"></div>
+                    <div class="form-field"><label>Traumi & Fratture</label><input type="text" id="clinTraumi" placeholder="Es. Frattura polso sx"></div>
+                </div>
+                <div class="form-field">
+                    <label>Terapia Farmacologica all'Ingresso</label>
+                    <input type="text" id="clinTerapiaIngresso" placeholder="Es. Cardioaspirina 100mg, Ramipril 5mg, Lasix 25mg...">
+                </div>
+            </div>
+
+            <div class="card-tablet">
+                <h3>📋 Anamnesi Generale & Rischio Infettivo</h3>
+                <div class="form-grid-3">
+                    <div class="form-field"><label style="color:#b91c1c;">Allergie & Intolleranze</label><input type="text" id="clinAllergie" placeholder="Nega allergie / Penicillina..."></div>
+                    <div class="form-field"><label>Protesi & Ausili</label><input type="text" id="clinProtesi" placeholder="Dentaria, occhiali, acustica..."></div>
+                    <div class="form-field"><label>Stato Vaccinale</label><input type="text" id="clinVaccinazioni" placeholder="Antinfluenzale, Covid..."></div>
+                </div>
+                <div class="form-grid-2" style="margin-top:10px; background:#fffbeb; padding:12px; border-radius:6px; border:1px solid #fde68a;">
+                    <label style="display:flex; align-items:center; gap:8px; font-weight:700; cursor:pointer;">
+                        <input type="checkbox" id="chkDisfagia" style="transform:scale(1.3); accent-color:var(--warning);">
+                        <span>🥣 Paziente Disfagico (Rischio Soffocamento)</span>
+                    </label>
+                    <div>
+                        <label style="font-weight:700; font-size:0.85em;">Isolamento ICA (Infezione)</label>
+                        <select id="selInfezione">
+                            <option value="">Nessuno (Ordinario)</option>
+                            <option value="Clostridium Difficile">Clostridium Difficile</option>
+                            <option value="MRSA">MRSA</option>
+                            <option value="Scabbia">Scabbia</option>
+                            <option value="KPC / Enterobatteri">KPC / Enterobatteri</option>
+                            <option value="COVID-19">COVID-19</option>
+                            <option value="Altra Infezione">Altro isolamento</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-tablet btn-save-main" onclick="window.salvaFascicoloClinicoTablet()">💾 Salva Patologie & Anamnesi</button>
+        </div>
+
+        <!-- 2. ESAME OBIETTIVO & BMI -->
+        <div id="sec-obiettiva" class="section-view">
+            <div class="card-tablet">
+                <h3>📏 Dati Antropometrici & Calcolo BMI Automatico</h3>
+                <div class="form-grid-3">
+                    <div class="form-field">
+                        <label>Altezza (cm)</label>
+                        <input type="number" id="clinAltezza" placeholder="165" inputmode="numeric" oninput="window.calcolaBmi()">
+                    </div>
+                    <div class="form-field">
+                        <label>Peso (kg)</label>
+                        <input type="number" step="0.1" id="clinPeso" placeholder="68.5" inputmode="decimal" oninput="window.calcolaBmi()">
+                    </div>
+                    <div class="form-field">
+                        <label>B.M.I. (Calcolato)</label>
+                        <input type="text" id="clinBmi" readonly style="background:#f1f5f9; font-weight:800; color:var(--primary);">
+                    </div>
+                </div>
+                <div class="form-grid-2">
+                    <div class="form-field">
+                        <label>Stato Nutrizionale</label>
+                        <select id="clinStatoNutrizionale">
+                            <option value="Normopeso">Normopeso</option>
+                            <option value="Sottopeso">Sottopeso / Rischio Malnutrizione</option>
+                            <option value="Sovrappeso">Sovrappeso</option>
+                            <option value="Obesità Grado I">Obesità Grado I</option>
+                            <option value="Obesità Grave">Obesità Grave</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>Tipo Costituzionale</label>
+                        <select id="clinTipoCostituzionale">
+                            <option value="Normotipo">Normotipo</option>
+                            <option value="Brevilineo">Brevilineo</option>
+                            <option value="Longilineo">Longilineo</option>
+                            <option value="Cachettico">Cachettico</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-tablet">
+                <h3>🩺 Esame Obiettivo Generale all'Ingresso</h3>
+                <div class="form-grid-2">
+                    <div class="form-field"><label>Decubito / Postura</label><input type="text" id="clinDecubito" placeholder="Indifferente / Obbligato a letto"></div>
+                    <div class="form-field"><label>Facies</label><input type="text" id="clinFacies" placeholder="Normale / Amimica / Sofferente"></div>
+                    <div class="form-field"><label>Psiche & Sensorio</label><input type="text" id="clinPsicheSensorio" placeholder="Vigile, orientato / Disorientato"></div>
+                    <div class="form-field"><label>Cute & Mucose</label><input type="text" id="clinCuteMucose" placeholder="Pallide, disidratate, integra..."></div>
+                </div>
+                <div class="form-grid-2">
+                    <div class="form-field"><label>Masse Muscolari & Tono</label><input type="text" id="clinMasseMuscolari" placeholder="Normotrofiche / Ipotrofia arti inferiori"></div>
+                    <div class="form-field"><label>Apparato Locomotore</label><input type="text" id="clinApparatoLocomotore" placeholder="Deambulazione assistita / Carrozzina"></div>
+                </div>
+            </div>
+            <button class="btn-tablet btn-save-main" onclick="window.salvaFascicoloClinicoTablet()">💾 Salva Esame Obiettivo</button>
+        </div>
+
+        <!-- 3. MAPPA LESIONI & FOTO -->
+        <div id="sec-lesioni" class="section-view">
+            <div class="card-tablet">
+                <h3>🩹 Mappa Anatomica Interattiva (Tocca il corpo per posizionare il punto)</h3>
+                <p style="font-size:0.85em; color:var(--text-light); margin:0 0 10px 0;">Tocca un punto del corpo per numerare la piaga da decubito. Tocca il numero per rimuoverlo.</p>
+                <div class="bodymap-container" id="bodyMapBox" onclick="window.handleBodyMapClick(event)">
+                    <img src="corpo_umano.png" alt="Mappa Anatomica">
+                    <div id="markersLayer"></div>
+                </div>
+                <div style="text-align:right; margin-top:8px;">
+                    <button class="btn-tablet" style="background:#64748b; padding:6px 12px; font-size:0.85em;" onclick="window.clearMarkers()">🗑️ Cancella Punti Mappa</button>
+                </div>
+            </div>
+
+            <div class="card-tablet">
+                <h3>📷 Acquisizione Foto Lesione Cutanea dal Tablet</h3>
+                <div class="form-grid-2">
+                    <div class="form-field"><label>Sede Anatomica *</label><input type="text" id="fotoSede" placeholder="Es. Sacro, Tallone DX"></div>
+                    <div class="form-field">
+                        <label>Stadio NPUAP / EPUAP *</label>
+                        <select id="fotoStadio">
+                            <option value="Stadio I">Stadio I (Eritema fisso)</option>
+                            <option value="Stadio II">Stadio II (Perdita cutanea parziale)</option>
+                            <option value="Stadio III">Stadio III (Cute a tutto spessore)</option>
+                            <option value="Stadio IV">Stadio IV (Coinvolgimento muscolo/osso)</option>
+                            <option value="Non Stadiabile">Non Stadiabile (Escara)</option>
+                            <option value="DTI">DTI (Danno Profondo)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-field"><label>Medicazione Applicata</label><input type="text" id="fotoMedicazione" placeholder="Es. Idrogel + Idrocolloide"></div>
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:8px;">
+                    <input type="file" id="fotoLesioneFile" accept="image/*" capture="environment" style="flex:1;">
+                    <button class="btn-tablet" style="background:var(--success);" onclick="window.salvaFotoLesioneTablet()">Scatta & Salva Foto</button>
+                </div>
+                <div class="photo-grid-touch" id="fotoGalleryBox"></div>
+            </div>
+            <button class="btn-tablet btn-save-main" onclick="window.salvaFascicoloClinicoTablet()">💾 Salva Mappa & Scheda Lesioni</button>
+        </div>
+
+        <!-- 4. B.I.N.A. REGIONE UMBRIA -->
+        <div id="sec-bina" class="section-view">
+            <div class="card-tablet">
+                <h3>🏛️ Scheda B.I.N.A. (Batteria Valutazione Non Autosufficienza - Umbria)</h3>
+                <div class="form-grid-2">
+                    <div class="form-field">
+                        <label>1. Non Autosufficienza Funzionale (0 - 10)</label>
+                        <input type="number" id="binaAuto" min="0" max="10" step="0.5" placeholder="0 - 10" oninput="window.calcolaBINA()">
+                    </div>
+                    <div class="form-field">
+                        <label>2. Stato Sanitario & Clinico (0 - 10)</label>
+                        <input type="number" id="binaSanita" min="0" max="10" step="0.5" placeholder="0 - 10" oninput="window.calcolaBINA()">
+                    </div>
+                    <div class="form-field">
+                        <label>3. Stato Psichico & Cognitivo (0 - 10)</label>
+                        <input type="number" id="binaPsiche" min="0" max="10" step="0.5" placeholder="0 - 10" oninput="window.calcolaBINA()">
+                    </div>
+                    <div class="form-field">
+                        <label>4. Stato Socio-Relazionale (0 - 10)</label>
+                        <input type="number" id="binaSociale" min="0" max="10" step="0.5" placeholder="0 - 10" oninput="window.calcolaBINA()">
+                    </div>
+                </div>
+
+                <div style="background:#e0f2fe; border:1px solid #bae6fd; padding:14px; border-radius:6px; margin-top:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:700; color:#0369a1;">Punteggio Totale B.I.N.A.:</span>
+                        <strong id="binaScorePill" style="font-size:1.4em; color:var(--primary-dark);">- / 40</strong>
+                    </div>
+                    <div id="binaClassePill" style="font-weight:800; font-size:1.05em; color:#0284c7; margin-top:6px;">Classe: Da calcolare</div>
+                </div>
+            </div>
+            <button class="btn-tablet btn-save-main" onclick="window.salvaFascicoloClinicoTablet()">💾 Salva Valutazione B.I.N.A.</button>
+        </div>
+
+        <!-- 5. SCALE VMD GERIATRICHE -->
+        <div id="sec-vmd" class="section-view">
+            <div class="card-tablet">
+                <h3>📊 Valutazione Multidimensionale Geriatrica (VMD)</h3>
+                <div class="form-grid-3">
+                    <div class="form-field">
+                        <label>ADL / Katz (0 - 6)</label>
+                        <input type="number" id="vmdADL" min="0" max="6" placeholder="0-6">
+                        <small style="color:var(--text-light);">Autonomia funzioni di base</small>
+                    </div>
+                    <div class="form-field">
+                        <label>IADL / Lawton (0 - 8)</label>
+                        <input type="number" id="vmdIADL" min="0" max="8" placeholder="0-8">
+                        <small style="color:var(--text-light);">Attività strumentali quotidiane</small>
+                    </div>
+                    <div class="form-field">
+                        <label>MMSE Folstein (0 - 30)</label>
+                        <input type="number" id="vmdMMSE" min="0" max="30" step="0.1" placeholder="0-30">
+                        <small style="color:var(--text-light);">Stato cognitivo globale</small>
+                    </div>
+                </div>
+                <div class="form-grid-2" style="margin-top:12px;">
+                    <div class="form-field">
+                        <label style="color:#b91c1c;">Scala Braden (Rischio Decubito: 6 - 23)</label>
+                        <input type="number" id="vmdBraden" min="6" max="23" placeholder="6-23">
+                        <small style="color:var(--text-light);">≤ 12: Rischio Alto | 13-14: Medio | ≥ 15: Basso</small>
+                    </div>
+                    <div class="form-field">
+                        <label style="color:#b45309;">Morse Fall Scale (Rischio Caduta: 0 - 125)</label>
+                        <input type="number" id="vmdMorse" min="0" max="125" placeholder="0-125">
+                        <small style="color:var(--text-light);">≥ 51: Rischio Caduta Elevato</small>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-tablet btn-save-main" onclick="window.salvaFascicoloClinicoTablet()">💾 Salva Scale VMD</button>
+        </div>
+
+        <!-- 6. P.A.I. MULTIDISCIPLINARE & FIRME TOUCH -->
+        <div id="sec-pai" class="section-view">
+            <div class="card-tablet">
+                <h3>📋 Piano Assistenziale Individualizzato (P.A.I.)</h3>
+                <div class="form-grid-2">
+                    <div class="form-field"><label>Data Stesura P.A.I.</label><input type="date" id="paiDataStesura" onchange="window.calcRevisionePai()"></div>
+                    <div class="form-field"><label>Data Scadenza / Prossima Revisione</label><input type="date" id="paiDataRevisione"></div>
+                </div>
+                <div class="form-field"><label>Obiettivo Medico</label><textarea id="paiMedico" rows="2" placeholder="Stabilizzazione clinica, aderenza terapeutica..."></textarea></div>
+                <div class="form-field"><label>Obiettivo Infermieristico</label><textarea id="paiInfermieristico" rows="2" placeholder="Cura lesioni cutanee, monitoraggio parametri..."></textarea></div>
+                <div class="form-field"><label>Obiettivo Assistenziale (OSS)</label><textarea id="paiAssistenziale" rows="2" placeholder="Igiene, mobilizzazione, stimolo idratazione..."></textarea></div>
+            </div>
+
+            <!-- FIRME TOUCH MULTIDISCIPLINARI -->
+            <div class="card-tablet">
+                <h3>✍️ Firme Elettroniche Multidisciplinari P.A.I.</h3>
+                <div class="form-grid-3">
+                    <div style="background:#f0fdf4; border:1px solid #bbf7d0; padding:12px; border-radius:6px; text-align:center;">
+                        <strong style="color:#166534;">Medico Curante</strong>
+                        <div id="paiSigStatusMed" style="font-size:0.82em; margin:6px 0; color:var(--text-light);">⏳ In attesa</div>
+                        <button class="btn-tablet" style="background:#15803d; width:100%; font-size:0.85em; padding:8px;" onclick="window.avviaFirmaPai('Medico')">✍️ Firma Medico</button>
+                    </div>
+                    <div style="background:#f0f9ff; border:1px solid #bae6fd; padding:12px; border-radius:6px; text-align:center;">
+                        <strong style="color:#0369a1;">Infermiere</strong>
+                        <div id="paiSigStatusInf" style="font-size:0.82em; margin:6px 0; color:var(--text-light);">⏳ In attesa</div>
+                        <button class="btn-tablet" style="background:#0284c7; width:100%; font-size:0.85em; padding:8px;" onclick="window.avviaFirmaPai('Infermiere')">✍️ Firma Inf.</button>
+                    </div>
+                    <div style="background:#fffbeb; border:1px solid #fde68a; padding:12px; border-radius:6px; text-align:center;">
+                        <strong style="color:#b45309;">O.S.S.</strong>
+                        <div id="paiSigStatusOss" style="font-size:0.82em; margin:6px 0; color:var(--text-light);">⏳ In attesa</div>
+                        <button class="btn-tablet" style="background:#d97706; width:100%; font-size:0.85em; padding:8px;" onclick="window.avviaFirmaPai('OSS')">✍️️ Firma OSS</button>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-tablet btn-save-main" onclick="window.salvaFascicoloClinicoTablet()">💾 Salva Obiettivi & Date P.A.I.</button>
+        </div>
+
+    </div>
+
+    <!-- FIREBASE LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAc0fIlfds4Gne5m3qpH25uacK4NeR6TzM", 
+            authDomain: "gestione-visite-b445b.firebaseapp.com", 
+            projectId: "gestione-visite-b445b", 
+            storageBucket: "gestione-visite-b445b.firebasestorage.app", 
+            messagingSenderId: "720937824810", 
+            appId: "1:720937824810:web:b04b60d1d66bb8f4040953" 
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.dbOspiti = [];
+        window.dbClinica = {};
+        window.dbContenzioni = [];
+        window.currentBodyMarkers = [];
+        window.pendingSigRole = null;
+
+        window.activeOp = sessionStorage.getItem("activeOperator") || "Operatore";
+        window.activeQualifica = sessionStorage.getItem("activeQualifica") || "Operatore";
+        window.activeRole = sessionStorage.getItem("activeRole") || "user";
+        window.currentPatient = sessionStorage.getItem("globalSelectedPatient") || "";
+
+        window.showToast = (msg) => {
+            const t = document.getElementById('toast-tablet');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        };
+
+        window.getTimestamp = () => {
+            const n = new Date();
+            return `${n.toLocaleDateString('it-IT')} alle ${n.toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'})}`;
+        };
+
+        window.switchTab = (secId, btn) => {
+            document.querySelectorAll('.section-view').forEach(e => e.classList.remove('active'));
+            document.querySelectorAll('.sub-nav-tabs .tab-btn').forEach(e => e.classList.remove('active'));
+            document.getElementById('sec-' + secId).classList.add('active');
+            if(btn) btn.classList.add('active');
+        };
+
+        // GESTIONE CANVAS FIRMA PAI
+        const sigCanvas = document.getElementById('canvasPaiSig');
+        const sigCtx = sigCanvas.getContext('2d');
+        let isDrawing = false;
+
+        const getPos = (e) => {
+            const r = sigCanvas.getBoundingClientRect();
+            const cx = e.touches ? e.touches[0].clientX : e.clientX;
+            const cy = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: cx - r.left, y: cy - r.top };
+        };
+
+        sigCanvas.addEventListener('mousedown', (e) => { isDrawing = true; const p = getPos(e); sigCtx.beginPath(); sigCtx.moveTo(p.x, p.y); });
+        sigCanvas.addEventListener('mousemove', (e) => { if(!isDrawing) return; const p = getPos(e); sigCtx.lineTo(p.x, p.y); sigCtx.stroke(); });
+        window.addEventListener('mouseup', () => isDrawing = false);
+
+        sigCanvas.addEventListener('touchstart', (e) => { isDrawing = true; const p = getPos(e); sigCtx.beginPath(); sigCtx.moveTo(p.x, p.y); e.preventDefault(); }, {passive:false});
+        sigCanvas.addEventListener('touchmove', (e) => { if(!isDrawing) return; const p = getPos(e); sigCtx.lineTo(p.x, p.y); sigCtx.stroke(); e.preventDefault(); }, {passive:false});
+        sigCanvas.addEventListener('touchend', () => isDrawing = false);
+
+        window.clearSig = () => { sigCtx.clearRect(0,0,sigCanvas.width,sigCanvas.height); };
+
+        window.avviaFirmaPai = (ruolo) => {
+            window.pendingSigRole = ruolo;
+            document.getElementById('sigRoleTitle').innerText = `Firma P.A.I. - Ruolo: ${ruolo}`;
+            window.clearSig();
+            document.getElementById('sigModal').style.display = 'flex';
+        };
+
+        window.confirmPaiSig = async () => {
+            const ruolo = window.pendingSigRole;
+            const b64 = sigCanvas.toDataURL('image/png');
+            const n = window.currentPatient;
+            if(!n) return;
+
+            let d = window.dbClinica[n] || {};
+            const prefix = ruolo === 'Medico' ? 'paiFirmaMed' : (ruolo === 'Infermiere' ? 'paiFirmaInf' : 'paiFirmaOss');
+
+            d[prefix + 'Date'] = `${window.activeOp} il ${window.getTimestamp()}`;
+            d[prefix + 'B64'] = b64;
+
+            await setDoc(doc(db, "cartelle_cliniche", n), d, { merge: true });
+            document.getElementById('sigModal').style.display = 'none';
+            window.showToast(`✅ Firma ${ruolo} registrata!`);
+            window.caricaFascicoloPaziente();
+        };
+
+        // CALCOLO BMI AUTOMATICO
+        window.calcolaBmi = () => {
+            const h = parseFloat(document.getElementById('clinAltezza')?.value);
+            const p = parseFloat(document.getElementById('clinPeso')?.value);
+            const bmiInp = document.getElementById('clinBmi');
+            const statoSel = document.getElementById('clinStatoNutrizionale');
+
+            if(!h || !p || h <= 0 || p <= 0) {
+                if(bmiInp) bmiInp.value = '-';
+                return;
+            }
+            const bmi = (p / ((h/100) * (h/100))).toFixed(1);
+            if(bmiInp) bmiInp.value = bmi;
+
+            if(statoSel) {
+                if(bmi < 18.5) statoSel.value = "Sottopeso";
+                else if(bmi < 25) statoSel.value = "Normopeso";
+                else if(bmi < 30) statoSel.value = "Sovrappeso";
+                else if(bmi < 35) statoSel.value = "Obesità Grado I";
+                else statoSel.value = "Obesità Grave";
+            }
+        };
+
+        // CALCOLO B.I.N.A. UMBRIA
+        window.calcolaBINA = () => {
+            const v = (id) => parseFloat(document.getElementById(id)?.value) || 0;
+            const tot = v('binaAuto') + v('binaSanita') + v('binaPsiche') + v('binaSociale');
+            document.getElementById('binaScorePill').innerText = `${tot} / 40`;
+
+            let cls = "";
+            if(tot >= 25) cls = "🔴 Classe R1 - Alta Intensità (≥ 25)";
+            else if(tot >= 15) cls = "🟡 Classe R2 - Media Intensità (15 - 24.5)";
+            else cls = "🟢 Classe R3 - Bassa Intensità (< 15)";
+            document.getElementById('binaClassePill').innerText = cls;
+        };
+
+        // CALCOLO DATA PROSSIMA REVISIONE PAI (+6 MESI)
+        window.calcRevisionePai = () => {
+            const st = document.getElementById('paiDataStesura')?.value;
+            if(st) {
+                let dt = new Date(st);
+                dt.setMonth(dt.getMonth() + 6);
+                document.getElementById('paiDataRevisione').value = dt.toISOString().split('T')[0];
+            }
+        };
+
+        // MAPPA CORPO UMANO INTERATTIVA
+        window.handleBodyMapClick = (e) => {
+            const box = document.getElementById('bodyMapBox');
+            const rect = box.getBoundingClientRect();
+            const x = Math.round(((e.clientX - rect.left) / rect.width) * 1000) / 10;
+            const y = Math.round(((e.clientY - rect.top) / rect.height) * 1000) / 10;
+            const num = window.currentBodyMarkers.length + 1;
+            window.currentBodyMarkers.push({ x, y, n: num });
+            window.renderMarkers();
+        };
+
+        window.renderMarkers = () => {
+            const layer = document.getElementById('markersLayer');
+            layer.innerHTML = '';
+            window.currentBodyMarkers.forEach((m, idx) => {
+                const el = document.createElement('div');
+                el.className = 'body-marker-touch';
+                el.style.left = m.x + '%';
+                el.style.top = m.y + '%';
+                el.innerText = idx + 1;
+                el.onclick = (ev) => {
+                    ev.stopPropagation();
+                    window.currentBodyMarkers.splice(idx, 1);
+                    window.renderMarkers();
+                };
+                layer.appendChild(el);
+            });
+        };
+
+        window.clearMarkers = () => {
+            if(confirm("Rimuovere tutti i punti della mappa lesioni?")) {
+                window.currentBodyMarkers = [];
+                window.renderMarkers();
+            }
+        };
+
+        // FOTO LESIONI CON COMPRESSIONE
+        window.salvaFotoLesioneTablet = () => {
+            const n = window.currentPatient;
+            if(!n) return window.showToast("⚠️ Seleziona prima un paziente!");
+            const fileInput = document.getElementById('fotoLesioneFile');
+            const sede = document.getElementById('fotoSede').value.trim();
+            const stadio = document.getElementById('fotoStadio').value;
+            const med = document.getElementById('fotoMedicazione').value.trim();
+
+            if(!sede) return window.showToast("⚠️ Inserisci la sede anatomica!");
+            if(!fileInput.files || fileInput.files.length === 0) return window.showToast("⚠️ Scatta o seleziona la foto!");
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = async () => {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width, h = img.height;
+                    const maxDim = 600;
+                    if(w > maxDim || h > maxDim) {
+                        if(w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                        else { w = Math.round((w * maxDim) / h); h = maxDim; }
+                    }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    const b64 = canvas.toDataURL('image/jpeg', 0.65);
+
+                    let d = window.dbClinica[n] || {};
+                    if(!d.fotoLesioni) d.fotoLesioni = [];
+                    d.fotoLesioni.unshift({
+                        id: 'les_' + Date.now(),
+                        data: window.getTimestamp(),
+                        sede: sede,
+                        stadio: stadio,
+                        medicazione: med,
+                        imgBase64: b64,
+                        op: window.activeOp
+                    });
+
+                    await setDoc(doc(db, "cartelle_cliniche", n), d, { merge: true });
+                    fileInput.value = '';
+                    document.getElementById('fotoSede').value = '';
+                    document.getElementById('fotoMedicazione').value = '';
+                    window.showToast("📷 Foto lesione archiviata!");
+                    window.renderFotoGallery(d);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        };
+
+        window.renderFotoGallery = (d) => {
+            const box = document.getElementById('fotoGalleryBox');
+            const list = d.fotoLesioni || [];
+            box.innerHTML = list.length === 0 ? '<p style="color:#64748b;">Nessuna foto presente.</p>' : '';
+            list.forEach(f => {
+                box.innerHTML += `
+                    <div class="photo-card-touch">
+                        <img src="${f.imgBase64}">
+                        <strong>${f.sede}</strong><br>
+                        <small style="color:var(--danger);">${f.stadio}</small><br>
+                        <small style="color:#64748b;">${f.data.split(' alle ')[0]}</small>
+                    </div>`;
+            });
+        };
+
+        // CARICAMENTO FASCICOLO OSPITE
+        window.caricaFascicoloPaziente = () => {
+            const n = window.currentPatient;
+            if(!n) return;
+
+            const g = window.dbOspiti.find(x => x.name === n) || {};
+            const d = window.dbClinica[n] || {};
+
+            document.getElementById('patName').innerText = n;
+            document.getElementById('patMeta').innerText = `Camera: ${g.room || '-'} | CF: ${g.cf || '-'} | MMG: ${g.mmg || '-'}`;
+            document.getElementById('patAvatar').innerHTML = g.photo ? `<img src="${g.photo}">` : '👤';
+
+            let bHtml = '';
+            if(d.infezione) bHtml += `<span class="badge-alert alert-ica">☣ ${d.infezione}</span>`;
+            if(d.disfagia) bHtml += `<span class="badge-alert alert-disfagia">🥣 Disfagico</span>`;
+            if(window.dbContenzioni.some(c => c.ospite === n && c.stato === 'ATTIVA')) bHtml += `<span class="badge-alert alert-cont">🔒 Contenzione</span>`;
+            document.getElementById('patBadges').innerHTML = bHtml;
+
+            // Popola Campi
+            const sV = (id, v) => { if(document.getElementById(id)) document.getElementById(id).value = v || ""; };
+
+            sV('clinPatologieAttive', d.clinPatologieAttive);
+            sV('clinPatologiePregresse', d.clinPatologiePregresse);
+            sV('clinInterventiChirurgici', d.clinInterventiChirurgici);
+            sV('clinTraumi', d.clinTraumi);
+            sV('clinTerapiaIngresso', d.clinTerapiaIngresso);
+            sV('clinAllergie', d.clinAllergie);
+            sV('clinProtesi', d.clinProtesi);
+            sV('clinVaccinazioni', d.clinVaccinazioni);
+            sV('selInfezione', d.infezione);
+            document.getElementById('chkDisfagia').checked = !!d.disfagia;
+
+            sV('clinAltezza', d.clinAltezza);
+            sV('clinPeso', d.clinPeso);
+            sV('clinBmi', d.clinBmi);
+            sV('clinStatoNutrizionale', d.clinStatoNutrizionale);
+            sV('clinTipoCostituzionale', d.clinTipoCostituzionale);
+            sV('clinDecubito', d.clinDecubito);
+            sV('clinFacies', d.clinFacies);
+            sV('clinPsicheSensorio', d.clinPsicheSensorio);
+            sV('clinCuteMucose', d.clinCuteMucose);
+            sV('clinMasseMuscolari', d.clinMasseMuscolari);
+            sV('clinApparatoLocomotore', d.clinApparatoLocomotore);
+
+            sV('binaAuto', d.binaAuto);
+            sV('binaSanita', d.binaSanita);
+            sV('binaPsiche', d.binaPsiche);
+            sV('binaSociale', d.binaSociale);
+            window.calcolaBINA();
+
+            sV('vmdADL', d.vmdADL);
+            sV('vmdIADL', d.vmdIADL);
+            sV('vmdMMSE', d.vmdMMSE);
+            sV('vmdBraden', d.vmdBraden);
+            sV('vmdMorse', d.vmdMorse);
+
+            sV('paiDataStesura', d.paiDataStesura);
+            sV('paiDataRevisione', d.paiDataRevisione);
+            sV('paiMedico', d.paiMedico);
+            sV('paiInfermieristico', d.paiInfermieristico);
+            sV('paiAssistenziale', d.paiAssistenziale);
+
+            // Stato Firme PAI
+            const setSigUI = (prefix, elId) => {
+                const el = document.getElementById(elId);
+                if(d[prefix + 'Date']) el.innerHTML = `✅ ${d[prefix + 'Date']}`;
+                else el.innerHTML = `⏳ In attesa`;
+            };
+            setSigUI('paiFirmaMed', 'paiSigStatusMed');
+            setSigUI('paiFirmaInf', 'paiSigStatusInf');
+            setSigUI('paiFirmaOss', 'paiSigStatusOss');
+
+            window.currentBodyMarkers = d.chkMarkers ? [...d.chkMarkers] : [];
+            window.renderMarkers();
+            window.renderFotoGallery(d);
+        };
+
+        // SALVATAGGIO COMPLETO FASCICOLO
+        window.salvaFascicoloClinicoTablet = async () => {
+            const n = window.currentPatient;
+            if(!n) return window.showToast("⚠️️ Seleziona prima un paziente!");
+
+            let d = window.dbClinica[n] || {};
+            const gV = (id) => document.getElementById(id)?.value.trim() || "";
+
+            d.clinPatologieAttive = gV('clinPatologieAttive');
+            d.clinPatologiePregresse = gV('clinPatologiePregresse');
+            d.clinInterventiChirurgici = gV('clinInterventiChirurgici');
+            d.clinTraumi = gV('clinTraumi');
+            d.clinTerapiaIngresso = gV('clinTerapiaIngresso');
+            d.clinAllergie = gV('clinAllergie');
+            d.clinProtesi = gV('clinProtesi');
+            d.clinVaccinazioni = gV('clinVaccinazioni');
+            d.disfagia = document.getElementById('chkDisfagia').checked;
+            d.infezione = document.getElementById('selInfezione').value;
+
+            d.clinAltezza = gV('clinAltezza');
+            d.clinPeso = gV('clinPeso');
+            d.clinBmi = gV('clinBmi');
+            d.clinStatoNutrizionale = gV('clinStatoNutrizionale');
+            d.clinTipoCostituzionale = gV('clinTipoCostituzionale');
+            d.clinDecubito = gV('clinDecubito');
+            d.clinFacies = gV('clinFacies');
+            d.clinPsicheSensorio = gV('clinPsicheSensorio');
+            d.clinCuteMucose = gV('clinCuteMucose');
+            d.clinMasseMuscolari = gV('clinMasseMuscolari');
+            d.clinApparatoLocomotore = gV('clinApparatoLocomotore');
+
+            d.binaAuto = gV('binaAuto');
+            d.binaSanita = gV('binaSanita');
+            d.binaPsiche = gV('binaPsiche');
+            d.binaSociale = gV('binaSociale');
+
+            d.vmdADL = gV('vmdADL');
+            d.vmdIADL = gV('vmdIADL');
+            d.vmdMMSE = gV('vmdMMSE');
+            d.vmdBraden = gV('vmdBraden');
+            d.vmdMorse = gV('vmdMorse');
+
+            d.paiDataStesura = gV('paiDataStesura');
+            d.paiDataRevisione = gV('paiDataRevisione');
+            d.paiMedico = gV('paiMedico');
+            d.paiInfermieristico = gV('paiInfermieristico');
+            d.paiAssistenziale = gV('paiAssistenziale');
+
+            d.chkMarkers = window.currentBodyMarkers;
+
+            await setDoc(doc(db, "cartelle_cliniche", n), d, { merge: true });
+            window.showToast("💾 Fascicolo Clinico Aggiornato con Successo!");
+        };
+
+        // LISTENERS REALTIME FIRESTORE
+        onSnapshot(collection(db, "ospiti"), snap => {
+            window.dbOspiti = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            if(window.currentPatient) window.caricaFascicoloPaziente();
+        });
+
+        onSnapshot(collection(db, "cartelle_cliniche"), snap => {
+            window.dbClinica = {};
+            snap.forEach(d => { window.dbClinica[d.id] = d.data(); });
+            if(window.currentPatient) window.caricaFascicoloPaziente();
+        });
+
+        onSnapshot(collection(db, "contenzioni"), snap => {
+            window.dbContenzioni = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            if(window.currentPatient) window.caricaFascicoloPaziente();
+        });
+
+        window.onload = () => {
+            document.getElementById('badgeCurrentOp').innerText = `👤 ${window.activeOp} (${window.activeQualifica})`;
+            if(window.currentPatient) {
+                window.caricaFascicoloPaziente();
+            }
+        };
+    </script>
+</body>
+</html>

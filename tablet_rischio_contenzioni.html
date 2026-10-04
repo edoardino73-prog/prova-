@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NVS Masterpiece - Rischio Clinico & Contenzioni Tablet (10/11")</title>
+
+    <style>
+        :root {
+            --bg-body: #f1f5f9;
+            --surface: #ffffff;
+            --primary: #0d9488;
+            --primary-dark: #0f766e;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --danger: #e11d48;
+            --warning: #d97706;
+            --success: #059669;
+            --cont-color: #be123c;
+            --radius: 8px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0; padding: 0;
+            background: var(--bg-body);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        /* HEADER TOUCH */
+        .topbar {
+            background: var(--primary-dark);
+            color: #ffffff;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .topbar-brand { font-size: 1.15em; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .topbar-btns { display: flex; gap: 8px; align-items: center; }
+        .nav-btn {
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #ffffff;
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85em;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex; align-items: center;
+        }
+
+        /* LAYOUT SPLIT A DUE COLONNE */
+        .tablet-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* COLONNA SINISTRA: OSPITI */
+        .sidebar-guests {
+            width: 30%;
+            max-width: 340px;
+            min-width: 260px;
+            background: #ffffff;
+            border-right: 2px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .search-area {
+            padding: 10px 12px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+        }
+        .search-area input {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 0.95em;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+        }
+        .search-area input:focus { border-color: var(--primary); }
+
+        .guests-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .touch-guest-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+        .touch-guest-card.gender-m { border-left: 5px solid #0284c7; background: #f0f9ff; }
+        .touch-guest-card.gender-f { border-left: 5px solid #db2777; background: #fdf2f8; }
+        .touch-guest-card.active {
+            border-color: var(--primary);
+            background: #ccfbf1 !important;
+            box-shadow: 0 2px 6px rgba(13,148,136,0.25);
+            transform: scale(0.99);
+        }
+        .guest-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5em;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+        }
+        .guest-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .guest-info h4 { margin: 0; font-size: 0.95em; font-weight: 700; color: var(--text-dark); }
+        .guest-info small { color: var(--text-muted); font-size: 0.8em; }
+
+        /* COLONNA DESTRA: AREA OPERATIVA RISCHIO & CONTENZIONI */
+        .workspace-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+
+        .patient-banner {
+            background: #ffffff;
+            border-bottom: 2px solid var(--border);
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .pb-name { font-size: 1.15em; font-weight: 800; color: var(--primary-dark); }
+        .pb-sub { font-size: 0.85em; color: var(--text-muted); }
+
+        /* TABS VISTA */
+        .tab-bar {
+            display: flex;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px 8px;
+            border: none;
+            background: transparent;
+            font-size: 0.88em;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            text-align: center;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn.active {
+            color: var(--danger);
+            border-bottom-color: var(--danger);
+            background: #fff1f2;
+        }
+        .tab-btn.active.tab-rischio {
+            color: var(--warning);
+            border-bottom-color: var(--warning);
+            background: #fffbeb;
+        }
+
+        .tab-pane {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px;
+            display: none;
+        }
+        .tab-pane.active { display: block; }
+
+        /* CARDS */
+        .card-touch {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            margin-bottom: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .card-touch h4 { margin: 0 0 10px 0; font-size: 1em; color: var(--danger); display: flex; align-items: center; justify-content: space-between; }
+
+        .btn-full {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 800;
+            color: #ffffff;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .cont-card-item {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--danger);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+        .cont-card-item.revocata {
+            border-left-color: var(--text-muted);
+            background: #f8fafc;
+            opacity: 0.85;
+        }
+
+        .badge-status {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: 800;
+        }
+        .bs-attiva { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        .bs-revocata { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+
+        #toast-box {
+            position: fixed; bottom: 20px; right: 20px;
+            background: #0f172a; color: #ffffff;
+            padding: 10px 18px; border-radius: 6px; font-weight: 700;
+            z-index: 100000; opacity: 0; transition: opacity 0.2s; pointer-events: none;
+        }
+        #toast-box.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div id="toast-box"></div>
+
+    <!-- TOPBAR SUPERIORE -->
+    <div class="topbar">
+        <div class="topbar-brand">
+            <span>⚠️ NVS Tablet - Rischio Clinico & Contenzioni</span>
+            <small style="font-weight:normal; opacity:0.85;">[10/11"]</small>
+        </div>
+        <div class="topbar-btns">
+            <span id="badgeOpTop" style="font-weight:700; background:rgba(255,255,255,0.2); padding:5px 10px; border-radius:4px; font-size:0.85em;">👤 Op</span>
+            <button class="nav-btn" onclick="window.location.href='tablet_nvs.html'">📱 Carrello Giro</button>
+            <button class="nav-btn" onclick="window.location.href='tablet_diari.html'">📖 Diari Reparto</button>
+            <button class="nav-btn" onclick="window.location.href='index.html'">🏠 Home</button>
+        </div>
+    </div>
+
+    <div class="tablet-layout">
+        
+        <!-- PANE OSPITI -->
+        <div class="sidebar-guests">
+            <div class="search-area">
+                <input type="text" id="guestSearch" placeholder="🔍 Cerca paziente / stanza..." oninput="window.renderGuests()">
+            </div>
+            <div class="guests-scroll" id="guestList">Caricamento elenco...</div>
+        </div>
+
+        <!-- PANE OPERATIVO -->
+        <div class="workspace-main">
+            
+            <div class="patient-banner">
+                <div>
+                    <div class="pb-name" id="bannerGuestName">Nessun ospite selezionato</div>
+                    <div class="pb-sub" id="bannerGuestMeta">Tocca un ospite dall'elenco a sinistra</div>
+                </div>
+                <div id="bannerBadges" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+            </div>
+
+            <div class="tab-bar">
+                <button class="tab-btn active" onclick="window.switchTab('contenzioni', this)">🔒 Registro Contenzioni Fisiche</button>
+                <button class="tab-btn tab-rischio" onclick="window.switchTab('rischio', this)">⚠️️ Incident Reporting (Cadute & Eventi)</button>
+            </div>
+
+            <!-- TAB 1: CONTENZIONI FISICHE -->
+            <div id="pane-contenzioni" class="tab-pane active">
+                
+                <!-- BOX PRESCRIZIONE (MEDICO / INFERMIERE / ADMIN) -->
+                <div id="boxPrescriviCont" class="card-touch" style="border-top:4px solid var(--cont-color);">
+                    <h4 style="color:var(--cont-color);">🔒 Nuova Prescrizione di Contenzione Fisica</h4>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">Tipologia Presidio *</label>
+                            <select id="contTipo" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px; font-weight:bold;">
+                                <option value="Spondine letto bilaterali">Spondine letto bilaterali</option>
+                                <option value="Spondina singola">Spondina singola</option>
+                                <option value="Cintura pelvica carrozzina">Cintura pelvica carrozzina</option>
+                                <option value="Cintura pettorale">Cintura pettorale</option>
+                                <option value="Pettorina di contenimento">Pettorina di contenimento</option>
+                                <option value="Guanti / Manopole protettive">Guanti / Manopole protettive</option>
+                                <option value="Tavolino per carrozzina">Tavolino per carrozzina</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">Data Inizio *</label>
+                            <input type="date" id="contDataInizio" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px;">
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">Cadenza Controllo Cute & Postura</label>
+                            <select id="contCadenza" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px;">
+                                <option value="Ogni 2 ore">Ogni 2 ore (Standard di sicurezza)</option>
+                                <option value="Ad ogni turno">Ad ogni turno di servizio</option>
+                                <option value="Continuo">Monitoraggio continuo a vista</option>
+                            </select>
+                        </div>
+                        <div style="display:flex; align-items:center; padding-top:18px;">
+                            <label style="display:flex; align-items:center; gap:8px; font-weight:700; cursor:pointer;">
+                                <input type="checkbox" id="contConsenso" style="transform:scale(1.3); accent-color:var(--danger);">
+                                <span>Consenso Informato Acquisito (Famiglia/AdS)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:10px;">
+                        <label style="font-weight:700; font-size:0.85em;">Motivazione Clinica & Valutazione Rischio *</label>
+                        <input type="text" id="contMotivo" placeholder="Rischio cadute, agitazione psicomotoria, auto-rimozione presidi terapeutici..." style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px;">
+                    </div>
+
+                    <button class="btn-full" style="background:var(--cont-color);" onclick="window.salvaContenzione()">
+                        🔒 Prescrivi Contenzione Fisica
+                    </button>
+                </div>
+
+                <div id="warningOssCont" class="card-touch" style="display:none; background:#f8fafc; text-align:center; padding:15px;">
+                    <span style="font-weight:bold; color:var(--text-muted);">
+                        🔒 La prescrizione e revoca delle contenzioni è riservata a Medico o Infermiere. Consulta il registro sottostante per le scadenze e i controlli posturali.
+                    </span>
+                </div>
+
+                <!-- ELENCO PRESCRIZIONI ATTIVE E STORICO -->
+                <div class="card-touch">
+                    <h4>📋 Prescrizioni Registrate per l'Ospite</h4>
+                    <div id="contenzioniList">Seleziona un paziente.</div>
+                </div>
+            </div>
+
+            <!-- TAB 2: INCIDENT REPORTING -->
+            <div id="pane-rischio" class="tab-pane">
+                <div class="card-touch" style="border-top:4px solid var(--warning);">
+                    <h4 style="color:var(--warning);">⚠️ Nuova Segnalazione Evento Avverso / Incident Report</h4>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">Data Evento *</label>
+                            <input type="date" id="incData" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px;">
+                        </div>
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">Ora Evento *</label>
+                            <input type="time" id="incOra" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px;">
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">Tipologia Evento *</label>
+                            <select id="incTipo" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px; font-weight:bold;">
+                                <option value="Caduta senza danno apparente">Caduta accidentale (senza danno apparente)</option>
+                                <option value="Caduta con trauma/lesione">Caduta accidentale con lesione/trauma</option>
+                                <option value="Errore Terapia / Farmaco">Errore Terapia (somministrazione/orario)</option>
+                                <option value="Lesione cutanea acuta">Lesione cutanea acuta / ematoma</option>
+                                <option value="Smarrimento / Allontanamento">Smarrimento / Tentativo di allontanamento</option>
+                                <option value="Ingestione impropria / Soffocamento">Ingestione impropria / Rischio soffocamento</option>
+                                <option value="Aggressione / Conflitto">Aggressione / Conflitto verbale/fisico</option>
+                                <option value="Quasi Evento (Near Miss)">Quasi Evento (Near Miss - nessun danno)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">Luogo dell'Evento *</label>
+                            <select id="incLuogo" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px;">
+                                <option value="Camera da letto">Camera da letto</option>
+                                <option value="Bagno camera">Bagno camera</option>
+                                <option value="Corridoio / Reparto">Corridoio / Reparto</option>
+                                <option value="Sala da pranzo / Soggiorno">Sala da pranzo / Soggiorno</option>
+                                <option value="Giardino / Esterno">Giardino / Esterno</option>
+                                <option value="Altro locale">Altro locale</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap:10px; margin-bottom:10px;">
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">Gravità / Esito *</label>
+                            <select id="incGravita" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px; font-weight:bold;">
+                                <option value="Lieve">Lieve (Nessun danno / medicazione semplice)</option>
+                                <option value="Moderata">Moderata (Visita medica urgente / trauma medio)</option>
+                                <option value="Grave">Grave (Invio in Pronto Soccorso / 118)</option>
+                                <option value="Near Miss">Near Miss (Danno evitato)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-weight:700; font-size:0.85em;">Notifiche Immediate (Famiglia/MMG)</label>
+                            <input type="text" id="incNotifiche" placeholder="Es. Avvisato MMG ore 11:30 e Figlio" style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:10px;">
+                        <label style="font-weight:700; font-size:0.85em;">Dinamica Dettagliata dell'Evento *</label>
+                        <textarea id="incDinamica" rows="3" placeholder="Descrivi circostanze, fattori ambientali, ausili in uso e stato dell'ospite..." style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px; font-family:inherit;"></textarea>
+                    </div>
+
+                    <div style="margin-bottom:10px;">
+                        <label style="font-weight:700; font-size:0.85em;">Azioni Correttive Immediate Intraprese</label>
+                        <input type="text" id="incAzioni" placeholder="Parametri rilevati, ghiaccio, allertato medico di turno..." style="width:100%; padding:10px; border:2px solid var(--border); border-radius:6px;">
+                    </div>
+
+                    <button class="btn-full" style="background:var(--warning);" onclick="window.salvaIncidentReport()">
+                        ⚠️ Registra Incident Report nel Fascicolo
+                    </button>
+                </div>
+
+                <!-- STORICO SEGNALAZIONI RISCHIO -->
+                <div class="card-touch">
+                    <h4>📋 Registro Incidenti & Segnalazioni dell'Ospite</h4>
+                    <div id="rischioList">Seleziona un paziente.</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SCRIPT FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAc0fIlfds4Gne5m3qpH25uacK4NeR6TzM", 
+            authDomain: "gestione-visite-b445b.firebaseapp.com", 
+            projectId: "gestione-visite-b445b", 
+            storageBucket: "gestione-visite-b445b.firebasestorage.app", 
+            messagingSenderId: "720937824810", 
+            appId: "1:720937824810:web:b04b60d1d66bb8f4040953" 
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.dbOspiti = [];
+        window.dbClinica = {};
+        window.dbContenzioni = [];
+        window.dbRischio = [];
+
+        window.activeOp = sessionStorage.getItem("activeOperator") || "Operatore";
+        window.activeRole = sessionStorage.getItem("activeRole") || "user";
+        window.activeQualifica = sessionStorage.getItem("activeQualifica") || "Operatore";
+        window.currentPatient = sessionStorage.getItem("globalSelectedPatient") || "";
+
+        window.showToast = (msg) => {
+            const t = document.getElementById('toast-box');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        };
+
+        window.getTimestamp = () => {
+            const n = new Date();
+            return `${n.toLocaleDateString('it-IT')} alle ${n.toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'})}`;
+        };
+
+        window.getTodayString = () => {
+            const n = new Date();
+            return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
+        };
+
+        window.formatDateSafe = (d) => {
+            if(!d) return "-";
+            if(typeof d === 'string' && d.includes('-')) return d.split('-').reverse().join('/');
+            return d;
+        };
+
+        window.switchTab = (id, btn) => {
+            document.querySelectorAll('.tab-pane, .tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('pane-' + id).classList.add('active');
+            if(btn) btn.classList.add('active');
+        };
+
+        // GESTIONE PERMESSI RUOLI
+        window.aggiornaPermessi = () => {
+            document.getElementById('badgeOpTop').innerText = `👤 ${window.activeOp} (${window.activeQualifica})`;
+            const canPrescribeCont = (window.activeQualifica !== 'OSS' || window.activeRole === 'admin');
+
+            document.getElementById('boxPrescriviCont').style.display = canPrescribeCont ? 'block' : 'none';
+            document.getElementById('warningOssCont').style.display = canPrescribeCont ? 'none' : 'block';
+        };
+
+        // RENDERING OSPITI
+        window.renderGuests = () => {
+            const list = document.getElementById('guestList');
+            const search = (document.getElementById('guestSearch')?.value || '').toLowerCase();
+            list.innerHTML = '';
+
+            const attivi = window.dbOspiti
+                .filter(g => !g.decesso && !g.dimissione)
+                .sort((a,b) => a.name.localeCompare(b.name));
+
+            attivi.forEach(g => {
+                if(search && !g.name.toLowerCase().includes(search) && !(g.room||'').toLowerCase().includes(search)) return;
+
+                const isM = (g.sesso || '').toUpperCase() === 'M';
+                const isSelected = g.name === window.currentPatient;
+                const hasContAttiva = window.dbContenzioni.some(c => c.ospite === g.name && c.stato === 'ATTIVA');
+
+                const item = document.createElement('div');
+                item.className = `touch-guest-card ${isM ? 'gender-m' : 'gender-f'} ${isSelected ? 'active' : ''}`;
+                item.onclick = () => window.selezionaPaziente(g.name);
+                item.innerHTML = `
+                    <div class="guest-avatar">
+                        ${g.photo ? `<img src="${g.photo}">` : (isM ? '👤' : '🌸')}
+                    </div>
+                    <div class="guest-info" style="flex:1; overflow:hidden;">
+                        <h4>${g.name}</h4>
+                        <small>Stanza: <strong>${g.room || '-'}</strong></small>
+                        <div style="margin-top:3px;">
+                            ${hasContAttiva ? `<span style="background:#fee2e2; color:#991b1b; padding:1px 5px; border-radius:3px; font-weight:800; font-size:0.7em;">🔒 CONTENZIONE ATTIVA</span>` : ''}
+                        </div>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        };
+
+        window.selezionaPaziente = (n) => {
+            window.currentPatient = n;
+            sessionStorage.setItem("globalSelectedPatient", n);
+            window.renderGuests();
+            window.aggiornaDatiPaziente();
+        };
+
+        window.aggiornaDatiPaziente = () => {
+            const n = window.currentPatient;
+            if(!n) return;
+
+            const g = window.dbOspiti.find(x => x.name === n) || {};
+            const pD = window.dbClinica[n] || {};
+
+            document.getElementById('bannerGuestName').innerText = n;
+            document.getElementById('bannerGuestMeta').innerText = `Camera: ${g.room || '-'} | CF: ${g.cf || '-'}`;
+
+            let bHtml = '';
+            if(pD.infezione) bHtml += `<span style="background:#fee2e2; color:#991b1b; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:0.75em;">☣ ICA: ${pD.infezione}</span>`;
+            if(pD.disfagia) bHtml += `<span style="background:#fef3c7; color:#92400e; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:0.75em;">🥣 Disfagia</span>`;
+            
+            const contCount = window.dbContenzioni.filter(c => c.ospite === n && c.stato === 'ATTIVA').length;
+            if(contCount > 0) {
+                bHtml += `<span style="background:#fee2e2; color:#991b1b; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:0.75em;">🔒 ${contCount} Contenzioni Attive</span>`;
+            }
+
+            document.getElementById('bannerBadges').innerHTML = bHtml;
+
+            window.renderContenzioniPaziente();
+            window.renderRischioPaziente();
+        };
+
+        // GESTIONE CONTENZIONI FISICHE
+        window.salvaContenzione = async () => {
+            const o = window.currentPatient;
+            if(!o) return window.showToast("⚠️ Seleziona prima un paziente!");
+
+            const motivo = document.getElementById('contMotivo').value.trim();
+            if(!motivo) return window.showToast("⚠️ Inserisci la motivazione clinica della contenzione!");
+
+            await addDoc(collection(db, "contenzioni"), {
+                ospite: o,
+                tipo: document.getElementById('contTipo').value,
+                dataInizio: document.getElementById('contDataInizio').value || window.getTodayString(),
+                cadenza: document.getElementById('contCadenza').value,
+                motivo: motivo,
+                consenso: document.getElementById('contConsenso').checked,
+                stato: "ATTIVA",
+                opPrescrizione: window.activeOp,
+                ts: window.getTimestamp()
+            });
+
+            document.getElementById('contMotivo').value = '';
+            document.getElementById('contConsenso').checked = false;
+            window.showToast("🔒 Contenzione prescritta con successo!");
+            window.aggiornaDatiPaziente();
+        };
+
+        window.revocaContenzione = async (id, tipo) => {
+            if(window.activeQualifica === 'OSS' && window.activeRole !== 'admin') {
+                return window.showToast("🚫 Solo Medico o Infermiere possono revocare una contenzione");
+            }
+            if(!confirm(`Confermi la REVOCA della contenzione "${tipo}"?`)) return;
+
+            await updateDoc(doc(db, "contenzioni", id), {
+                stato: "REVOCATA",
+                dataFine: window.getTodayString(),
+                opRevoca: window.activeOp,
+                tsRevoca: window.getTimestamp()
+            });
+
+            window.showToast("🔓 Contenzione revocata!");
+            window.aggiornaDatiPaziente();
+        };
+
+        window.renderContenzioniPaziente = () => {
+            const container = document.getElementById('contenzioniList');
+            const n = window.currentPatient;
+            if(!n) {
+                container.innerHTML = '<p style="color:#64748b; margin:0;">Seleziona un paziente.</p>';
+                return;
+            }
+
+            const list = window.dbContenzioni.filter(c => c.ospite === n);
+            if(list.length === 0) {
+                container.innerHTML = '<p style="color:#64748b; margin:0;">Nessuna contenzione registrata per questo ospite.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            const canRevoke = (window.activeQualifica !== 'OSS' || window.activeRole === 'admin');
+
+            list.sort((a,b) => (b.dataInizio || '').localeCompare(a.dataInizio || '')).forEach(c => {
+                const isAttiva = c.stato === 'ATTIVA';
+                const statusBadge = isAttiva ? `<span class="badge-status bs-attiva">🔒 ATTIVA</span>` : `<span class="badge-status bs-revocata">REVOCATA</span>`;
+                
+                const revokeBtn = (isAttiva && canRevoke) ? `
+                    <button onclick="window.revocaContenzione('${c.id}', '${c.tipo}')" style="background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer;">
+                        🔓 Revoca Presidio
+                    </button>` : '';
+
+                container.innerHTML += `
+                    <div class="cont-card-item ${isAttiva ? '' : 'revocata'}">
+                        <div>
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                                <strong>${c.tipo}</strong> ${statusBadge}
+                            </div>
+                            <small style="color:var(--text-muted); display:block;">
+                                Inizio: <strong>${window.formatDateSafe(c.dataInizio)}</strong> | Controllo: <strong>${c.cadenza}</strong> | Consenso: <strong>${c.consenso ? 'Acquisito' : 'Non firmato'}</strong>
+                            </small>
+                            <small style="color:#0f172a; margin-top:2px; display:block;">
+                                <em>"${c.motivo}"</em> (Prescritta da ${c.opPrescrizione || '-'})
+                            </small>
+                            ${!isAttiva ? `<small style="color:var(--text-muted);">Revocata il ${window.formatDateSafe(c.dataFine)} da${c.opRevoca || '-'}</small>` : ''}
+                        </div>
+                        <div>${revokeBtn}</div>
+                    </div>`;
+            });
+        };
+
+        // GESTIONE INCIDENT REPORTING
+        window.salvaIncidentReport = async () => {
+            const o = window.currentPatient;
+            if(!o) return window.showToast("⚠️ Seleziona prima un paziente!");
+
+            const din = document.getElementById('incDinamica').value.trim();
+            if(!din) return window.showToast("⚠️ Descrivi la dinamica dettagliata dell'evento!");
+
+            await addDoc(collection(db, "rischio"), {
+                ospite: o,
+                data: document.getElementById('incData').value || window.getTodayString(),
+                ora: document.getElementById('incOra').value || '',
+                tipo: document.getElementById('incTipo').value,
+                luogo: document.getElementById('incLuogo').value,
+                gravita: document.getElementById('incGravita').value,
+                notifiche: document.getElementById('incNotifiche').value.trim(),
+                din: din,
+                azioni: document.getElementById('incAzioni').value.trim(),
+                op: window.activeOp,
+                ts: window.getTimestamp()
+            });
+
+            document.getElementById('incDinamica').value = '';
+            document.getElementById('incAzioni').value = '';
+            document.getElementById('incNotifiche').value = '';
+            window.showToast("⚠️ Incident Report registrato con successo!");
+            window.aggiornaDatiPaziente();
+        };
+
+        window.renderRischioPaziente = () => {
+            const container = document.getElementById('rischioList');
+            const n = window.currentPatient;
+            if(!n) {
+                container.innerHTML = '<p style="color:#64748b; margin:0;">Seleziona un paziente.</p>';
+                return;
+            }
+
+            const list = window.dbRischio.filter(r => r.ospite === n);
+            if(list.length === 0) {
+                container.innerHTML = '<p style="color:#64748b; margin:0;">Nessun evento o incidente segnalato per questo ospite.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            list.sort((a,b) => (b.data || '').localeCompare(a.data || '')).forEach(r => {
+                container.innerHTML += `
+                    <div style="background:#fff; border:1px solid var(--border); border-left:4px solid var(--warning); padding:10px 12px; border-radius:6px; margin-bottom:8px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                            <strong style="color:var(--text-dark);">${r.tipo}</strong>
+                            <span style="font-weight:bold; color:#b45309; font-size:0.85em;">Gravità: ${r.gravita}</span>
+                        </div>
+                        <small style="color:var(--text-muted); display:block;">
+                            📅 ${window.formatDateSafe(r.data)} ore ${r.ora || '-'} | Luogo: <strong>${r.luogo}</strong> | Segnalato da: <strong>${r.op}</strong>
+                        </small>
+                        <div style="font-size:0.9em; margin-top:4px; line-height:1.4;">
+                            ${r.din}
+                        </div>
+                        ${r.azioni ? `<small style="color:var(--success); font-weight:bold; display:block; margin-top:3px;">Azioni: ${r.azioni}</small>` : ''}
+                    </div>`;
+            });
+        };
+
+        // REAL-TIME FIRESTORE LISTENERS
+        onSnapshot(collection(db, "ospiti"), snap => {
+            window.dbOspiti = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            window.renderGuests();
+        });
+
+        onSnapshot(collection(db, "cartelle_cliniche"), snap => {
+            window.dbClinica = {};
+            snap.forEach(d => { window.dbClinica[d.id] = d.data(); });
+            if(window.currentPatient) window.aggiornaDatiPaziente();
+        });
+
+        onSnapshot(collection(db, "contenzioni"), snap => {
+            window.dbContenzioni = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            window.renderGuests();
+            if(window.currentPatient) window.aggiornaDatiPaziente();
+        });
+
+        onSnapshot(collection(db, "rischio"), snap => {
+            window.dbRischio = snap.docs.map(d=>({id:d.id, ...d.data()}));
+            if(window.currentPatient) window.aggiornaDatiPaziente();
+        });
+
+        window.onload = () => {
+            window.aggiornaPermessi();
+            document.getElementById('contDataInizio').value = window.getTodayString();
+            document.getElementById('incData').value = window.getTodayString();
+            document.getElementById('incOra').value = new Date().toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+
+            if(window.currentPatient) {
+                window.aggiornaDatiPaziente();
+            }
+        };
+    </script>
+</body>
+</html>

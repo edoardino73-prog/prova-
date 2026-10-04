@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Diario Clinico - NVS WardPad</title>
+    <title>Diario Clinico di Reparto - NVS WardPad</title>
 
     <style>
         :root {
@@ -13,8 +13,8 @@
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border: #e2e8f0;
-            --brand-med: #0284c7;     /* Azzurro per Medico */
-            --brand-inf: #0f766e;     /* Verde Ottanio per Infermiere */
+            --brand-med: #0284c7;     /* Azzurro Medico */
+            --brand-inf: #0f766e;     /* Verde Ottanio Infermiere */
             --success: #059669;
             --alert-red: #e11d48;
             --radius-md: 10px;
@@ -38,11 +38,16 @@
         .card-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 16px; }
         .card-title { margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--text-main); border-bottom: 1px solid var(--border); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* SELETTORE REGISTRO (MEDICO VS INFERMIERISTICO) */
+        /* SELETTORE REGISTRO CON BLOCCO RUOLI */
         .register-switch { display: flex; gap: 8px; background: #f1f5f9; padding: 4px; border-radius: var(--radius-md); }
-        .btn-switch { flex: 1; padding: 10px 8px; border: none; border-radius: 8px; font-weight: 800; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--text-muted); transition: all 0.15s; }
+        .btn-switch { flex: 1; padding: 10px 8px; border: none; border-radius: 8px; font-weight: 800; font-size: 0.88rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--text-muted); transition: all 0.15s; }
         .btn-switch.active-inf { background: #ffffff; color: var(--brand-inf); box-shadow: var(--shadow-sm); }
         .btn-switch.active-med { background: #ffffff; color: var(--brand-med); box-shadow: var(--shadow-sm); }
+        .btn-switch.locked { opacity: 0.45; cursor: not-allowed; text-decoration: line-through; }
+
+        .role-notice { font-size: 0.82rem; font-weight: 700; padding: 8px 12px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between; }
+        .role-notice.inf { background: #f0fdfa; color: var(--brand-inf); border: 1px solid #ccfbf1; }
+        .role-notice.med { background: #e0f2fe; color: var(--brand-med); border: 1px solid #bae6fd; }
 
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-group label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
@@ -58,7 +63,7 @@
 
         /* TIMELINE DIARIO */
         .filter-bar { display: flex; gap: 6px; margin-bottom: 8px; }
-        .btn-filter { flex: 1; padding: 6px; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); cursor: pointer; text-align: center; }
+        .btn-filter { flex: 1; padding: 7px; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); cursor: pointer; text-align: center; }
         .btn-filter.active { background: #0f172a; color: #fff; border-color: #0f172a; }
 
         .timeline-scroll { display: flex; flex-direction: column; gap: 12px; max-height: 520px; overflow-y: auto; padding-right: 4px; }
@@ -106,34 +111,42 @@
     <main class="main-container">
         <div class="content-wrapper">
 
-            <!-- 1. FORM REDAZIONE NOTA CLINICA -->
+            <!-- 1. FORM REDAZIONE NOTA CLINICA PROTETTA DA RUOLO -->
             <div class="card-box">
-                <h3 class="card-title">✍️ Nuova Registrazione Clinica</h3>
+                <h3 class="card-title">
+                    <span>✍️ Registrazione Clinica</span>
+                    <small id="lblAccessLevel" style="font-size:0.75rem; text-transform:none;"></small>
+                </h3>
 
-                <!-- Selettore Registro (Infermieristico vs Medico) -->
+                <!-- Switch Ruolo protetto -->
                 <div class="register-switch">
-                    <button type="button" class="btn-switch active-inf" id="btnSwitchInf" onclick="window.setRegisterType('Infermieristico')">
+                    <button type="button" class="btn-switch" id="btnSwitchInf" onclick="window.selezionaRegistro('Infermieristico')">
                         🩺 Diario Infermieristico
                     </button>
-                    <button type="button" class="btn-switch" id="btnSwitchMed" onclick="window.setRegisterType('Medico')">
+                    <button type="button" class="btn-switch" id="btnSwitchMed" onclick="window.selezionaRegistro('Medico')">
                         👨‍⚕️ Diario Medico
                     </button>
                 </div>
 
+                <div class="role-notice" id="roleNoticeBox">
+                    <span id="roleNoticeText">Verifica credenziali operatore...</span>
+                    <strong id="badgeOperatore">-</strong>
+                </div>
+
                 <div class="form-group">
-                    <label>Oggetto / Motivo della Visita</label>
+                    <label>Oggetto / Motivo</label>
                     <input type="text" id="entryTitle" class="touch-input" placeholder="Es. Valutazione clinica, medicazione, febbre, variazione terapia...">
                 </div>
 
                 <div class="form-group">
                     <label>Relazione Clinica / Obiettività</label>
-                    <textarea id="entryBody" class="touch-input" rows="5" placeholder="Descrizione dettagliata dell'esame obiettivo, sintomi, provvedimenti adottati, prescrizioni..."></textarea>
+                    <textarea id="entryBody" class="touch-input" rows="5" placeholder="Descrizione dell'esame obiettivo, sintomi, provvedimenti adottati, prescrizioni..."></textarea>
                 </div>
 
                 <!-- Box Firma Grafometrica Digitale -->
                 <div class="signature-box">
                     <div class="sig-header">
-                        <span>Apposizione Firma Operatore (<strong id="lblSignerName">Operatore</strong>)</span>
+                        <span>Firma e Timbro (<strong id="lblSignerName">Operatore</strong>)</span>
                         <button type="button" class="btn-clear-sig" onclick="window.clearSignature()">Pulisci Firma</button>
                     </div>
                     <div class="canvas-wrap">
@@ -142,17 +155,17 @@
                 </div>
             </div>
 
-            <!-- 2. TIMELINE STORICA REGISTRO CLINICO -->
+            <!-- 2. TIMELINE STORICA CONSULTABILE -->
             <div class="card-box">
                 <h3 class="card-title">
-                    <span>📑 Storico Diario Paziente</span>
+                    <span>📑 Fascicolo Storico Paziente</span>
                     <span id="entriesCount" style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">0 note</span>
                 </h3>
 
                 <div class="filter-bar">
-                    <div class="btn-filter active" onclick="window.filterTimeline('ALL', this)">Tutti</div>
-                    <div class="btn-filter" onclick="window.filterTimeline('Medico', this)">👨‍⚕️ Solo Medico</div>
-                    <div class="btn-filter" onclick="window.filterTimeline('Infermieristico', this)">🩺 Solo Infermiere</div>
+                    <div class="btn-filter active" onclick="window.filterTimeline('ALL', this)">Tutti i Diari</div>
+                    <div class="btn-filter" onclick="window.filterTimeline('Medico', this)">👨‍⚕️ Registro Medico</div>
+                    <div class="btn-filter" onclick="window.filterTimeline('Infermieristico', this)">🩺 Registro Infermiere</div>
                 </div>
 
                 <div class="timeline-scroll" id="timelineContainer">
@@ -168,7 +181,7 @@
     <div class="bottom-action-bar">
         <button class="btn-submit-entry" id="btnSalvaEntry" onclick="window.salvaNotaClinica()">
             <svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-            Firma & Archivia nel Fascicolo Clinico
+            Firma & Salva Registrazione
         </button>
     </div>
 
@@ -188,7 +201,7 @@
         const db = firebase.firestore();
 
         window.activeOperator = sessionStorage.getItem("activeOperator") || localStorage.getItem("activeOperator") || "Operatore";
-        window.activeQualifica = sessionStorage.getItem("activeQualifica") || localStorage.getItem("activeQualifica") || "Infermiere";
+        window.activeQualifica = (sessionStorage.getItem("activeQualifica") || localStorage.getItem("activeQualifica") || "Infermiere").trim();
 
         const urlParams = new URLSearchParams(window.location.search);
         window.targetPatient = (urlParams.get('ospite') || sessionStorage.getItem('globalSelectedPatient') || "").trim().toUpperCase();
@@ -199,10 +212,11 @@
             document.getElementById('headerPatientName').innerText = window.targetPatient;
         }
 
-        document.getElementById('lblSignerName').innerText = `${window.activeOperator} (${window.activeQualifica})`;
+        window.isMedico = window.activeQualifica.toLowerCase().includes('medico') || window.activeQualifica.toLowerCase().includes('sanitario') || window.activeQualifica.toLowerCase().includes('direttore');
+        window.isInfermiere = window.activeQualifica.toLowerCase().includes('infermiere') || window.activeQualifica.toLowerCase().includes('inf');
 
-        // Impostazione iniziale tipo registro in base al ruolo attivo
-        window.currentRegisterType = (window.activeQualifica.toLowerCase().includes('medico') || window.activeQualifica.toLowerCase().includes('sanitario')) ? 'Medico' : 'Infermieristico';
+        // Determinazione del registro assegnato
+        window.currentRegisterType = window.isMedico ? 'Medico' : 'Infermieristico';
 
         window.showToast = (m) => {
             const c = document.getElementById('toast-container');
@@ -211,6 +225,83 @@
             c.appendChild(t);
             setTimeout(() => t.classList.add('show'), 10);
             setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2200);
+        };
+
+        // APPLICAZIONE CONTROLLO ACCESSI SUI TAB
+        window.applicaPermessiRuolo = () => {
+            const btnInf = document.getElementById('btnSwitchInf');
+            const btnMed = document.getElementById('btnSwitchMed');
+            const noticeBox = document.getElementById('roleNoticeBox');
+            const noticeTxt = document.getElementById('roleNoticeText');
+            const badgeOp = document.getElementById('badgeOperatore');
+            const roleHeaderBadge = document.getElementById('roleHeaderBadge');
+            const btnSalva = document.getElementById('btnSalvaEntry');
+
+            badgeOp.innerText = `${window.activeOperator} (${window.activeQualifica})`;
+            document.getElementById('lblSignerName').innerText = `${window.activeOperator} [${window.activeQualifica}]`;
+
+            if (window.isMedico) {
+                // MEDICO / DIRETTORE SANITARIO
+                btnMed.className = 'btn-switch active-med';
+                btnInf.className = 'btn-switch'; // Il medico può redigere su entrambi o vidimare
+                noticeBox.className = 'role-notice med';
+                noticeTxt.innerText = "Accesso Medico / Direzione Sanitaria abilitato alla compilazione clinica";
+                roleHeaderBadge.innerText = "Profilo: Medico";
+                roleHeaderBadge.style.background = "#e0f2fe";
+                roleHeaderBadge.style.color = "var(--brand-med)";
+                btnSalva.style.background = "var(--brand-med)";
+                btnSalva.style.boxShadow = "0 4px 6px rgba(2, 132, 199, 0.2)";
+            } else if (window.isInfermiere) {
+                // INFERMIERE: Diario Medico BLOCCATO
+                btnInf.className = 'btn-switch active-inf';
+                btnMed.className = 'btn-switch locked';
+                btnMed.title = "Accesso riservato a Medico e Direttore Sanitario";
+                noticeBox.className = 'role-notice inf';
+                noticeTxt.innerText = "Profilo Infermieristico: Redazione abilitata su Diario Infermiere";
+                roleHeaderBadge.innerText = "Profilo: Infermiere";
+                roleHeaderBadge.style.background = "#f0fdfa";
+                roleHeaderBadge.style.color = "var(--brand-inf)";
+                btnSalva.style.background = "var(--brand-inf)";
+                btnSalva.style.boxShadow = "0 4px 6px rgba(15, 118, 110, 0.2)";
+            } else {
+                // OSS / ALTRI RUOLI
+                btnInf.className = 'btn-switch locked';
+                btnMed.className = 'btn-switch locked';
+                btnSalva.disabled = true;
+                btnSalva.innerText = "🔒 Consultazione in sola lettura (Usa Diario OSS per le consegne)";
+                btnSalva.style.opacity = "0.5";
+                noticeBox.className = 'role-notice';
+                noticeBox.style.background = "#fee2e2";
+                noticeBox.style.color = "var(--alert-red)";
+                noticeTxt.innerText = "Accesso redazione riservato esclusivamente a Medici e Infermieri.";
+            }
+        };
+
+        // CAMBIO REGISTRO CON CONTROLLO DI SICUREZZA
+        window.selezionaRegistro = (tipo) => {
+            if (tipo === 'Medico' && !window.isMedico) {
+                return window.showToast("⛔ Accesso negato: Il Diario Medico è riservato a Medici e Direttore Sanitario!");
+            }
+            if (tipo === 'Infermieristico' && !window.isInfermiere && !window.isMedico) {
+                return window.showToast("⛔ Accesso riservato al personale infermieristico!");
+            }
+
+            window.currentRegisterType = tipo;
+            const btnInf = document.getElementById('btnSwitchInf');
+            const btnMed = document.getElementById('btnSwitchMed');
+            const btnSalva = document.getElementById('btnSalvaEntry');
+
+            if (tipo === 'Medico') {
+                btnMed.className = 'btn-switch active-med';
+                btnInf.className = 'btn-switch';
+                btnSalva.style.background = 'var(--brand-med)';
+                btnSalva.style.boxShadow = '0 4px 6px rgba(2, 132, 199, 0.2)';
+            } else {
+                btnInf.className = 'btn-switch active-inf';
+                btnMed.className = window.isMedico ? 'btn-switch' : 'btn-switch locked';
+                btnSalva.style.background = 'var(--brand-inf)';
+                btnSalva.style.boxShadow = '0 4px 6px rgba(15, 118, 110, 0.2)';
+            }
         };
 
         // GESTIONE CANVAS TOUCH PER FIRMA GRAFOMETRICA
@@ -233,12 +324,9 @@
 
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
-            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-            return {
-                x: clientX - rect.left,
-                y: clientY - rect.top
-            };
+            const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0].clientY);
+            return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
         canvas.addEventListener('mousedown', (e) => { isDrawing = true; hasSigned = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
@@ -254,46 +342,22 @@
             hasSigned = false;
         };
 
-        // CAMBIO TIPO REGISTRO (INFERMIERE / MEDICO)
-        window.setRegisterType = (tipo) => {
-            window.currentRegisterType = tipo;
-            const btnInf = document.getElementById('btnSwitchInf');
-            const btnMed = document.getElementById('btnSwitchMed');
-            const btnSalva = document.getElementById('btnSalvaEntry');
-            const headerBadge = document.getElementById('roleHeaderBadge');
-
-            if (tipo === 'Medico') {
-                btnMed.className = 'btn-switch active-med';
-                btnInf.className = 'btn-switch';
-                btnSalva.style.background = 'var(--brand-med)';
-                btnSalva.style.boxShadow = '0 4px 6px rgba(2, 132, 199, 0.2)';
-                headerBadge.innerText = 'Diario Medico';
-                headerBadge.style.background = '#e0f2fe';
-                headerBadge.style.color = 'var(--brand-med)';
-            } else {
-                btnInf.className = 'btn-switch active-inf';
-                btnMed.className = 'btn-switch';
-                btnSalva.style.background = 'var(--brand-inf)';
-                btnSalva.style.boxShadow = '0 4px 6px rgba(15, 118, 110, 0.2)';
-                headerBadge.innerText = 'Diario Infermieristico';
-                headerBadge.style.background = '#f0fdfa';
-                headerBadge.style.color = 'var(--brand-inf)';
-            }
-        };
-
-        // SALVATAGGIO NOTA NEL DIARIO CLINICO CON FIRMA
+        // SALVATAGGIO CON VALIDAZIONE DI RUOLO
         window.salvaNotaClinica = async () => {
+            if (window.currentRegisterType === 'Medico' && !window.isMedico) {
+                return window.showToast("⛔ Permesso negato: solo i Medici possono firmare il Diario Medico.");
+            }
+
             const titleVal = document.getElementById('entryTitle').value.trim();
             const bodyVal = document.getElementById('entryBody').value.trim();
 
             if (!bodyVal) {
-                return window.showToast("⚠️ Inserisci la relazione clinica.");
+                return window.showToast("⚠️ Inserisci la relazione clinica prima di firmare.");
             }
 
             const signatureDataUrl = hasSigned ? canvas.toDataURL('image/png') : null;
             const now = new Date();
             const timeStr = `${now.toLocaleDateString('it-IT')} ore ${now.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'})}`;
-            
             const logNota = `${titleVal ? '[' + titleVal + '] ' : ''}${bodyVal}`;
 
             try {
@@ -311,20 +375,19 @@
                     ts: Date.now()
                 });
 
-                window.showToast("✅ Nota clinica registrata e firmata!");
+                window.showToast(`✅ ${window.currentRegisterType === 'Medico' ? 'Diario Medico' : 'Diario Infermieristico'} registrato e firmato!`);
 
-                // Reset campi
                 document.getElementById('entryTitle').value = '';
                 document.getElementById('entryBody').value = '';
                 window.clearSignature();
 
             } catch (e) {
-                console.error("Errore salvataggio diario clinico:", e);
+                console.error("Errore salvataggio diario:", e);
                 window.showToast("❌ Errore durante il salvataggio.");
             }
         };
 
-        // TIMELINE STORICA CON FILTRO
+        // TIMELINE CRONOLOGICA FILTRABILE
         let allEntries = [];
         let currentFilter = 'ALL';
 
@@ -357,7 +420,7 @@
                     <div class="timeline-item ${isMed ? 'med' : 'inf'}">
                         <div class="entry-top">
                             <span class="entry-badge ${isMed ? 'med' : 'inf'}">
-                                ${isMed ? '👨‍⚕️ Diario Medico' : '🩺 Diario Infermieristico'}
+                                ${isMed ? '👨‍⚕️ Diario Medico' : '🩺 Diario Infermiere'}
                             </span>
                             <span>${item.data}</span>
                         </div>
@@ -376,7 +439,7 @@
             });
         };
 
-        // ASCOLTO REALTIME DA FIRESTORE
+        // CARICAMENTO IN TEMPO REALE DA FIRESTORE
         const caricaDiario = () => {
             db.collection("diario_clinico")
               .where("ospite", "==", window.targetPatient)
@@ -393,7 +456,7 @@
               });
         };
 
-        window.setRegisterType(window.currentRegisterType);
+        window.applicaPermessiRuolo();
         caricaDiario();
     </script>
 </body>

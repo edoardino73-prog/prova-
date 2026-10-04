@@ -24,6 +24,7 @@
             --gender-female: #db2777;
             --gender-female-bg: #fdf2f8;
             --gender-female-border: #fbcfe8;
+            --haccp-green: #15803d;
             --radius-md: 10px;
             --radius-lg: 14px;
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
@@ -83,6 +84,10 @@
         .op-qual { color: var(--brand-primary); font-size: 0.75rem; text-transform: uppercase; display: block; font-weight: 800; }
         
         .btn-close-patient { background: #fee2e2; color: var(--accent-red); border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1rem; }
+
+        /* PULSANTE HACCP NELL'HEADER */
+        .btn-haccp-header { background: var(--haccp-green); color: #ffffff; padding: 8px 14px; border-radius: var(--radius-md); font-weight: 800; font-size: 0.85rem; text-decoration: none; display: none; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(21, 128, 61, 0.2); }
+        .btn-haccp-header:active { transform: scale(0.96); }
 
         .workspace-content { flex: 1; overflow-y: auto; padding: 20px; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 18px; }
 
@@ -150,6 +155,11 @@
             </div>
 
             <div style="display:flex; align-items:center; gap:12px;">
+                <!-- TASTO HACCP RISERVATO ESCLUSIVAMENTE A CUCINA E AMMINISTRAZIONE -->
+                <a href="tablet_haccp.html" class="btn-haccp-header" id="btnHaccpHeader" title="Registro Autocontrollo HACCP">
+                    🍽️ HACCP Cucina
+                </a>
+
                 <div class="operator-pill">
                     <div>
                         <span id="opNameHeader">OPERATORE</span>
@@ -184,7 +194,7 @@
             </div>
         </div>
 
-        <!-- ================= BOTTOM TAB BAR (AGGIORNATA) ================= -->
+        <!-- ================= BOTTOM TAB BAR (AGGIORNATA & RIPULITA) ================= -->
         <nav class="bottom-tab-bar">
             <!-- 1. HOME -->
             <button class="tab-item active" onclick="window.navTab('home')">
@@ -204,7 +214,7 @@
                 Vitali
             </button>
 
-            <!-- 4. CONSENSI & PRIVACY (SUBITO DOPO VITALI) -->
+            <!-- 4. CONSENSI & PRIVACY -->
             <button class="tab-item disabled" id="tabConsensi" onclick="window.navModo('consensi')">
                 <svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                 Consensi
@@ -223,13 +233,13 @@
             </button>
 
             <!-- 7. NOTE CLINICHE (MEDICO / INFERMIERE) -->
-            <button class="tab-item disabled" id="tabNote" onclick="window.navModo('note')">
+            <button class="tab-item disabled req-inf" id="tabNote" onclick="window.navModo('note')">
                 <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 Note Cliniche
             </button>
 
             <!-- 8. B.I.N.A. / P.A.I. -->
-            <button class="tab-item disabled" id="tabBinaPai" onclick="window.navModo('binapai')">
+            <button class="tab-item disabled req-inf" id="tabBinaPai" onclick="window.navModo('binapai')">
                 <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                 BINA/PAI
             </button>
@@ -255,7 +265,7 @@
         window.dbOspiti = [];
         window.dbClinica = {};
         window.activeOperator = sessionStorage.getItem("activeOperator") || localStorage.getItem("activeOperator");
-        window.activeQualifica = sessionStorage.getItem("activeQualifica") || localStorage.getItem("activeQualifica");
+        window.activeQualifica = (sessionStorage.getItem("activeQualifica") || localStorage.getItem("activeQualifica") || "Operatore").trim();
         window.selectedPatient = sessionStorage.getItem("globalSelectedPatient") || null;
 
         if(!window.activeOperator) {
@@ -282,32 +292,43 @@
 
         window.initUI = () => {
             document.getElementById('opNameHeader').innerText = window.activeOperator;
-            document.getElementById('opQualHeader').innerText = window.activeQualifica || 'Operatore';
+            document.getElementById('opQualHeader').innerText = window.activeQualifica;
 
-            if (['Infermiere', 'Medico', 'Direttore Sanitario'].includes(window.activeQualifica)) {
-                document.querySelectorAll('.req-inf').forEach(el => el.style.display = 'flex');
-            } else {
-                document.querySelectorAll('.req-inf').forEach(el => el.style.display = 'none');
+            // 1. GESTIONE VISIBILITÀ PULSANTE HACCP (Solo Cucina e Amministrazione)
+            const qualLower = window.activeQualifica.toLowerCase();
+            const ruoliHaccp = ['cuoco', 'cucina', 'amministrazione', 'amministratore', 'direttore', 'direttore sanitario'];
+            const isHaccpAllowed = ruoliHaccp.some(r => qualLower.includes(r));
+
+            const btnHaccp = document.getElementById('btnHaccpHeader');
+            if (btnHaccp) {
+                btnHaccp.style.display = isHaccpAllowed ? 'inline-flex' : 'none';
             }
+
+            // 2. GESTIONE RUOLI CLINICI (Infermieri / Medici vs OSS)
+            const ruoliClinici = ['infermiere', 'medico', 'direttore sanitario', 'direttore', 'sanitario'];
+            const isClinico = ruoliClinici.some(r => qualLower.includes(r));
+            document.querySelectorAll('.req-inf').forEach(el => {
+                el.style.display = isClinico ? 'flex' : 'none';
+            });
 
             if (window.selectedPatient) {
                 window.aggiornaBannerSelezionato(window.selectedPatient);
             }
         };
 
-        // Funzione ausiliaria per riconoscere il sesso (M / F)
+        // Funzione per riconoscere il genere (M / F) per i colori azzurro/rosa
         window.determinaGenere = (g) => {
             if (g.gender === 'M' || g.sesso === 'M' || g.gender === 'Maschile' || g.sesso === 'Maschile') return 'M';
             if (g.gender === 'F' || g.sesso === 'F' || g.gender === 'Femminile' || g.sesso === 'Femminile') return 'F';
             
-            // Deduci dal Codice Fiscale (giorno > 40 = Donna)
+            // Deduci dal Codice Fiscale (giorno di nascita > 40 per le donne)
             if (g.cf && g.cf.length === 16) {
                 const giorno = parseInt(g.cf.substr(9, 2), 10);
                 if (!isNaN(giorno)) {
                     return giorno > 40 ? 'F' : 'M';
                 }
             }
-            return 'M'; // default fallback
+            return 'M';
         };
 
         // RENDER DELLA LISTA OSPITI CON COLORI GENERE
@@ -327,7 +348,7 @@
                 const isSelected = window.selectedPatient === g.name ? 'selected' : '';
                 const pD = window.dbClinica[g.name] || {};
 
-                // Determinazione classe genere: 'male' (azzurro) o 'female' (rosa)
+                // Colore Genere: 'male' (azzurro) o 'female' (rosa)
                 const gender = window.determinaGenere(g);
                 const genderClass = gender === 'F' ? 'female' : 'male';
                 const genderLabel = gender === 'F' ? 'F' : 'M';
@@ -407,6 +428,7 @@
             document.querySelectorAll('.tab-item.disabled').forEach(t => t.classList.remove('disabled'));
         };
 
+        // NAVIGAZIONE AI MODULI FUNZIONALI
         window.navModo = (modo) => {
             if (!window.selectedPatient) {
                 return window.showToast("⚠️ Seleziona prima un paziente dall'elenco a sinistra!");
@@ -448,7 +470,7 @@
             }
         };
 
-        // ASCOLTO REALTIME DA FIRESTORE
+        // ASCOLTO IN TEMPO REALE DA FIRESTORE
         db.collection("ospiti").onSnapshot(snap => {
             window.dbOspiti = snap.docs.map(d => ({id: d.id, ...d.data()}));
             window.renderSidebarOspiti();

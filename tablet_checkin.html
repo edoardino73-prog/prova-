@@ -5,79 +5,117 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Check-in Cutaneo & Clinico - NVS WardPad</title>
+    <title>Check-in & Mappatura Lesioni - NVS WardPad</title>
 
     <style>
         :root {
-            --bg-body: #f8fafc;
+            --bg-body: #f1f5f9;
             --bg-card: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
-            --border: #e2e8f0;
+            --border: #cbd5e1;
             --brand-primary: #0f766e;
             --brand-secondary: #0284c7; 
-            --success: #16a34a;
-            --alert-amber: #f59e0b;
-            --alert-red: #ef4444;
-            --radius-md: 10px;
-            --radius-lg: 16px;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07);
+            --success: #059669;
+            --alert-red: #e11d48;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-body); margin: 0; padding: 0; color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        .app-header { background: #ffffff; color: var(--text-main); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); z-index: 10; flex-shrink: 0; }
-        .header-left { display: flex; align-items: center; gap: 14px; }
+        .app-header { background: #ffffff; color: var(--text-main); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); z-index: 10; flex-shrink: 0; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
         .back-btn { background: none; border: none; font-size: 1.15rem; color: var(--brand-primary); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 0; }
-        .patient-title { font-size: 1.15rem; font-weight: 800; text-transform: uppercase; color: var(--text-main); border-left: 2px solid var(--border); padding-left: 14px; }
+        .patient-title { font-size: 1.1rem; font-weight: 800; text-transform: uppercase; color: var(--text-main); border-left: 2px solid var(--border); padding-left: 12px; }
 
-        .main-container { flex: 1; overflow-y: auto; padding: 20px 24px; -webkit-overflow-scrolling: touch; display: flex; justify-content: center; }
-        .content-wrapper { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; }
+        .main-container { flex: 1; overflow-y: auto; padding: 18px 20px; -webkit-overflow-scrolling: touch; display: flex; justify-content: center; }
+        .content-wrapper { width: 100%; max-width: 1050px; display: flex; flex-direction: column; gap: 18px; padding-bottom: 40px; }
 
-        .checkin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 900px) { .checkin-grid { grid-template-columns: 1fr; } }
+        .checkin-grid { display: grid; grid-template-columns: 420px 1fr; gap: 20px; align-items: start; }
+        @media (max-width: 860px) { .checkin-grid { grid-template-columns: 1fr; } }
 
-        .card-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 22px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between; }
-        .card-title { margin: 0 0 16px 0; font-size: 1.05rem; font-weight: 800; color: var(--brand-primary); border-bottom: 1px solid var(--border); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 0.5px; }
+        .card-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); }
+        .card-title { margin: 0 0 14px 0; font-size: 1.05rem; font-weight: 800; color: var(--brand-primary); border-bottom: 1px solid var(--border); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* BODY MAP WRAPPER */
-        .body-map-container { display: flex; justify-content: space-around; align-items: center; background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 10px; min-height: 380px; }
-        .body-figure { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 48%; }
-        .figure-label { font-size: 0.8rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        /* BODY MAP IDENTICA ALLA CARTELLA CLINICA */
+        .body-map-frame {
+            position: relative;
+            width: 100%;
+            max-width: 380px;
+            margin: 0 auto;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            background: #ffffff;
+            overflow: hidden;
+            user-select: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .body-map-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            pointer-events: none;
+        }
+        .body-map-click-surface {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
 
-        /* BODY SVG STYLES */
-        .body-svg { width: 100%; max-width: 170px; height: 320px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.04)); }
-        .body-zone { fill: #e2e8f0; stroke: #94a3b8; stroke-width: 1.5; cursor: pointer; transition: all 0.2s ease; }
-        .body-zone:hover { fill: #cbd5e1; }
-        .body-zone.active { fill: var(--brand-secondary) !important; stroke: #0369a1; }
-        .body-zone.alert-lesion { fill: #fca5a5 !important; stroke: var(--alert-red); }
+        /* MARKER LESIONE / PIAGA */
+        .body-marker {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background-color: var(--alert-red);
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            z-index: 20;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            animation: popIn 0.2s ease-out;
+        }
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            80% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
 
-        .selected-zone-badge { background: #e0f2fe; color: var(--brand-secondary); border: 1px solid #bae6fd; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; margin-top: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .map-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .btn-clear-points { background: #fee2e2; color: var(--alert-red); border: 1px solid #fecdd3; padding: 8px 14px; border-radius: var(--radius-md); font-weight: 700; font-size: 0.85rem; cursor: pointer; }
+        .btn-clear-points:active { background: #fca5a5; }
 
-        /* FORM CONTROLS */
+        /* FORM CLINICO */
         .form-group { margin-bottom: 14px; }
         .form-group label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; }
-        .touch-input { background: #f8fafc; border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 12px 14px; font-size: 1rem; color: var(--text-main); outline: none; width: 100%; font-weight: 600; }
+        .touch-input { background: #f8fafc; border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 12px; font-size: 0.95rem; color: var(--text-main); outline: none; width: 100%; font-weight: 600; font-family: inherit; }
         .touch-input:focus { border-color: var(--brand-primary); background: #ffffff; }
 
-        .chip-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
-        .chip { background: #f1f5f9; border: 1px solid var(--border); padding: 8px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); cursor: pointer; user-select: none; transition: all 0.15s; }
-        .chip.active { background: #f0fdfa; border-color: var(--brand-primary); color: var(--brand-primary); box-shadow: 0 0 0 1px var(--brand-primary); }
-
-        .bottom-action-bar { position: sticky; bottom: 0; background: #ffffff; padding: 14px 24px; border-top: 1px solid var(--border); box-shadow: 0 -4px 10px rgba(0,0,0,0.04); display: flex; justify-content: center; z-index: 20; }
-        .btn-save { background: var(--success); color: #fff; border: none; padding: 16px 28px; border-radius: var(--radius-lg); font-size: 1.15rem; font-weight: 700; width: 100%; max-width: 1100px; cursor: pointer; box-shadow: 0 4px 6px rgba(22, 163, 74, 0.2); }
-        .btn-save:active { transform: scale(0.98); }
+        .bottom-action-bar { position: sticky; bottom: 0; background: #ffffff; padding: 14px 20px; border-top: 1px solid var(--border); box-shadow: 0 -4px 10px rgba(0,0,0,0.04); display: flex; justify-content: center; z-index: 20; }
+        .btn-save-checkin { background: var(--success); color: #fff; border: none; padding: 16px 28px; border-radius: var(--radius-lg); font-size: 1.15rem; font-weight: 700; width: 100%; max-width: 1050px; cursor: pointer; box-shadow: 0 4px 6px rgba(5, 150, 105, 0.2); }
+        .btn-save-checkin:active { transform: scale(0.98); }
 
         #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 50000; }
-        .toast { background: #1e293b; color: #fff; padding: 14px 24px; border-radius: 30px; font-size: 1rem; font-weight: 500; opacity: 0; transition: opacity 0.3s; box-shadow: var(--shadow-md); text-align: center; }
+        .toast { background: #1e293b; color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 0.95rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; box-shadow: var(--shadow-sm); text-align: center; }
         .toast.show { opacity: 1; }
 
         .svg-icon { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     </style>
 
-    <!-- FIREBASE COMPAT SDK -->
+    <!-- FIREBASE COMPAT SDK (FUNZIONA OVUNQUE) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
@@ -92,7 +130,7 @@
             <div class="patient-title" id="headerPatientName">Caricamento...</div>
         </div>
         <div style="font-size:0.85rem; font-weight:700; color:var(--brand-primary); background:#f0fdfa; padding:6px 14px; border-radius:20px; border:1px solid #ccfbf1;">
-            Rivalutazione Point-of-Care
+            Check-in e Mappatura Lesioni
         </div>
     </header>
 
@@ -101,117 +139,60 @@
 
             <div class="checkin-grid">
 
-                <!-- 1. MAPPA CORPOREA VISIVA (BODY MAP) -->
+                <!-- 1. MAPPA CORPOREA IDENTICA AL DESKTOP -->
                 <div class="card-box">
-                    <div>
-                        <h3 class="card-title">
-                            <span>🧍 Ispezione Cutanea Interattiva</span>
-                            <small style="font-size:0.75rem; color:var(--text-muted);">Tocca una zona</small>
-                        </h3>
+                    <h3 class="card-title">
+                        <span>🧍 Mappa Anatomica Lesioni</span>
+                        <small style="font-size:0.75rem; color:var(--text-muted); font-weight:bold;">Tocca per segnare</small>
+                    </h3>
 
-                        <div class="body-map-container">
-                            <!-- SAGOMA ANTERIORE -->
-                            <div class="body-figure">
-                                <span class="figure-label">Fronte</span>
-                                <svg class="body-svg" viewBox="0 0 100 200">
-                                    <!-- Testa -->
-                                    <circle id="zone_head_front" class="body-zone" cx="50" cy="18" r="14" onclick="window.selectZone('Testa / Viso (Fronte)')"></circle>
-                                    <!-- Tronco Torace / Addome -->
-                                    <path id="zone_chest_front" class="body-zone" d="M34,35 L66,35 L62,95 L38,95 Z" onclick="window.selectZone('Torace & Addome')"></path>
-                                    <!-- Braccio Sinistro -->
-                                    <path id="zone_arm_left_front" class="body-zone" d="M30,38 L20,95 L26,97 L34,42 Z" onclick="window.selectZone('Arto Superiore Dx')"></path>
-                                    <!-- Braccio Destro -->
-                                    <path id="zone_arm_right_front" class="body-zone" d="M70,38 L80,95 L74,97 L66,42 Z" onclick="window.selectZone('Arto Superiore Sn')"></path>
-                                    <!-- Gamba Sinistra -->
-                                    <path id="zone_leg_left_front" class="body-zone" d="M38,98 L48,98 L45,175 L35,175 Z" onclick="window.selectZone('Arto Inferiore Dx')"></path>
-                                    <!-- Gamba Destra -->
-                                    <path id="zone_leg_right_front" class="body-zone" d="M52,98 L62,98 L65,175 L55,175 Z" onclick="window.selectZone('Arto Inferiore Sn')"></path>
-                                    <!-- Piedi Anteriore -->
-                                    <rect id="zone_feet_front" class="body-zone" x="33" y="177" width="34" height="12" rx="4" onclick="window.selectZone('Piedi / Dita')"></rect>
-                                </svg>
-                            </div>
-
-                            <!-- SAGOMA POSTERIORE -->
-                            <div class="body-figure">
-                                <span class="figure-label">Retro (Decubiti)</span>
-                                <svg class="body-svg" viewBox="0 0 100 200">
-                                    <!-- Nuca / Collo -->
-                                    <circle id="zone_head_back" class="body-zone" cx="50" cy="18" r="14" onclick="window.selectZone('Nuca & Rachide Cervicale')"></circle>
-                                    <!-- Dorso Superiore -->
-                                    <path id="zone_back_top" class="body-zone" d="M34,35 L66,35 L64,68 L36,68 Z" onclick="window.selectZone('Dorso & Scapole')"></path>
-                                    <!-- Zona Sacro / Glutei (Critica decubito) -->
-                                    <path id="zone_sacrum_back" class="body-zone" d="M36,70 L64,70 L62,96 L38,96 Z" onclick="window.selectZone('Zona Sacrale & Glutei')"></path>
-                                    <!-- Braccia Posteriori -->
-                                    <path id="zone_arm_left_back" class="body-zone" d="M30,38 L20,95 L26,97 L34,42 Z" onclick="window.selectZone('Gomito & Arto Sup. Dx')"></path>
-                                    <path id="zone_arm_right_back" class="body-zone" d="M70,38 L80,95 L74,97 L66,42 Z" onclick="window.selectZone('Gomito & Arto Sup. Sn')"></path>
-                                    <!-- Gambe Posteriori -->
-                                    <path id="zone_leg_left_back" class="body-zone" d="M38,98 L48,98 L45,168 L35,168 Z" onclick="window.selectZone('Cavo Popliteo & Polpaccio Dx')"></path>
-                                    <path id="zone_leg_right_back" class="body-zone" d="M52,98 L62,98 L65,168 L55,168 Z" onclick="window.selectZone('Cavo Popliteo & Polpaccio Sn')"></path>
-                                    <!-- Talloni (Punto critico) -->
-                                    <ellipse id="zone_heels_back" class="body-zone alert-lesion" cx="50" cy="178" rx="18" ry="7" onclick="window.selectZone('Talloni (Zona ad Alto Rischio)')"></ellipse>
-                                </svg>
-                            </div>
-                        </div>
-
-                        <div class="selected-zone-badge">
-                            <span>Sito Selezionato:</span>
-                            <strong id="labelSelectedZone">Zona Sacrale & Glutei</strong>
-                        </div>
+                    <div class="body-map-frame" id="bodyMapWrapper">
+                        <img src="corpo_umano.png" alt="Mappa Corpo Umano Fronte Retro" class="body-map-img" id="bodyImgRef">
+                        <div class="body-map-click-surface" id="bodyMapClickSurface" onclick="window.handleBodyMapClick(event)"></div>
+                        <div id="bodyMarkersLayer"></div>
                     </div>
 
-                    <div style="margin-top:14px;">
-                        <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Stato Cutaneo Rilevato:</label>
-                        <div class="chip-group">
-                            <span class="chip active" onclick="window.setStatoCute('Cute Integra', this)">Cute Integra</span>
-                            <span class="chip" onclick="window.setStatoCute('Iperemia / Arrossamento', this)">Iperemia</span>
-                            <span class="chip" onclick="window.setStatoCute('Lesione Stadio I-II', this)">Lesione Grado I-II</span>
-                            <span class="chip" onclick="window.setStatoCute('Medicazione Attiva', this)">Medicazione Attiva</span>
-                        </div>
+                    <div class="map-actions">
+                        <span id="markersCountLabel" style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">0 punti segnati</span>
+                        <button type="button" class="btn-clear-points" onclick="window.clearBodyMarkers()">🗑 Cancella Punti</button>
                     </div>
                 </div>
 
-                <!-- 2. CHECK-IN CLINICO & EVOLUTIVO -->
+                <!-- 2. CAMPI CLINICI IDENTICI A CARTELLA_CLINICA.HTML -->
                 <div class="card-box">
-                    <div>
-                        <h3 class="card-title">
-                            <span>📋 Esito Rivalutazione Periodica</span>
-                            <span style="font-size:0.75rem; color:var(--text-muted);">Trimestrale</span>
-                        </h3>
+                    <h3 class="card-title">
+                        <span>📋 Dati Clinici di Reparto</span>
+                        <span id="lastCheckinDateBadge" style="font-size:0.75rem; color:var(--text-muted);">Data: Oggi</span>
+                    </h3>
 
-                        <div class="form-group">
-                            <label>Data Rivalutazione</label>
-                            <input type="date" id="checkinData" class="touch-input">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Andamento Evolutivo Globale</label>
-                            <select id="checkinEsito" class="touch-input">
-                                <option value="Stabile / Condizioni Cliniche Invariate">Stabile / Condizioni Cliniche Invariate</option>
-                                <option value="Miglioramento Globale">Miglioramento Globale</option>
-                                <option value="Rallentamento Funzionale / Monitoraggio">Rallentamento Funzionale / Monitoraggio</option>
-                                <option value="Peggioramento / Necessaria rivalutazione medica">Peggioramento / Necessaria rivalutazione medica</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Presidi Antidecubito in Uso</label>
-                            <select id="checkinPresidi" class="touch-input">
-                                <option value="Materasso a Pressione Alternata (Attivo)">Materasso a Pressione Alternata (Attivo)</option>
-                                <option value="Materasso Viscoelastico / Statico">Materasso Viscoelastico / Statico</option>
-                                <option value="Cuscino Sagomato per Carrozzina">Cuscino Sagomato per Carrozzina</option>
-                                <option value="Nessun Presidio Particolare">Nessun Presidio Particolare</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Note e Provvedimenti Assistenziali al Letto</label>
-                            <textarea id="checkinNote" class="touch-input" rows="4" placeholder="Annota osservazioni cliniche, idratazione cutanea, cambi posturali programmati..."></textarea>
-                        </div>
+                    <div class="form-group">
+                        <label>Data Valutazione / Check-in</label>
+                        <input type="date" id="chkData" class="touch-input">
                     </div>
 
-                    <div style="background:#f1f5f9; padding:10px 14px; border-radius:var(--radius-md); font-size:0.8rem; color:var(--text-muted); display:flex; justify-content:space-between;">
-                        <span>Operatore Incaricato:</span>
-                        <strong id="labelOperatorBadge" style="color:var(--text-main);">-</strong>
+                    <div class="form-group">
+                        <label>Condizioni Generali all'Arrivo / di Reparto</label>
+                        <textarea id="chkGen" class="touch-input" rows="3" placeholder="Descrizione delle condizioni generali, nutrizione, mobilità, orientamento..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Dettaglio Piaghe / Lesioni / Cute</label>
+                        <textarea id="chkPiaghe" class="touch-input" rows="3" placeholder="Sede, stadio, stato della lesione da decubito, medicazioni in atto..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Esito Evolutivo / Note di Controllo</label>
+                        <select id="chkEsito" class="touch-input">
+                            <option value="Stabile / Cute Integra">Stabile / Cute Integra</option>
+                            <option value="Lesione in miglioramento / Detersione">Lesione in miglioramento / Detersione</option>
+                            <option value="Nuova lesione rilevata / Avviato protocollo">Nuova lesione rilevata / Avviato protocollo</option>
+                            <option value="Peggioramento / Necessaria rivalutazione medica">Peggioramento / Necessaria rivalutazione medica</option>
+                        </select>
+                    </div>
+
+                    <div style="background:#f8fafc; padding:10px 14px; border-radius:var(--radius-md); font-size:0.85rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; border:1px solid var(--border);">
+                        <span>Operatore Registrazione:</span>
+                        <strong id="labelOperatorBadge" style="color:var(--brand-primary);">-</strong>
                     </div>
                 </div>
 
@@ -221,7 +202,7 @@
     </main>
 
     <div class="bottom-action-bar">
-        <button class="btn-save" onclick="window.salvaCheckin()">💾 Registra Ispezione Cutanea & Check-in Clinico</button>
+        <button class="btn-save-checkin" onclick="window.saveClinicalData()">💾 Salva Check-in e Mappatura Lesioni</button>
     </div>
 
     <script>
@@ -250,11 +231,10 @@
         } else {
             document.getElementById('headerPatientName').innerText = window.targetPatient;
             const n = new Date();
-            document.getElementById('checkinData').value = `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
+            document.getElementById('chkData').value = `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
         }
 
-        window.selectedZoneName = "Zona Sacrale & Glutei";
-        window.selectedCuteStatus = "Cute Integra";
+        window.currentMarkers = [];
 
         window.showToast = (m) => {
             const c = document.getElementById('toast-container');
@@ -265,77 +245,128 @@
             setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2200);
         };
 
-        // SELEZIONE ZONA DEL CORPO
-        window.selectZone = (zoneName) => {
-            window.selectedZoneName = zoneName;
-            document.getElementById('labelSelectedZone').innerText = zoneName;
-            
-            document.querySelectorAll('.body-zone').forEach(el => el.classList.remove('active'));
-            if (event && event.target) {
-                event.target.classList.add('active');
+        // GESTIONE CLICK E TOCCO SULLA MAPPA ANATOMICA
+        window.handleBodyMapClick = (e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+            const x = ((clientX - rect.left) / rect.width) * 100;
+            const y = ((clientY - rect.top) / rect.height) * 100;
+
+            const marker = {
+                id: 'm_' + Date.now(),
+                x: Math.round(x * 10) / 10,
+                y: Math.round(y * 10) / 10
+            };
+
+            window.currentMarkers.push(marker);
+            window.renderMarkers();
+            window.showToast("Punto lesione aggiunto!");
+        };
+
+        window.renderMarkers = () => {
+            const layer = document.getElementById('bodyMarkersLayer');
+            layer.innerHTML = '';
+
+            window.currentMarkers.forEach((m, idx) => {
+                const dot = document.createElement('div');
+                dot.className = 'body-marker';
+                dot.style.left = m.x + '%';
+                dot.style.top = m.y + '%';
+                dot.innerText = idx + 1;
+                dot.title = `Punto #${idx + 1} (Tocca per rimuovere)`;
+
+                dot.onclick = (evt) => {
+                    evt.stopPropagation();
+                    window.currentMarkers = window.currentMarkers.filter(item => item.id !== m.id);
+                    window.renderMarkers();
+                    window.showToast("Punto rimosso.");
+                };
+
+                layer.appendChild(dot);
+            });
+
+            document.getElementById('markersCountLabel').innerText = `${window.currentMarkers.length} punti segnati`;
+        };
+
+        window.clearBodyMarkers = () => {
+            if (window.currentMarkers.length === 0) return;
+            if (confirm("Cancellare tutti i punti segnati sulla mappa corporea?")) {
+                window.currentMarkers = [];
+                window.renderMarkers();
+                window.showToast("Mappa ripulita.");
             }
-            window.showToast(`Selezionato: ${zoneName}`);
         };
 
-        // STATO CUTE CHIP
-        window.setStatoCute = (status, el) => {
-            window.selectedCuteStatus = status;
-            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
+        // CARICAMENTO DATI ESISTENTI DALLA CARTELLA CLINICA
+        const caricaDatiCheckin = () => {
+            db.collection("cartelle_cliniche").doc(window.targetPatient).onSnapshot(docSnap => {
+                if (docSnap.exists) {
+                    const data = docSnap.data();
+
+                    if (data.chkGen) document.getElementById('chkGen').value = data.chkGen;
+                    if (data.chkPiaghe) document.getElementById('chkPiaghe').value = data.chkPiaghe;
+                    if (data.checkinEsito) document.getElementById('chkEsito').value = data.checkinEsito;
+                    if (data.checkinDataUltima) {
+                        document.getElementById('chkData').value = data.checkinDataUltima;
+                        document.getElementById('lastCheckinDateBadge').innerText = `Ultimo: ${data.checkinDataUltima}`;
+                    }
+
+                    // Caricamento dei punti anatomici salvati (array bodyMarkers compatibile col desktop)
+                    if (Array.isArray(data.bodyMarkers)) {
+                        window.currentMarkers = data.bodyMarkers;
+                        window.renderMarkers();
+                    }
+                }
+            });
         };
 
-        // SALVATAGGIO CHECK-IN INTEGRATO
-        window.salvaCheckin = async () => {
-            const dataVal = document.getElementById('checkinData').value;
-            const esitoVal = document.getElementById('checkinEsito').value;
-            const presidiVal = document.getElementById('checkinPresidi').value;
-            const noteVal = document.getElementById('checkinNote').value.trim();
+        // SALVATAGGIO ALLINEATO A CARTELLA_CLINICA.HTML E DIARIO
+        window.saveClinicalData = async () => {
+            const dataVal = document.getElementById('chkData').value;
+            const genVal = document.getElementById('chkGen').value.trim();
+            const piagheVal = document.getElementById('chkPiaghe').value.trim();
+            const esitoVal = document.getElementById('chkEsito').value;
 
             const timeStr = `${new Date().toLocaleDateString('it-IT')} ore ${new Date().toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'})}`;
-            
-            const logNota = `Check-in Clinico ➔ Esito: ${esitoVal} | Cute: ${window.selectedZoneName} (${window.selectedCuteStatus}) | Presidi: ${presidiVal}${noteVal ? ' | Note: ' + noteVal : ''}`;
+            const logNota = `Check-in Clinico & Lesioni ➔ Condizioni: ${genVal || 'Stabili'} | Piaghe/Cute: ${piagheVal || 'Integra'} | Mappa: ${window.currentMarkers.length} punti segnati | Esito: ${esitoVal}`;
 
             try {
-                window.showToast("⏳ Archiviazione check-in...");
+                window.showToast("⏳ Salvataggio in corso...");
 
-                // 1. Registrazione nella cartella clinica
-                const docRef = db.collection("cartelle_cliniche").doc(window.targetPatient);
-                const docSnap = await docRef.get();
-                let d = docSnap.exists ? docSnap.data() : {};
+                // 1. Aggiornamento cartella clinica dell'ospite (stessi identici campi del gestionale desktop)
+                await db.collection("cartelle_cliniche").doc(window.targetPatient).set({
+                    chkGen: genVal,
+                    chkPiaghe: piagheVal,
+                    bodyMarkers: window.currentMarkers,
+                    checkinEsito: esitoVal,
+                    checkinDataUltima: dataVal,
+                    ultimoOperatoreCheckin: window.activeOperator,
+                    tsUltimoCheckin: Date.now()
+                }, { merge: true });
 
-                if(!d.checkinIntegrazioni) d.checkinIntegrazioni = [];
-                d.checkinIntegrazioni.unshift({
-                    data: dataVal,
-                    orario: timeStr,
-                    op: window.activeOperator,
-                    esito: esitoVal,
-                    zonaIspezionata: window.selectedZoneName,
-                    statoCute: window.selectedCuteStatus,
-                    presidi: presidiVal,
-                    note: noteVal
-                });
-                d.checkinDataUltima = dataVal;
-
-                await docRef.set(d, { merge: true });
-
-                // 2. Aggiunta automatica al diario clinico di reparto
+                // 2. Tracciamento storico nel diario clinico
                 await db.collection("diario_clinico").add({
                     data: timeStr,
                     ospite: window.targetPatient,
                     tipo: 'Clinica',
                     nota: logNota,
+                    puntiLesioni: window.currentMarkers.length,
                     op: window.activeOperator,
                     ts: Date.now()
                 });
 
-                window.showToast("✅ Check-in e ispezione cutanea registrati!");
+                window.showToast("✅ Check-in e lesioni salvati con successo!");
                 setTimeout(() => { window.location.href = 'tablet_hub.html'; }, 1200);
 
             } catch(e) {
-                console.error("Errore salvataggio checkin:", e);
+                console.error("Errore salvataggio check-in:", e);
                 window.showToast("❌ Errore durante il salvataggio.");
             }
         };
+
+        caricaDatiCheckin();
     </script>
 </body>
 </html>
